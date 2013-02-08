@@ -1,11 +1,10 @@
 <package>
-  <description brief="DIAGNOSIS OBSERVERS">
+  <description brief="Diagnosis Observers provides current observations coming from the system">
 
-This package provides all oservers. An observer is a software entity that observers particular 
-property of the system or part of the system.
+This package provides a set of observers like DOBs, GObs, NObs, QObs, BiQObs, MObs, PObs and HObs. An observer is a software entity actin like ROS node that observers particular property of the system or part of the system. Observation is a First Order Logic (FOL) sentence.
 
   </description>
-  <author>Safdar Zaman, Gerald Steinbaue</author>
+  <author>Safdar Zaman, Gerald Steinbauer</author>
   <license>GPLv3</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/tug_ist_diagnosis_observers</url>

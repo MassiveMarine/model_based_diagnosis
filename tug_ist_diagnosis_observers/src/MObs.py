@@ -52,7 +52,7 @@ class Multiple_Observer_Triggered(object):
 					self.pub = rospy.Publisher('/observations', Observations)
 					self.param_in_topic = rospy.get_param('~in_topic', '/Topic1')
 					self.param_out_topic = rospy.get_param('~out_topic', '/Topic2')
-					self.param_tm =  rospy.get_param('~tm', 500)
+					self.param_tm =  rospy.get_param('~tim', 500)
 					self.req_delta_t = float(self.param_tm)/1000.0
 					thread.start_new_thread(self.check_topic,(self.param_in_topic,2))
 					

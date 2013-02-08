@@ -1,10 +1,10 @@
 <package>
-  <description brief="DIAGNOSIS MSGS">
-This package contains all neccessary message types required for diagnosis.
+  <description brief="Diagnosis msgs define all necessary messages for diagnosis system">
+This package contains all neccessary message types required for observations, diagnosis, model server and repair.
 
   </description>
-  <author>Safdar Zaman</author>
-  <license>BSD</license>
+  <author>Safdar Zaman, Gerald Steinbauer</author>
+  <license>GPLv3</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/tug_ist_diagnosis_msgs</url>
   <depend package="actionlib"/>

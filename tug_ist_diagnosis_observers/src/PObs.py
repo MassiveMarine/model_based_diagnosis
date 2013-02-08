@@ -40,10 +40,10 @@ class Property_Observer(object):
 		def __init__(self, argv):
 					rospy.init_node('PObs1', anonymous=True)
 					self.pub = rospy.Publisher('/observations', Observations)
-					self.node = rospy.get_param('~node', 'No_Node')
+					self.node = rospy.get_param('~node', 'Node')
 					self.th = rospy.get_param('~th', 0.2)
 					self.dev = rospy.get_param('~dev', 0.1)
-					self.property = rospy.get_param('~property', 'Mem')
+					self.property = rospy.get_param('~property', 'MEM')
 					self.args = argv
 					if self.node[0] == '/':
 							self.node = self.node[1:len(self.node)]

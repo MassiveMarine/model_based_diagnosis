@@ -123,7 +123,7 @@ class Qualitative_Observer(object):
 					self.caller_id = '/script'
 					self.m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
 					self.param_field = rospy.get_param('~field', 'pose.pose.position.x')
-					self.param_topic = rospy.get_param('~topic', '/Topic1')
+					self.param_topic = rospy.get_param('~topic', '/pose')
 					self.param_ws = rospy.get_param('~ws', 1000)
 					self.param_b = rospy.get_param('~b', 0.0000005)
 					self.ws = float(self.param_ws)/1000.0

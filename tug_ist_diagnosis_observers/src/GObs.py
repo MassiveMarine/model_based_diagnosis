@@ -47,7 +47,7 @@ class General_Observer(object):
 				self.pub = rospy.Publisher('/observations', Observations)
 				self.param_topic = rospy.get_param('~topic', '/Topic')
 				self.param_frq =  rospy.get_param('~frq', 10)
-				self.param_dev = rospy.get_param('~dev', 1)
+				self.param_dev = rospy.get_param('~dev', 5)
 				self.param_ws = rospy.get_param('~ws', 10)
 				self.circular_queu = [0 for i in xrange(self.param_ws)]
 				thread.start_new_thread(self.check_topic,(self.param_topic,0.5))

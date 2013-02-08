@@ -127,22 +127,22 @@ class Qualitative_Observer(object):
 					self.caller_id = '/script'
 					self.m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
 					self.param_field1 = rospy.get_param('~field1', 'pose.pose.position.x')
-					self.param_topic1 = rospy.get_param('~topic1', '/Topic1')
+					self.param_topic1 = rospy.get_param('~topic1', '/pose')
 					self.param_ws1 = rospy.get_param('~ws1', 1000)
 					self.param_b1 = rospy.get_param('~b1', 0.0000005)
 					self.param_field2 = rospy.get_param('~field2', 'pose.pose.position.y')
-					self.param_topic2 = rospy.get_param('~topic2', '/Topic2')
+					self.param_topic2 = rospy.get_param('~topic2', '/pose')
 					self.param_ws2 = rospy.get_param('~ws2', 1000)
 					self.param_b2 = rospy.get_param('~b2', 0.0000005)
 					self.mismatch_thr = rospy.get_param('~thr', 20)
 					self.mode = rospy.get_param('~mode', 'LIN')
-					r1_param = rospy.get_param('~r1','yy')
-					if len(r1_param) != 2:
+					reg_param = rospy.get_param('~reg','yy')
+					if len(reg_param) != 2:
 						print 'r1 parameter should be nn/yy/ny/yn'
 						sys.exit(os.EX_USAGE)
 					else:
-						self.r11 = r1_param[0]
-						self.r12 = r1_param[1]
+						self.r11 = reg_param[0]
+						self.r12 = reg_param[1]
 					self.ws1 = float(self.param_ws1)/1000.0
 					self.ws2 = float(self.param_ws2)/1000.0
 					self.topic1 = ""
@@ -330,7 +330,7 @@ class Qualitative_Observer(object):
 
 
 def report_error():
-				print 'rosrun tug_ist_diagnosis_observers QObs.py <Topic> <Field_variable> <WindowSize>'
+				print 'rosrun tug_ist_diagnosis_observers BiQObs.py <Topic> <Field_variable> <WindowSize>'
 				print 'e.g rosrun tug_ist_diagnosis_observers QObs.py _topic:=/odom _field:=pose.pose.position.x _ws:=1000'
 				sys.exit(os.EX_USAGE)
 			

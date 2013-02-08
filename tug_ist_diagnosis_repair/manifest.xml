@@ -1,11 +1,11 @@
 <package>
-  <description brief="DIAGNOSIS REPAIR">
+  <description brief="Diagnosis Repair Engine repairs the faulty components by using planner and action servers">
 
-This package provides repair. It used PDDL based planner that makes a plan for the action.
+This package provides planner based repair action server. It uses Planning Domain Definition Language (PDDL) based planner that makes a plan for the action by using a domain and problem file. Repair Engine gets diagnosis from diagnosis engine and observations from observers and generates a problem file for the planner. Planner using domain and problem files, generates a set of action plans. Based on action plans repair engine invokes appropriate action server to stop/start a software node or shut-down/power-up a hardware device.
 
   </description>
   <author>Safdar Zaman</author>
-  <license>BSD</license>
+  <license>GPLv3</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/tug_ist_diagnosis_repair</url>
   <depend package="roscpp" />

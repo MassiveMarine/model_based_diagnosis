@@ -1,7 +1,6 @@
 <package>
-  <description brief="DIAGNOSIS ENGINE">
-This package provides a diagnosis engiene. It works as model based diagnosis engine.
-It takes model from model server and provides diagnosis.
+  <description brief="Diagnosis Engine finds which component is faulty and which is working">
+This package provides a diagnosis engine. It is infact a model based diagnosis engine meaning it uses model of correct behavior of the robot system and current observations to compute diagnosis. It takes model from model server and observations from the observers to provide diagnosis.
 
   </description>
   <author>Safdar Zaman, Gerald Steinbauer</author>

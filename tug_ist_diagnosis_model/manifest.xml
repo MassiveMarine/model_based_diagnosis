@@ -1,7 +1,7 @@
 <package>
-  <description brief="DIAGNOSIS MODEL">
+  <description brief="Diagnosis Model provides model of the system">
 
-This package provides diagnosis model. Diagnosis Model is a description of the correct system behavior.
+Diagnosis Model Server is an action server that provides diagnosis model of the system. It reads this model from YAML file which is a description of the correct behavior of the robot system. Diagnosis Model description contains three strings AB for Abnormal, NAB for Not Abnormal, neg_prefix for a prefix denoting a negative literal, and two sets each for propositions and rules. Propositions are first order logic sentences while rules use these propositions to define rules.
 
   </description>
   <author>Safdar Zaman, Gerald Steinbauer</author>

@@ -1,7 +1,7 @@
 <package>
-  <description brief="DIAGNOSIS BOARD">
+  <description brief="Diagnosis Board is for hardware diagnosis">
 This package includes board controller, vurtual board, board simulator. It originally controlles 
-hardware diagnosis board which is responsible of controlling all connected hardware sensors to robot system.
+hardware diagnosis board which is responsible of controlling all connected hardware sensors to the robot system. Hardware diagnosis board can switch on/off the channels, and measure the current and voltage status on each channel.
 
   </description>
   <author>Safdar Zaman, Gerald Steinbauer</author>
