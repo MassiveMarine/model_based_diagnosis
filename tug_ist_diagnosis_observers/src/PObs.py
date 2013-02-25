@@ -38,7 +38,7 @@ import time
 class Property_Observer(object):
 
 		def __init__(self, argv):
-					rospy.init_node('PObs1', anonymous=True)
+					rospy.init_node('PObs', anonymous=True)
 					self.pub = rospy.Publisher('/observations', Observations)
 					self.node = rospy.get_param('~node', 'Node')
 					self.th = rospy.get_param('~th', 0.2)
@@ -50,16 +50,17 @@ class Property_Observer(object):
          
 		def start(self):
 				print 'PObs is up and has started publishsing observations.......'
-				a = commands.getoutput('rosnode info /test_node')
-				a = subprocess.Popen("rosnode info /test_node" , shell=True,stdout=subprocess.PIPE)
+				a = commands.getoutput('rosnode info ' + self.node)
+				a = subprocess.Popen("rosnode info " + self.node , shell=True,stdout=subprocess.PIPE)
 				parts = shlex.split(a.communicate()[0])
-				print "parts", parts
+				print "INFO=", parts
 				indx = parts.index("Pid:")
 				pid = parts[indx+1]
 				while not rospy.is_shutdown():
 					p = subprocess.Popen("top -b -n 1 | grep -i %s" %pid, shell=True,stdout=subprocess.PIPE)
 					self.out = p.communicate()[0]
 					self.out1 = shlex.split(self.out)
+					#print self.out
 					if self.property == 'CPU':
 						self.publish_output(self.out1[8])
 					else:
@@ -67,13 +68,17 @@ class Property_Observer(object):
 					
 		def publish_output(self,obtained_val):
 					obs_msg = []
-					if (float(obtained_val) >= float(self.th) - float(self.dev)) | (float(obtained_val) <= float(self.th) + float(self.dev))  :
-							print 'ok('+self.property+','+self.node+')'
-							obs_msg.append('ok('+self.property+','+self.node+')')
+					print float(obtained_val)
+					print float(self.th) - float(self.dev)
+					if (float(obtained_val) >= float(self.th) - float(self.dev)) & (float(obtained_val) <= float(self.th) + float(self.dev))  :
+							print self.out
+							print 'ok('+self.node+','+self.property+')'
+							obs_msg.append('ok('+self.node+','+self.property+')')
 							self.pub.publish(Observations(time.time(),obs_msg))
 					else:
-							print '~ok('+self.property+','+self.node+')'
-							obs_msg.append('~ok('+self.property+','+self.node+')')
+							print self.out
+							print '~ok('+self.node+','+self.property+')'
+							obs_msg.append('~ok('+self.node+','+self.property+')')
 							self.pub.publish(Observations(time.time(),obs_msg))
 						
 				
@@ -86,7 +91,8 @@ e.g rosrun tug_ist_diagnosis_observers PObs.py _node:=openni_camera _property:=C
 		sys.exit(os.EX_USAGE)        
     
 if __name__ == '__main__':
-			if len(sys.argv) < 3: 
+			print len(sys.argv)
+			if len(sys.argv) < 2: 
 				report_error()
 			pObs = Property_Observer(sys.argv)
 			pObs.start()

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 ##
 # QObs.py is a Qualitative Observer.
 # It needs three parameters Required frequency, frequency deviation and window size.
@@ -25,7 +24,7 @@
 # It publishes this trned of the vaule overs /observations topic compatible for our Model Based Diagnosis.
 # It needs topic name, vaule name in the message with all fields seperated by space, window size(miliseconds).
 
-import roslib; roslib.load_manifest('tug_ist_diagnosis_observers')
+import roslib.message; roslib.load_manifest('tug_ist_diagnosis_observers')
 import rospy
 import sys
 import xmlrpclib
@@ -198,7 +197,8 @@ class Qualitative_Observer(object):
     def check_thread(self,string,sleeptime,*args):
 				while True:
 						t = 0
-						pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
+						m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
+						pubcode, statusMessage, topicList = m.getPublishedTopics(self.caller_id, "")
 						for item in topicList:
 							if item[0] == string:
 									t = 1
@@ -210,7 +210,7 @@ class Qualitative_Observer(object):
 
     def report_error(self):
 				print 'rosrun tug_ist_diagnosis_observers QObs.py <Topic> <Field_variable> <WindowSize>'
-				print 'e.g rosrun tug_ist_diagnosis_observers QObs.py _topic:=/odom _field:=pose.pose.position.x _ws:=1000'
+				print 'e.g rosrun tug_ist_diagnosis_observers QObs.py _topic:=/odom _field:=pose.pose.position.x _ws:=1000 _b:=0.0005'
 				sys.exit(os.EX_USAGE)
 			
 if __name__=="__main__":
