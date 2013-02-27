@@ -2,7 +2,7 @@
 
 ##
 # PObs.py is a Property Observer.
-# It needs three parameters Required frequency, frequency deviation and window size.
+# It needs five parameters node name, property(either cpu or mem), maximum value, mismatch threshold and window size.
 # Copyright (c).2012. OWNER: Institute for Software Technology, TU Graz Austria.
 # Authors: Safdar Zaman, Gerald Steinbauer. (szaman@ist.tugraz.at, steinbauer@ist.tugraz.at)
 # All rights reserved.
@@ -22,8 +22,8 @@
 
 # The Property Observer observers a specific hardware/software property related to a node. 
 # A property could be CPU usage , Memory usage or any other resourse.
-# It publishes this property over /Diagnosic_Observation topic compatible for our Model Based Diagnosis.
-# It needs topic name, proerty name.
+# It publishes this property over /observations topic compatible for our Model Based Diagnosis.
+
 
 import roslib; roslib.load_manifest('tug_ist_diagnosis_observers')
 import commands
@@ -38,57 +38,79 @@ import time
 class Property_Observer(object):
 
 		def __init__(self, argv):
-					rospy.init_node('PObs', anonymous=True)
-					self.pub = rospy.Publisher('/observations', Observations)
-					self.node = rospy.get_param('~node', 'Node')
-					self.th = rospy.get_param('~th', 0.2)
-					self.dev = rospy.get_param('~dev', 0.1)
-					self.property = rospy.get_param('~property', 'MEM')
-					self.args = argv
-					if self.node[0] == '/':
-							self.node = self.node[1:len(self.node)]
+			rospy.init_node('PObs', anonymous=True)
+			self.pub = rospy.Publisher('/observations', Observations)
+			self.param_node = rospy.get_param('~node', 'Node')
+			self.param_property = rospy.get_param('~property', 'MEM')
+			self.param_max = rospy.get_param('~max_val', 0.2)
+			self.param_mis_th = rospy.get_param('~mismatch_thr', 5)
+			self.param_ws = rospy.get_param('~ws', 10)
+			self.circular_queu = [0 for i in xrange(self.param_ws)]
+			self.mismatch_counter = 0
+			self.args = argv
+			self.sum = 0
+			if self.param_node[0] == '/':
+				self.node = self.node[1:len(self.node)]
          
 		def start(self):
-				print 'PObs is up and has started publishsing observations.......'
-				a = commands.getoutput('rosnode info ' + self.node)
-				a = subprocess.Popen("rosnode info " + self.node , shell=True,stdout=subprocess.PIPE)
-				parts = shlex.split(a.communicate()[0])
-				print "INFO=", parts
-				indx = parts.index("Pid:")
-				pid = parts[indx+1]
-				while not rospy.is_shutdown():
-					p = subprocess.Popen("top -b -n 1 | grep -i %s" %pid, shell=True,stdout=subprocess.PIPE)
-					self.out = p.communicate()[0]
-					self.out1 = shlex.split(self.out)
-					#print self.out
-					if self.property == 'CPU':
-						self.publish_output(self.out1[8])
-					else:
-						self.publish_output(self.out1[9])
+			print 'PObs is up and has started publishsing observations.......'
+			a = subprocess.Popen("rosnode info " + self.param_node , shell=True,stdout=subprocess.PIPE)
+			parts = shlex.split(a.communicate()[0])
+			indx = parts.index("Pid:")
+			pid = parts[indx+1]
+			p = subprocess.Popen("top -b -n 1 | grep -i %s" %pid, shell=True,stdout=subprocess.PIPE)
+			self.out = p.communicate()[0]
+			self.out1 = shlex.split(self.out)
+			if (self.param_property == 'CPU') | (self.param_property == 'cpu') :
+				indx = 8
+			else:
+				indx = 9
+			while not rospy.is_shutdown():
+				self.circular_queu.pop(0)
+				p = subprocess.Popen("top -b -n 1 | grep -i %s" %pid, shell=True,stdout=subprocess.PIPE)
+				self.out = p.communicate()[0]
+				print self.out
+				self.out1 = shlex.split(self.out)
+				self.circular_queu.append(float(self.out1[indx]))
+				avg_val = self.average()
+				self.publish_output(avg_val)
+
+		def average(self):
+			s = 0
+			for val in self.circular_queu:
+				print val
+				s = s + val
+			print "AVG=", s/self.param_ws
+			return s/self.param_ws
+
+			
 					
 		def publish_output(self,obtained_val):
-					obs_msg = []
-					print float(obtained_val)
-					print float(self.th) - float(self.dev)
-					if (float(obtained_val) >= float(self.th) - float(self.dev)) & (float(obtained_val) <= float(self.th) + float(self.dev))  :
-							print self.out
-							print 'ok('+self.node+','+self.property+')'
-							obs_msg.append('ok('+self.node+','+self.property+')')
-							self.pub.publish(Observations(time.time(),obs_msg))
-					else:
-							print self.out
-							print '~ok('+self.node+','+self.property+')'
-							obs_msg.append('~ok('+self.node+','+self.property+')')
-							self.pub.publish(Observations(time.time(),obs_msg))
-						
-				
+			obs_msg = []
+			if (obtained_val <= float(self.param_max)):
+				if self.mismatch_counter != 0:
+					self.mismatch_counter = self.mismatch_counter - 1	
+				print 'ok('+self.param_node+','+self.param_property+')'
+				obs_msg.append('ok('+self.param_node+','+self.param_property+')')
+				self.pub.publish(Observations(time.time(),obs_msg))
+			else:
+				self.mismatch_counter = self.mismatch_counter + 1
+				if self.mismatch_counter < self.param_mis_th:
+					print 'ok('+self.param_node+','+self.param_property+')'
+					obs_msg.append('ok('+self.param_node+','+self.param_property+')')
+					self.pub.publish(Observations(time.time(),obs_msg))
+				else:
+					print '~ok('+self.param_node+','+self.param_property+')'
+					obs_msg.append('~ok('+self.param_node+','+self.param_property+')')
+					self.pub.publish(Observations(time.time(),obs_msg))
+			
 
 def report_error():
-		print """
-rosrun tug_ist_diagnosis_observers PObs.py _node:=<Node_name> _property:=<Mem/Cpu> _th:=<Threshold> _dev:=<Deviation>
-e.g rosrun tug_ist_diagnosis_observers PObs.py _node:=openni_camera _property:=CPU _th:=.2 _dev:=.1'
+	print """
+rosrun tug_ist_diagnosis_observers PObs.py _node:=<Node_name> _property:=<Mem/Cpu> _max_value:=<maximumLimit> _mismatch_thr:=<mistmachthr> _ws:=<windowsize>
+e.g rosrun tug_ist_diagnosis_observers PObs.py _node:=openni_camera _property:=CPU _max_value:=0.2 _mismatch_thr:=5'
 """
-		sys.exit(os.EX_USAGE)        
+	sys.exit(os.EX_USAGE)        
     
 if __name__ == '__main__':
 			print len(sys.argv)

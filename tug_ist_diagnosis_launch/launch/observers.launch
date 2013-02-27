@@ -11,14 +11,14 @@
  
 
  <node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="ariaGObserver" >
-  <param name="topic" value="/aria_node_topic" />
+  <param name="topic" value="aria_node_topic" />
   <param name="frq" value="10" />
   <param name="dev" value="5" />
   <param name="ws" value="10" />
  </node>
 
  <node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="laserGObserver" >
-  <param name="topic" value="/laser_node_topic" />
+  <param name="topic" value="laser_node_topic" />
   <param name="frq" value="10" />
   <param name="dev" value="5" />
   <param name="ws" value="10" />

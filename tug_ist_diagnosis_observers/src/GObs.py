@@ -47,7 +47,7 @@ class General_Observer(object):
 				self.pub = rospy.Publisher('/observations', Observations)
 				self.param_topic = rospy.get_param('~topic', '/Topic')
 				self.param_frq =  rospy.get_param('~frq', 10)
-				self.param_dev = rospy.get_param('~dev', 5)
+				self.param_dev = rospy.get_param('~dev', 1)
 				self.param_ws = rospy.get_param('~ws', 10)
 				self.circular_queu = [0 for i in xrange(self.param_ws)]
 				thread.start_new_thread(self.check_topic,(self.param_topic,0.5))
@@ -74,7 +74,6 @@ class General_Observer(object):
 						rospy.spin()
 					else:
 						self.msg = '~ok('+self.topic_name+')'
-						rospy.loginfo('Observer='+rospy.get_name()+',Topic=\\'+self.topic_name+','+self.msg)
 						self.pub.publish(Observations(time.time(),[self.msg]))
 					time.sleep(1)
 			
@@ -87,6 +86,7 @@ class General_Observer(object):
 						self.circular_queu.append(delta_t)
 						avg_delta_t = self.average_delta_t()
 						calculated_freq = 1/avg_delta_t
+						print calculated_freq, avg_delta_t
 						diff_freq = abs(self.param_frq - calculated_freq )
 						self.make_output(diff_freq)
 						self.prev_t = curr_t
@@ -122,6 +122,7 @@ class General_Observer(object):
 						m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
 						pubcode, statusMessage, topicList = m.getPublishedTopics(self.caller_id, "")
 						for item in topicList:
+							#print item[0][1:len[item]],string
 							if item[0] == string:
 									t = 1
 									if time.time() - self.prev_t > 2 :
