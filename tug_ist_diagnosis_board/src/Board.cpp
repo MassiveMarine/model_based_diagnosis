@@ -18,7 +18,7 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */ 
 
-
+//#include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -32,7 +32,7 @@
 #include <stdlib.h>
 
 int BUFF_SIZE;
-int sock, connected, bytes_recieved , True = 1;  
+int sock, connected, bytes_recieved , True = 1, broadcastFrq;  
 char send_data[255] , recv_data[255];
 unsigned char nbuffer[255];
 unsigned char * p;
@@ -49,7 +49,30 @@ struct board
 struct board board_info; 
 struct sockaddr_in server_addr,client_addr;    
 int sin_size;
-unsigned char b_frq;
+
+void set_channels(void)
+{
+            for(int channel=0;channel<MAX_channels;channel++)
+           {
+             if((channel%2)==0)
+               { 
+                 board_info.on_off[channel] = 0;
+                 board_info.max_vol[channel] = channel*10+0.1*channel;
+                 board_info.max_cur[channel] = channel*20+0.1*channel;
+                 board_info.pr_vol[channel] = channel-1+0.1*channel;
+                 board_info.pr_cur[channel] = channel+1+0.1*channel;
+              }
+             else
+                {
+                 board_info.on_off[channel] = 0;
+                 board_info.max_vol[channel] = channel*5+0.1*channel;
+                 board_info.max_cur[channel] = channel*8+0.1*channel;
+                 board_info.pr_vol[channel] = channel+0.1*channel;
+                 board_info.pr_cur[channel] = channel+2+0.1*channel;
+                 }
+           }        
+
+}
 
 void take_boardSpecifications()
 {          
@@ -83,11 +106,9 @@ void take_boardSpecifications()
           p+=4;
           }
           BUFF_SIZE = 4+1+8*channels;
-          //printf("\n SENT DATA from Server: delim = %i , command = %i , length = %i , Channels = %i " , nbuffer[0], nbuffer[1], nbuffer[2] , nbuffer[4]);
           offset = 5;
           for(int channel=0;channel<channels;channel++)
           {
-           //printf("\n Channel# : %d, Max_Vol= %f, Max_Cur= %f", channel,*((float *)(nbuffer+offset)), *((float *)(nbuffer+offset+4)));
            offset +=8;
           }
 }                
@@ -127,21 +148,13 @@ void take_boardMeasurments()
           }
 
           BUFF_SIZE = 4+1+9*channels;
-          //printf("\n SENT DATA from Server: delim = %i , command = %i , length = %i , Channels = %i " , nbuffer[0], nbuffer[1], nbuffer[2] , nbuffer[4]);
-
-          int offset = 5;
-          for(int channel=0;channel<channels;channel++)
-          {
-           //printf("\n Channel# : %d, On/Off= %i, Present_Curr= %f, Present_Vol= %f", channel,nbuffer[offset] ,*((float *)(nbuffer+offset+1)), *((float *)(nbuffer+offset+5)));
-           offset+=9;
-          }
-          
+         
 					
 }
 
 bool check_Command(unsigned char *buf)
 { 
-  printf("\n RECIEVED from Client:\ndelim = %i , command = %i , length = %d" ,*recv_data, *(&recv_data[1]), *(&recv_data[2]),*((float *)(nbuffer+5)));
+  //printf("\n RECIEVED from Client:\ndelim = %i , command = %i , length = %d" ,*recv_data, *(&recv_data[1]), *(&recv_data[2]),*((float *)(nbuffer+5)));
 }
 void send_Ack()
 {         
@@ -164,19 +177,24 @@ void send_Ack()
           
           BUFF_SIZE = 5;
           send(connected,(void*)&nbuffer,BUFF_SIZE, 0);
-          printf("\n ACK from Server: delim = %i , command = %i , length = %i , ecode = %i " , nbuffer[0], nbuffer[1], nbuffer[2] , nbuffer[4]);
+          
          
 }
 
 void switch_OnOffChannel(char channel, char status)
 {
-printf("%i channel to %c ",channel,status);
 int ch;
+int state;
 ch = (int) channel;
-board_info.on_off[ch] = status;
+ch = ch - 48;
+state = (int) status;
+state = state - 48;
+if(state>1)
+state = 1;
+board_info.on_off[ch] = state;
 }
 
-void BoradcastWithFrq()
+void BoradcastWithFrq(int connected)
 {
 
 while(true)
@@ -184,37 +202,53 @@ while(true)
     
     take_boardMeasurments(); 
     send(connected,(void*)&nbuffer,BUFF_SIZE, 0);
-    sleep(1);
-    //printf("Broadcast FRQ = %d ",b_frq);
+    double Frq = ((double)1/broadcastFrq);
+    sleep(Frq);
  }
+}
 
+void thread_for_client(int connected)
+{
+            boost::thread broadcaster;
 
+            take_boardSpecifications();
+            char command=0;
+            while (1)
+            { 
+              if(command!=4)
+              send(connected,(void*)&nbuffer,BUFF_SIZE, 0);
+              bytes_recieved = recv(connected,recv_data,255,0);
+              
+                   
+              command = recv_data[1];
+              if(command==1)
+                   {
+                    printf("\n RECIEVED from Client(%d):\ndelim = %i, command = %i,length = %d, BroadCastFrequency = %d", connected ,*recv_data, *(&recv_data[1]), *(&recv_data[2]), *((unsigned char *)&recv_data[4]));
+		    unsigned char b_frq = *((unsigned char *)&recv_data[4]);
+		    broadcastFrq = (int) b_frq;
+		    broadcaster.interrupt();
+                    broadcaster = boost::thread(BoradcastWithFrq, connected);
+                    
+                   }
+              else if(command==3)
+                 { printf("\n RECIEVED from Client(%d):\ndelim = %i, command = %i,length = %i " ,connected ,*recv_data, *(&recv_data[1]), *(&recv_data[2]), *(&recv_data[4]), *(&recv_data[5]));
+                   send_Ack();
+                   take_boardMeasurments();
+                 }
+              else if(command==4)
+                   {
+                     switch_OnOffChannel(*(&recv_data[4]),*(&recv_data[5]));
+                     printf("\n RECIEVED from Client(%d):\ndelim = %i, command = %i,length = %d,channel = %c, State = %c ", connected ,*recv_data, *(&recv_data[1]), *(&recv_data[2]), *(&recv_data[4]), *(&recv_data[5]));
+                    send_Ack();
+                   }
+              fflush(stdout);
+            }
 }
 
 
 
 int main()
 {
-
-        for(int channel=0;channel<MAX_channels;channel++)
-           {
-             if((channel%2)==0)
-               { 
-                 board_info.on_off[channel] = 1;
-                 board_info.max_vol[channel] = channel*10+0.1*channel;
-                 board_info.max_cur[channel] = channel*20+0.1*channel;
-                 board_info.pr_vol[channel] = channel-1+0.1*channel;
-                 board_info.pr_cur[channel] = channel+1+0.1*channel;
-              }
-             else
-                {
-                 board_info.on_off[channel] = 1;
-                 board_info.max_vol[channel] = channel*5+0.1*channel;
-                 board_info.max_cur[channel] = channel*8+0.1*channel;
-                 board_info.pr_vol[channel] = channel+0.1*channel;
-                 board_info.pr_cur[channel] = channel+2+0.1*channel;
-                 }
-           }        
 
         if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
             perror("Socket");
@@ -242,60 +276,22 @@ int main()
             exit(1);
         }
 		
-	      printf("\nTCPServer Waiting for client on port 5000");
+	      
         fflush(stdout);
-
-        boost::thread broadcaster;
+        set_channels();
+        boost::thread cthread;
         
         while(1)
         {  
 
             sin_size = sizeof(struct sockaddr_in);
- 
-            connected = accept(sock, (struct sockaddr *)&client_addr, (socklen_t*)&sin_size);
+            printf("TCPServer Waiting for client on port 5000.....\n");
+            int client_sock = accept(sock, (struct sockaddr *)&client_addr, (socklen_t*)&sin_size);
 
-            printf("\n I got a connection from (%s , %d)",
+            printf(" Got request for connection from (%s , %d)\n",
                    inet_ntoa(client_addr.sin_addr),ntohs(client_addr.sin_port));
-
-            take_boardSpecifications();
-            char command=0;
-            while (1)
-            { 
-              if(command!=4)
-              send(connected,(void*)&nbuffer,BUFF_SIZE, 0);
-              bytes_recieved = recv(connected,recv_data,255,0);
-              
-                   
-              command = recv_data[1];
-              if(command==1)
-                   {
-                    printf("\n RECIEVED from Client:\ndelim = %i, command = %i,length = %d, BroadCastFrequency = %d" ,*recv_data, *(&recv_data[1]), *(&recv_data[2]), *((unsigned char *)&recv_data[4]));
-		    b_frq = *((unsigned char *)&recv_data[4]);
-                    //int a = b_frq;
-		    //float b = 1/a;
-                    //printf("Broadcast FRQ = %d, a=%d, Sleep(%f) ",b_frq,a,b);
-                    broadcaster.interrupt();
-                    broadcaster = boost::thread(BoradcastWithFrq);
-                    //take_boardMeasurments();
-                   }
-              else if(command==3)
-                 { printf("\n RECIEVED from Client:\ndelim = %i, command = %i,length = %i " ,*recv_data, *(&recv_data[1]), *(&recv_data[2]), *(&recv_data[4]), *(&recv_data[5]));
-                   send_Ack();
-                   take_boardMeasurments();
-                 }
-              else if(command==4)
-                   {
-                     switch_OnOffChannel(*(&recv_data[4]),*(&recv_data[5]));
-                     printf("\n RECIEVED from Client:\ndelim = %i, command = %i,length = %d,channel = %i, State = %i " ,*recv_data, *(&recv_data[1]), *(&recv_data[2]), *(&recv_data[4]), *(&recv_data[5]));
-                    send_Ack();
-                   }
-              
-                    
- 
-              fflush(stdout);
-
-            }
-        }       
+	    cthread = boost::thread(thread_for_client, client_sock);
+      }       
 
       close(sock);
       return 0;

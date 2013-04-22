@@ -42,7 +42,6 @@ rosbuild_add_boost_directories()
 rosbuild_add_executable(board_controller src/main.cpp src/Message.cpp src/Controller.cpp src/Measurment.cpp src/Specification.cpp)
 rosbuild_add_executable(board_simulator src/ClientMain.cpp src/Client.cpp)
 rosbuild_add_executable(virtual_diagnosis_board src/Board.cpp)
-rosbuild_add_executable(virtual_board_driver src/BoardTest.cpp)
 rosbuild_link_boost(virtual_diagnosis_board thread)
 rosbuild_add_executable(NodeActionServer src/NodeActionServer.cpp)
 
