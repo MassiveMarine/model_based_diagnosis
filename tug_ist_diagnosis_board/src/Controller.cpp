@@ -150,11 +150,11 @@ while(1)
     switch(command)
     {
       case 0:
-      			msg = new MessageSpefications(delim,command,data_length);
+      	    msg = new MessageSpefications(delim,command,data_length);
             msg->parseBuffer(bufPtr);
       break;
       case 2:
-      			msg = new MessageMeasurments(delim,command,data_length);
+      	    msg = new MessageMeasurments(delim,command,data_length);
             msg->parseBuffer(bufPtr);
       break;
       case 5:

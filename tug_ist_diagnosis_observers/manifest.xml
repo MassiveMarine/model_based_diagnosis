@@ -12,6 +12,7 @@ This package provides a set of observers like DOBs, GObs, NObs, QObs, BiQObs, MO
   <depend package="rospy"/>
   <depend package="rosgraph"/>
   <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
   <depend package="tug_ist_diagnosis_msgs"/>
   <depend package="rostopic"/>
   <depend package="diagnostic_msgs"/>

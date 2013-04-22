@@ -40,7 +40,7 @@ class Node_Observer(object):
 					self.m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
 					self.msg = ""
 					self.pub = rospy.Publisher('/observations', Observations)
-					self.param_node_name = rospy.get_param('~node', '/NObs1')
+					self.param_node_name = rospy.get_param('~node', '/NoNode')
 
          
     def start(self):

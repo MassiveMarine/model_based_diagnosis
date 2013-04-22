@@ -113,7 +113,7 @@ int port;
 string ip; 
 n.param<int>("port", port, 5000);
 n.param<string>("ip", ip, "127.0.0.1");
-contl = new Controller(200,ip,port);
+contl = new Controller(1,ip,port);
 
 boardServer bserver(n, "board_server", boost::bind(&execute, _1, &bserver), false);
 switchServer pserver(n, "power_up", boost::bind(&power_up, _1, &pserver), false);

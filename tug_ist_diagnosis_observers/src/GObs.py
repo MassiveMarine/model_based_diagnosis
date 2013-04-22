@@ -85,7 +85,7 @@ class General_Observer(object):
 						delta_t = curr_t - self.prev_t
 						self.circular_queu.append(delta_t)
 						avg_delta_t = self.average_delta_t()
-						calculated_freq = 1/avg_delta_t
+						calculated_freq = 1/float(avg_delta_t)
 						print calculated_freq, avg_delta_t
 						diff_freq = abs(self.param_frq - calculated_freq )
 						self.make_output(diff_freq)
@@ -113,7 +113,7 @@ class General_Observer(object):
         s = 0
         for val in self.circular_queu:
             s = s + val
-        return s/self.param_ws
+        return s/float(self.param_ws)
 
     def check_topic(self,string,sleeptime,*args):
 				try:
@@ -121,8 +121,9 @@ class General_Observer(object):
 						t = 0
 						m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
 						pubcode, statusMessage, topicList = m.getPublishedTopics(self.caller_id, "")
+						#print topicList
 						for item in topicList:
-							#print item[0][1:len[item]],string
+							print item[0][1:],string
 							if item[0] == string:
 									t = 1
 									if time.time() - self.prev_t > 2 :

@@ -73,7 +73,7 @@ class Diagnostic_Observer(object):
 										self.pub.publish(Observations(time.time(),obs_msg))
 									elif a[i].level == 1:
 										print "Name:",a[i].name, "WARNINNG"
-										obs_msg.append('n_ok('+self.param_dev_node+')')
+										obs_msg.append('ok('+self.param_dev_node+')')
 										self.pub.publish(Observations(time.time(),obs_msg))
 									else:
 										print "Name:",a[i].name, "ERROR"

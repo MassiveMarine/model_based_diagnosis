@@ -1,0 +1,14 @@
+<package>
+  <description brief="Diagnosis Generator">
+
+Diagnosis Model System needs diagnois model of the correct behavior of the system. Diagnosis generator generates this diagnosis model automatically by continously observing and extracting parmaters from the system run. It takes the running system, extracts running nodes, extracts existing topics and their related information. It calculates frequencies of the topics, memory and cpu usage for each node. On the basis of acquired information, it generates diagnosis model, and list of observers for model based diagnosis system.
+
+  </description>
+  <author>Safdar Zaman, Gerald Steinbauer</author>
+  <license>GPLv3</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tug_ist_diagnosis_generator</url>
+
+</package>
+
+

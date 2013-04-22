@@ -9,10 +9,6 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
 
-#rosbuild_find_ros_package(actionlib_msgs)
-#include(${actionlib_msgs_PACKAGE_PATH}/cmake/actionbuild.cmake)
-#genaction()
-
 rosbuild_init()
 
 #set the default path for built executables to the "bin" directory
@@ -32,22 +28,3 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
-#rosbuild_add_executable(Imu2RPY src/Imu2RPY.cpp)
-#rosbuild_add_executable(Odom2RPY src/Odom2RPY.cpp)
-#rosbuild_add_executable(mapYaw src/mapYaw.cpp)
-#rosbuild_add_executable(rpy_4_odom_imu_map src/rpy_4_odom_imu_map.cpp)
-
-rosbuild_add_boost_directories()
-
-rosbuild_add_executable(board_controller src/main.cpp src/Message.cpp src/Controller.cpp src/Measurment.cpp src/Specification.cpp)
-rosbuild_add_executable(board_simulator src/ClientMain.cpp src/Client.cpp)
-rosbuild_add_executable(virtual_diagnosis_board src/Board.cpp)
-rosbuild_add_executable(virtual_board_driver src/BoardTest.cpp)
-rosbuild_link_boost(virtual_diagnosis_board thread)
-rosbuild_add_executable(NodeActionServer src/NodeActionServer.cpp)
-
-
-
-
-
-

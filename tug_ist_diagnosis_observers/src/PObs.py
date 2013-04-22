@@ -80,11 +80,9 @@ class Property_Observer(object):
 			for val in self.circular_queu:
 				print val
 				s = s + val
-			print "AVG=", s/self.param_ws
 			return s/self.param_ws
 
-			
-					
+				
 		def publish_output(self,obtained_val):
 			obs_msg = []
 			if (obtained_val <= float(self.param_max)):
