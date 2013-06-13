@@ -39,7 +39,7 @@ class Diagnostic_Observer(object):
 					self.topic = ""
 					self.topic_type = ""
 					self.pub = rospy.Publisher('/observations', Observations)
-					self.param_dev_node = rospy.get_param('~dev_node', 'hokuyo_node')
+					self.param_dev_node = rospy.get_param('~node', 'hokuyo_node')
 					thread.start_new_thread(self.check_topic,(self.top,2))
          
     def start(self):
@@ -67,6 +67,7 @@ class Diagnostic_Observer(object):
 						while (i<len(a)):
 								obs_msg = []
 								if self.param_dev_node in a[i].name :
+									print a[i].name
 									if a[i].level == 0:
 										print "Name:",a[i].name, "OK"
 										obs_msg.append('ok('+self.param_dev_node+')')
@@ -80,6 +81,7 @@ class Diagnostic_Observer(object):
 										obs_msg.append('n_ok('+self.param_dev_node+')')
 										self.pub.publish(Observations(time.time(),obs_msg))
 								else:
+									 print a[i].name
 									 print self.param_dev_node + " not found."
 								i = i+1
 

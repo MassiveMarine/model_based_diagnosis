@@ -22,7 +22,7 @@
 # The Binary Qualitative Observer observers a trends of two particular values of messages on a two topics
 # and publishes match or mismatch between them.
 
-import roslib; roslib.load_manifest('tug_ist_diagnosis_observers')
+import roslib.message; roslib.load_manifest('tug_ist_diagnosis_observers')
 import rospy
 import sys
 import xmlrpclib
@@ -35,13 +35,14 @@ import time
 import thread
 
 class Regression(object):
-		def __init__(self,ws,b):
+		def __init__(self,ws,pb,nb):
 				self.s   = [[],[],[],[]]
 				self.t  = []
 				self.prev_value = 0
 				self.ws = ws
 				self.n = None
-				self.b = b;
+				self.pb = pb;
+				self.nb = nb;
 				self.choice = 'n'
 				self.value = 0
 
@@ -56,10 +57,10 @@ class Regression(object):
 				self.s[2].append(value)
 				self.s[3].append(value)
 				self.t.append(time)
-				trend = self.find_slope(self.b)
+				trend = self.find_slope(self.pb,self.nb)
 				return trend	
 
-		def find_slope(self,b):
+		def find_slope(self,pb,nb):
 				if self.choice == 'y':
 					r1 = self.linear_regression(self.ws,self.s[0],self.t)
 				else:
@@ -73,13 +74,13 @@ class Regression(object):
 				self.s[3].pop()
 				self.s[3].append(r3)
 				self.remove_tails()
-				if r1<-self.b:
+				if r1<nb:
 						self.prev_value = -1
 						return -1
-				elif r1>self.b:
+				elif r1>pb:
 						self.prev_value = +1
 						return +1
-				elif ~(( (r2>-self.b)&(r2<self.b) ) & ( (r3>-self.b)&(r3<self.b) )):
+				elif ~(( (r2>nb)&(r2<pb) ) & ( (r3>nb)&(r3<pb) )):
 						self.prev_value = 0
 						return 0
 				else:
@@ -129,12 +130,14 @@ class Qualitative_Observer(object):
 					self.param_field1 = rospy.get_param('~field1', 'pose.pose.position.x')
 					self.param_topic1 = rospy.get_param('~topic1', '/pose')
 					self.param_ws1 = rospy.get_param('~ws1', 1000)
-					self.param_b1 = rospy.get_param('~b1', 0.0000005)
+					self.param_pb1 = rospy.get_param('~pb1', 0.0000005)
+					self.param_nb1 = rospy.get_param('~nb1', -0.0000005)
 					self.param_field2 = rospy.get_param('~field2', 'pose.pose.position.y')
 					self.param_topic2 = rospy.get_param('~topic2', '/pose')
 					self.param_ws2 = rospy.get_param('~ws2', 1000)
-					self.param_b2 = rospy.get_param('~b2', 0.0000005)
-					self.mismatch_thr = rospy.get_param('~thr', 20)
+					self.param_pb2 = rospy.get_param('~pb2', 0.0000005)
+					self.param_nb2 = rospy.get_param('~nb2', -0.0000005)
+					self.mismatch_thr = rospy.get_param('~thr', 30)
 					self.mode = rospy.get_param('~mode', 'LIN')
 					reg_param = rospy.get_param('~reg','yy')
 					if len(reg_param) != 2:
@@ -207,13 +210,13 @@ class Qualitative_Observer(object):
 						if self.mode == 'DRV1':
 							rospy.Subscriber(self.topic1, msg_class1, self.drv_call_back)
 							rospy.Subscriber(self.topic2, msg_class2, self.call_back2)
-							self.regression1 = Regression(self.ws1,self.param_b1)
-							self.regression2 = Regression(self.ws2,self.param_b2)
+							self.regression1 = Regression(self.ws1,self.param_pb1,self.param_nb1)
+							self.regression2 = Regression(self.ws2,self.param_pb2,self.param_nb2)
 						else:
 							rospy.Subscriber(self.topic1, msg_class1, self.call_back1)
 							rospy.Subscriber(self.topic2, msg_class2, self.call_back2)
-							self.regression1 = Regression(self.ws1,self.param_b1)
-							self.regression2 = Regression(self.ws2,self.param_b2)
+							self.regression1 = Regression(self.ws1,self.param_pb1,self.param_nb1)
+							self.regression2 = Regression(self.ws2,self.param_pb2,self.param_nb2)
 						thread.start_new_thread(self.BQObs_thread,(self.param_topic1,self.param_topic2,0.2))
 						rospy.spin()
 					time.sleep(1)
@@ -262,19 +265,21 @@ class Qualitative_Observer(object):
 							self.topic2 = self.topic2[1:len(self.topic2)]
 				obs_msg = []
 				if self.Trend1 == self.Trend2:
-						if self.mismatch != 0:
+						if self.mismatch > 0:
 							self.mismatch = self.mismatch - 1
 				else:
 						self.mismatch = self.mismatch + 1
 
-				rospy.loginfo('mismatch='+str(self.mismatch)+',thr='+str(self.mismatch_thr))
+				#rospy.loginfo('mismatch='+str(self.mismatch)+',thr='+str(self.mismatch_thr))
+				field1 = self.param_field1.replace('.', '_')
+				field2 = self.param_field2.replace('.', '_')
 				if self.mismatch <= self.mismatch_thr:
-						rospy.loginfo('matched('+self.topic1+','+self.topic2+')')
-						obs_msg.append('matched('+self.topic1+','+self.topic2+')')
+						rospy.loginfo('matched('+self.topic1+','+field1+','+self.topic2+','+field2+')')
+						obs_msg.append('matched('+self.topic1+','+field1+','+self.topic2+','+field2+')')
 						self.pub.publish(Observations(time.time(),obs_msg))
 				else:
-						rospy.loginfo('~matched('+self.topic1+','+self.topic2+')')
-						obs_msg.append('~matched('+self.topic1+','+self.topic2+')')
+						rospy.loginfo('~matched('+self.topic1+','+field1+','+self.topic2+','+field2+')')
+						obs_msg.append('~matched('+self.topic1+','+field1+','+self.topic2+','+field2+')')
 						self.pub.publish(Observations(time.time(),obs_msg))
 		
     def BQObs_thread(self,topic1,topic2,sleeptime,*args):

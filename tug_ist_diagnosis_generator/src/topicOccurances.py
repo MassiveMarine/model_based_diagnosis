@@ -30,35 +30,40 @@ import time
 import shlex
 import thread
 from math import sqrt
+import time
 class Generator(object):
 	def __init__(self):
 		rospy.init_node('observers_generator', anonymous=False)
 		self.m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
 		self.caller_id = '/script'
+		self.mapping = []
+		self.dataMAT = [[]]
+		self.dataFile = open('safdarFile', 'w')
 		
-
 	def start(self):
 		self.extract_nodes_topics()
-		
+
+	def end(self):
+		self.dataFile.close()
 
 	def callback(self,data,topic):
-		rospy.loginfo('from '+topic)
-
-
+		curr_t = time.time()
+		self.dataFile.write(str(curr_t)+'\n')
+		rospy.loginfo('type = '+str(data.header))
+		
 
 	def extract_nodes_topics(self):
 		pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
-		#print topicList			
 		for topic in topicList:
 			if (topic[0] == '/rosout') | (topic[0] == '/rosout_agg'):
 				continue
-			#if topic[0] not in self.topics_list:
-			#self.topics_list.append(topic[0])
+			#self.mapping[9] = topic[1]
+			print topic[1]
 			msg_class = roslib.message.get_message_class(topic[1])
-			#self.topic_data_structure.append(topic_data_structure(topic[0],self.param_gen_ws))
 			rospy.Subscriber(topic[0], msg_class, self.callback, topic[0])
 		rospy.spin()		
         
 if __name__ == '__main__':
       generator = Generator()
       generator.start()
+      generator.end()

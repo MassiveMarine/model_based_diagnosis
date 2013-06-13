@@ -106,9 +106,11 @@ void take_boardSpecifications()
           p+=4;
           }
           BUFF_SIZE = 4+1+8*channels;
+          //printf("\n SENT DATA from Server: delim = %i , command = %i , length = %i , Channels = %i " , nbuffer[0], nbuffer[1], nbuffer[2] , nbuffer[4]);
           offset = 5;
           for(int channel=0;channel<channels;channel++)
           {
+           //printf("\n Channel# : %d, Max_Vol= %f, Max_Cur= %f", channel,*((float *)(nbuffer+offset)), *((float *)(nbuffer+offset+4)));
            offset +=8;
           }
 }                
@@ -148,7 +150,15 @@ void take_boardMeasurments()
           }
 
           BUFF_SIZE = 4+1+9*channels;
-         
+          /*printf("\n SENT DATA from Server: delim = %i , command = %i , length = %i , Channels = %i " , nbuffer[0], nbuffer[1], nbuffer[2] , nbuffer[4]);
+
+          int offset = 5;
+          for(int channel=0;channel<channels;channel++)
+          {
+           printf("\n Channel# : %d, On/Off= %i, Present_Curr= %f, Present_Vol= %f", channel,nbuffer[offset] ,*((float *)(nbuffer+offset+1)), *((float *)(nbuffer+offset+5)));
+           offset+=9;
+          }*/
+          
 					
 }
 
@@ -177,7 +187,7 @@ void send_Ack()
           
           BUFF_SIZE = 5;
           send(connected,(void*)&nbuffer,BUFF_SIZE, 0);
-          
+          //printf("\n ACK from Server: delim = %i , command = %i , length = %i , ecode = %i " , nbuffer[0], nbuffer[1], nbuffer[2] , nbuffer[4]);
          
 }
 
@@ -187,6 +197,7 @@ int ch;
 int state;
 ch = (int) channel;
 ch = ch - 48;
+//printf("%d channel to %c ",ch,status);
 state = (int) status;
 state = state - 48;
 if(state>1)
@@ -204,6 +215,7 @@ while(true)
     send(connected,(void*)&nbuffer,BUFF_SIZE, 0);
     double Frq = ((double)1/broadcastFrq);
     sleep(Frq);
+    //printf("broadcast frq = %d and wait = %f\n",broadcastFrq,Frq);
  }
 }
 
@@ -215,6 +227,7 @@ void thread_for_client(int connected)
             char command=0;
             while (1)
             { 
+	      //printf("command = %d\n",command);
               if(command!=4)
               send(connected,(void*)&nbuffer,BUFF_SIZE, 0);
               bytes_recieved = recv(connected,recv_data,255,0);

@@ -32,6 +32,7 @@ from array import array
 import thread
 import re
 import traceback
+import numpy
 
 class General_Observer(object):
 
@@ -49,8 +50,16 @@ class General_Observer(object):
 				self.param_frq =  rospy.get_param('~frq', 10)
 				self.param_dev = rospy.get_param('~dev', 1)
 				self.param_ws = rospy.get_param('~ws', 10)
-				self.circular_queu = [0 for i in xrange(self.param_ws)]
-				thread.start_new_thread(self.check_topic,(self.param_topic,0.5))
+				self.param_mismatch_th = rospy.get_param('~mismatch_th', 5)
+				self.circular_queu = [0.1 for i in xrange(self.param_ws)]
+				self.delta_t = [0 for i in xrange(self.param_ws)]
+				self.sum = 1
+				self.count = 0
+				self.mismatch_th_counter = 0;
+				if self.param_topic[0] == '/':
+					self.param_topic = self.param_topic[1:len(self.param_topic)]
+				thread.start_new_thread(self.check_topic,(self.param_topic,1))
+				thread.start_new_thread(self.make_output,(self.param_topic,0.5))
         
         
     def start(self):         
@@ -80,34 +89,56 @@ class General_Observer(object):
 					
 
     def callback(self,data):
-						self.circular_queu.pop(0)
+						self.delta_t.pop(0)
 						curr_t = time.time()
 						delta_t = curr_t - self.prev_t
-						self.circular_queu.append(delta_t)
-						avg_delta_t = self.average_delta_t()
-						calculated_freq = 1/float(avg_delta_t)
-						print calculated_freq, avg_delta_t
-						diff_freq = abs(self.param_frq - calculated_freq )
-						self.make_output(diff_freq)
+						#self.sum = self.sum + delta_t
+						#self.count = self.count + 1
+						self.delta_t.append(delta_t)
+						#avg_delta_t = self.average_delta_t()
+						#calculated_freq = 1/float(avg_delta_t)
+						#print calculated_freq, avg_delta_t
+						#diff_freq = abs(self.param_frq - calculated_freq )
+						#self.make_output(diff_freq)
 						self.prev_t = curr_t
 		
 					
 
-    def make_output(self,diff_freq):
-						if self.param_topic[0] == '/':
-							self.param_topic = self.param_topic[1:len(self.param_topic)]
+    def make_output(self,diff_freq,delay,*args):
+				 self.sum = 1
+				 while not rospy.is_shutdown():
+						time.sleep(delay)
+						s = numpy.sum(self.delta_t);
+						#c = self.count
+						T = float(s)/self.param_ws
+						if T == 0:
+							T = 1
+						f = 1/T
+						print f,self.param_frq,abs(self.param_frq - f),self.param_dev,self.param_dev-abs(self.param_frq - f)
 						obs_msg = []
-						if self.param_dev > diff_freq:
+						if abs(self.param_frq - f) < self.param_dev:
+							if self.mismatch_th_counter > 0:
+								self.mismatch_th_counter = self.mismatch_th_counter -1
 							self.msg = 'ok('+self.topic_name+')'
 							rospy.loginfo('ok('+self.topic_name+')')
 							obs_msg.append(self.msg)
 							self.pub.publish(Observations(time.time(),obs_msg))
 						else:
-							self.msg = '~ok('+self.topic_name+')'
-							rospy.loginfo('~ok('+self.topic_name+')')
-							obs_msg.append(self.msg)
-							self.pub.publish(Observations(time.time(),obs_msg))
-							
+							self.mismatch_th_counter = self.mismatch_th_counter + 1
+							if self.mismatch_th_counter > self.param_mismatch_th:
+								self.msg = '~ok('+self.topic_name+')'
+								rospy.loginfo('~ok('+self.topic_name+')')
+								obs_msg.append(self.msg)
+								self.pub.publish(Observations(time.time(),obs_msg))
+							else:
+								self.msg = 'ok('+self.topic_name+')'
+								rospy.loginfo('ok('+self.topic_name+')')
+								obs_msg.append(self.msg)
+								self.pub.publish(Observations(time.time(),obs_msg))
+						#self.sum = 0
+						#self.count = 0
+						
+
 
     def average_delta_t(self):
         s = 0
@@ -123,8 +154,8 @@ class General_Observer(object):
 						pubcode, statusMessage, topicList = m.getPublishedTopics(self.caller_id, "")
 						#print topicList
 						for item in topicList:
-							print item[0][1:],string
-							if item[0] == string:
+							#print item[0][1:],string
+							if item[0][1:] == string:
 									t = 1
 									if time.time() - self.prev_t > 2 :
 										rospy.loginfo('~ok('+self.topic_name+')')

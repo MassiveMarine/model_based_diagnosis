@@ -34,7 +34,7 @@ import os
 import shlex
 from tug_ist_diagnosis_msgs.msg import Observations
 import time
-
+import numpy
 class Property_Observer(object):
 
 		def __init__(self, argv):
@@ -72,21 +72,15 @@ class Property_Observer(object):
 				print self.out
 				self.out1 = shlex.split(self.out)
 				self.circular_queu.append(float(self.out1[indx]))
-				avg_val = self.average()
+				avg_val = numpy.mean(self.circular_queu)
 				self.publish_output(avg_val)
-
-		def average(self):
-			s = 0
-			for val in self.circular_queu:
-				print val
-				s = s + val
-			return s/self.param_ws
+				time.sleep(0.1);
 
 				
 		def publish_output(self,obtained_val):
 			obs_msg = []
 			if (obtained_val <= float(self.param_max)):
-				if self.mismatch_counter != 0:
+				if self.mismatch_counter > 0:
 					self.mismatch_counter = self.mismatch_counter - 1	
 				print 'ok('+self.param_node+','+self.param_property+')'
 				obs_msg.append('ok('+self.param_node+','+self.param_property+')')

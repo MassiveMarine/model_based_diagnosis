@@ -31,11 +31,16 @@ import thread
 from math import sqrt
 import signal
 interrupted = False
+import numpy
+import matplotlib.pyplot as plt
+
 class node_data_structure(object):
 	def __init__(self,node_name):
 		self.node_name = node_name
 		self.pub_topic_list = []
 		self.sub_topic_list = []
+		self.cpu_list = []
+		self.mem_list = []
 		self.max_cpu = 0
 		self.max_mem = 0
 		self.node_pid = 0
@@ -49,14 +54,30 @@ class node_data_structure(object):
 		return self.pub_topic_list
 	def get_sub_topics(self):
 		return self.sub_topic_list
-	def set_max_cpu(self,max_cpu):
-		self.max_cpu = max_cpu
-	def get_max_cpu(self):
-		return self.max_cpu
-	def set_max_mem(self,max_mem):
-		self.max_mem = max_mem
-	def get_max_mem(self):
-		return self.max_mem
+	def set_cpu(self,cpu):
+		self.cpu_list.append(cpu)
+	def get_cpu(self):
+		n = len(self.cpu_list)
+		print 'cpu list len'+str(n)
+		print self.cpu_list
+		if n== 0:
+			mean = 0
+			sd = 0
+		else:
+			mean = sum(self.cpu_list)/n
+			dev = [x - mean for x in self.cpu_list]
+			dev2 = [x*x for x in dev]
+			sd = sqrt( sum(dev2) / n)
+		return mean+2*sd
+	def set_mem(self,mem):
+		self.mem_list.append(mem)
+	def get_mem(self):
+		n = len(self.mem_list)
+		mean = sum(self.mem_list)/n
+		dev = [x - mean for x in self.mem_list]
+		dev2 = [x*x for x in dev]
+		sd = sqrt( sum(dev2) / n)
+		return mean+2*sd
 	def set_node_pid(self,pid):
 		self.node_pid = pid
 	def get_node_pid(self):
@@ -85,20 +106,21 @@ class topic_data_structure(object):
 	def calc_frq(self,delta_t):
 		self.circular_queu.pop(0)
 		self.circular_queu.append(delta_t)
-		sm = 0
-		for dt in self.circular_queu:
-			sm = sm + dt
+		sm = numpy.sum(self.circular_queu)
+		#sm = 0
+		#for dt in self.circular_queu:
+		#	sm = sm + dt
 		frq = 1/(float(sm)/self.ws)
-		#self.frq_list.pop(0)
-        	self.frq_list.append(frq)
+		self.frq_list.append(frq)
 		#print 'size===',len(self.frq_list)
 	def calculate_frq_dev(self):
 		frq_list = self.frq_list[self.ws:]
 		n = len(frq_list)
-		#print 'n==',n
 		if n!=0:
-			mean = self.calculate_mean(frq_list)
-			self.calculated_frq_dev = self.calculate_standard_deviation(frq_list)
+			#mean = self.calculate_mean(frq_list)
+			mean = numpy.mean(frq_list)
+			#self.calculated_frq_dev = self.calculate_standard_deviation(frq_list)
+			self.calculated_frq_dev = numpy.std(frq_list)
 			self.calculated_frq = mean
 		else:
 			mean = 0
@@ -107,7 +129,6 @@ class topic_data_structure(object):
 	def calculate_mean(self,par_list):
 		n = len(par_list)
 		s = sum(par_list)
-		#print n,s
 		return 	float(s)/n
 	def calculate_standard_deviation(self,par_list):
 		n = len(par_list)
@@ -118,15 +139,18 @@ class topic_data_structure(object):
 	def get_calculated_frq_dev(self):
 		return self.calculated_frq_dev
 	def get_signal_nature(self):
-		signal_mean = self.calculate_mean(self.occur_list)
-		signal_dev =  self.calculate_standard_deviation(self.occur_list)
-		#print self.occur_list
-		#print self.topic_name, "%.6f" %signal_mean, "%.2f" %signal_dev
+		#signal_mean = self.calculate_mean(self.occur_list)
+		signal_mean = numpy.mean(self.occur_list)
+		#signal_dev =  self.calculate_standard_deviation(self.occur_list)
+		signal_dev =  numpy.std(self.occur_list)
 		print self.topic_name, signal_mean, signal_dev
 	def print_frq_list(self):
-		print self.topic_name
+		print 'FILE: for'+self.topic_name
+		fl = open(self.topic_name[1:len(self.topic_name)]+".txt", "w")
 		for f in self.frq_list:
+			fl.write(str(f)+"\n")
 			print f
+		fl.close()
 		
 
 class Generator(object):
@@ -153,7 +177,7 @@ class Generator(object):
 		self.param_dev = 0
 		self.maxCpu = 0
 		self.maxMem = 0
-		
+
 
 	def start(self):
 		signal.signal(signal.SIGINT, self.signal_handler)
@@ -164,8 +188,51 @@ class Generator(object):
 		while True:
 			if interrupted:
 		      		break;
+		#i = 1
+		#for tpc_ds in self.topic_data_structure:
+			#topic_name = tpc_ds.topic_name[1:len(tpc_ds.topic_name)]
+			#autocorr = self.auto_correlate(tpc_ds)
+			#print 'autocorr='
+			#print autocorr
+			#plt.plot(autocorr)
+			#topic_name = topic_name.replace("/","_")
+			#plt.savefig(topic_name+'.png')
+			#plt.close()
+			#del autocorr[2:5]
+			#for val in autocorr:
+            		#	autocorr.remove(val)
+			#if (topic_name == 'cmd_vel'):
+				#autocorr = self.auto_correlate(tpc_ds)
+				
+				#print 'autocorr='
+				#print autocorr
+				##plt.plot(autocorr)
+				##topic_name = topic_name.replace("/","_")
+				##plt.savefig(topic_name+'Only.png')
+				#xs1 = autocorr
+				#N = len(xs1)
+				#dwstat = []
+				#for lag in range(70000),
+				#    dxs = xs1((lag+1):N) - xs1(1:(N-lag));
+				#    dwstat = [dwstat sum(dxs1.^2) / sum(xs1.^2)];
+				    
+			#plt.show()
+			#else:
+			#	print 'No:'+tpc_ds.topic_name
+
+	def auto_correlate(self,tpc_ds):
+		lst = tpc_ds.occur_list
+		mean = numpy.mean(lst)
+		lst = lst-mean
+		autocorr = numpy.correlate(lst, lst, mode='full')
+		#autocorr = numpy.xcorr(s1n,"unbiased")
+		return autocorr
+			
+			
         def signal_handler(self,signum, frame):
 		global interrupted
+		START_TIME = time.time()
+		print 'START Time='+str(START_TIME)
 		interrupted = True
 		time.sleep(1)
 		print 'making observers started....'
@@ -174,7 +241,10 @@ class Generator(object):
 		print 'making model started....'
 		self.make_mdl_yaml()
 		print 'making model finished....'
-		self.topic_signal_nature()
+		END_TIME = time.time()
+		print 'END Time='+str(END_TIME)
+		print 'Total Calculated Time='+str(END_TIME - START_TIME)
+		#self.topic_signal_nature()
 		
        
 	def spin_thread(self):
@@ -207,12 +277,12 @@ class Generator(object):
 				self.out1 = shlex.split(self.out)
 				cpu = self.out1[8]
 				mem = self.out1[9]
-				if cpu > self.maxCpu:
-					self.maxCpu = cpu
-				if mem > self.maxMem:
-					self.maxMem = mem
-				node_ds.set_max_cpu(self.maxCpu)
-				node_ds.set_max_mem(self.maxMem)
+				#if cpu > self.maxCpu:
+				#	self.maxCpu = cpu
+				#if mem > self.maxMem:
+				#	self.maxMem = mem
+				node_ds.set_cpu(float(cpu))
+				node_ds.set_mem(float(mem))
 				#print 'node_name=',node_name,' node_pid=',node_pid, ' Max_cpu=',self.maxCpu,' Max_Mem=',self.maxMem
 			time.sleep(0.25)
 
@@ -303,7 +373,7 @@ class Generator(object):
 							self.node_data_structure.append(nd_ds)
 							#print 'node=',node,' pid=',pid
 
-			time.sleep(1)
+			time.sleep(0.5)
 			
 	def make_obs_launch(self):
 		temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
@@ -315,15 +385,15 @@ class Generator(object):
 		for nd_ds in self.node_data_structure:
 			node_name = nd_ds.get_node_name()
 			node_name = node_name[1:len(node_name)]
-			node_mxCpu = nd_ds.get_max_cpu()
-			node_mxMem = nd_ds.get_max_mem()
+			node_mxCpu = nd_ds.get_cpu()
+			node_mxMem = nd_ds.get_mem()
 			nobs_name = node_name+'NObs'
 			pubs = nd_ds.get_pub_topics()
-			if '/diagnostics' in pubs:
-				dobs_name = node_name+'DObs'
-				file.write('<node pkg="tug_ist_diagnosis_observers" type="DObs.py" name="'+dobs_name+'" >\n')
-				file.write('\t<param name="dev_node" value="'+node_name+'" />\n')
-				file.write('</node>\n')
+			#if '/diagnostics' in pubs:
+			#	dobs_name = node_name+'DObs'
+			#	file.write('<node pkg="tug_ist_diagnosis_observers" type="DObs.py" name="'+dobs_name+'" >\n')
+			#	file.write('\t<param name="dev_node" value="'+node_name+'" />\n')
+			#	file.write('</node>\n')
 			file.write('<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="'+nobs_name+'" >\n')
 			file.write('\t<param name="node" value="'+node_name+'" />\n')
 			file.write('</node>\n')
@@ -347,7 +417,9 @@ class Generator(object):
 			for tpc_ds in self.topic_data_structure:
 				if t == tpc_ds.get_topic_name():
 					tpc_ds.calculate_frq_dev()
-					tpc_ds.print_frq_list()
+					#y = 'imu'
+					#if y in t:
+					#	tpc_ds.print_frq_list()
 					self.param_frq = tpc_ds.get_calculated_frq()
 					self.param_dev = tpc_ds.get_calculated_frq_dev()
 					break
@@ -437,13 +509,13 @@ class Generator(object):
 			self.out1 = shlex.split(self.out)
 			cpu = self.out1[8]
 			mem = self.out1[9]
-			if cpu > maxCpu:
-				maxCpu = cpu
-			if mem > maxMem:
-				maxMem = mem
+			#if cpu > maxCpu:
+			#	maxCpu = cpu
+			#if mem > maxMem:
+			#	maxMem = mem
 			t = t + 1
-		node_ds.set_max_cpu(maxCpu)
-		node_ds.set_max_mem(maxMem)
+			node_ds.set_cpu(float(cpu))
+			node_ds.set_mem(float(mem))
 		
 	def extract_topics(self):
 		pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
@@ -459,7 +531,7 @@ class Generator(object):
 			sb=rospy.Subscriber(topic[0], msg_class, self.callback, topic[0])
 			i = i + 1
 		thread.start_new_thread(self.spin_thread,('thread', 1))
-		time.sleep(3)
+		time.sleep(1)
 		
 		
 	def average_delta_t(self):
