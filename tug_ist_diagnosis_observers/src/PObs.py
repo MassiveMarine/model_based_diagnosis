@@ -40,6 +40,7 @@ class Property_Observer(object):
 		def __init__(self, argv):
 			rospy.init_node('PObs', anonymous=True)
 			self.pub = rospy.Publisher('/observations', Observations)
+			self.obs_msg = Observations()
 			self.param_node = rospy.get_param('~node', 'Node')
 			self.param_property = rospy.get_param('~property', 'MEM')
 			self.param_max = rospy.get_param('~max_val', 0.2)
@@ -58,43 +59,68 @@ class Property_Observer(object):
 			parts = shlex.split(a.communicate()[0])
 			indx = parts.index("Pid:")
 			pid = parts[indx+1]
-			p = subprocess.Popen("top -b -n 1 | grep -i %s" %pid, shell=True,stdout=subprocess.PIPE)
-			self.out = p.communicate()[0]
-			self.out1 = shlex.split(self.out)
-			if (self.param_property == 'CPU') | (self.param_property == 'cpu') :
-				indx = 8
-			else:
-				indx = 9
-			while not rospy.is_shutdown():
-				self.circular_queu.pop(0)
+			if self.param_property.lower() == 'cpu':
 				p = subprocess.Popen("top -b -n 1 | grep -i %s" %pid, shell=True,stdout=subprocess.PIPE)
 				self.out = p.communicate()[0]
-				print self.out
 				self.out1 = shlex.split(self.out)
-				self.circular_queu.append(float(self.out1[indx]))
-				avg_val = numpy.mean(self.circular_queu)
+				self.circular_queu.append(float(self.out1[8]))
+			else :
+				p = subprocess.Popen("pmap -x %s" %pid, shell=True,stdout=subprocess.PIPE)
+				self.out = p.communicate()[0]
+				self.out1 = shlex.split(self.out)
+				self.circular_queu.append(float(self.out1[len(self.out1)-3]))
+			while not rospy.is_shutdown():
+				self.circular_queu.pop(0)
+				avg_val = 0
+				if self.param_property.lower() == 'cpu':
+					p = subprocess.Popen("top -b -n 1 | grep -i %s" %pid, shell=True,stdout=subprocess.PIPE)
+					self.out = p.communicate()[0]
+					self.out1 = shlex.split(self.out)
+					self.circular_queu.append(float(self.out1[8]))
+					avg_val = float(self.out1[8])
+				else:
+					p = subprocess.Popen("pmap -x %s" %pid, shell=True,stdout=subprocess.PIPE)
+					self.out = p.communicate()[0]
+					self.out1 = shlex.split(self.out)
+					#print "VALUE MEM=", float(self.out1[len(self.out1)-3])
+					self.circular_queu.append(float(self.out1[len(self.out1)-3]))
+					avg_val = float(self.out1[len(self.out1)-3])
+					
+				
+				#avg_val = numpy.mean(self.circular_queu)
+				#self.obs_msg.header.stamp = rospy.Time.now()
+				self.obs_msg.out_time = rospy.get_time()
 				self.publish_output(avg_val)
 				time.sleep(0.1);
 
 				
 		def publish_output(self,obtained_val):
 			obs_msg = []
-			if (obtained_val <= float(self.param_max)):
+			#print 'obtV', obtained_val, 'maxV', self.param_max
+			if (obtained_val <= float(self.param_max)+8):
 				if self.mismatch_counter > 0:
 					self.mismatch_counter = self.mismatch_counter - 1	
-				print 'ok('+self.param_node+','+self.param_property+')'
+				#print 'ok('+self.param_node+','+self.param_property+')'
 				obs_msg.append('ok('+self.param_node+','+self.param_property+')')
-				self.pub.publish(Observations(time.time(),obs_msg))
+				self.obs_msg.obs=obs_msg
+				self.pub.publish(self.obs_msg)
+				#self.pub.publish(Observations(time.time(),obs_msg))
 			else:
 				self.mismatch_counter = self.mismatch_counter + 1
 				if self.mismatch_counter < self.param_mis_th:
-					print 'ok('+self.param_node+','+self.param_property+')'
+					#print 'ok('+self.param_node+','+self.param_property+')'
 					obs_msg.append('ok('+self.param_node+','+self.param_property+')')
-					self.pub.publish(Observations(time.time(),obs_msg))
+					self.obs_msg.obs=obs_msg
+					self.pub.publish(self.obs_msg)
+					#self.pub.publish(Observations(time.time(),obs_msg))
 				else:
-					print '~ok('+self.param_node+','+self.param_property+')'
+					#print '~ok('+self.param_node+','+self.param_property+')'
+					#print self.circular_queu
+					#rospy.loginfo(self.param_node+' obtV='+str(obtained_val)+'maxV'+str(self.param_max))
 					obs_msg.append('~ok('+self.param_node+','+self.param_property+')')
-					self.pub.publish(Observations(time.time(),obs_msg))
+					self.obs_msg.obs=obs_msg
+					self.pub.publish(self.obs_msg)
+					#self.pub.publish(Observations(time.time(),obs_msg))
 			
 
 def report_error():

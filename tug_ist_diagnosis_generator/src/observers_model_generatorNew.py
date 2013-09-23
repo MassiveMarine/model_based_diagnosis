@@ -20,6 +20,7 @@
 ##
 
 import roslib.message;roslib.load_manifest('tug_ist_diagnosis_generator')
+import scipy.io as sio
 import rospy
 import sys
 import xmlrpclib
@@ -33,6 +34,7 @@ import signal
 interrupted = False
 import numpy
 import matplotlib.pyplot as plt
+import tf
 
 class node_data_structure(object):
 	def __init__(self,node_name):
@@ -56,6 +58,8 @@ class node_data_structure(object):
 		return self.sub_topic_list
 	def set_cpu(self,cpu):
 		self.cpu_list.append(cpu)
+	def get_cpu_list(self):
+		return self.cpu_list
 	def get_cpu(self):
 		n = len(self.cpu_list)
 		print 'cpu list len'+str(n)
@@ -71,6 +75,8 @@ class node_data_structure(object):
 		return mean+2*sd
 	def set_mem(self,mem):
 		self.mem_list.append(mem)
+	def get_mem_list(self):
+		return self.mem_list
 	def get_mem(self):
 		n = len(self.mem_list)
 		mean = sum(self.mem_list)/n
@@ -90,9 +96,13 @@ class topic_data_structure(object):
 		self.ws = ws
 		self.ws1 = ws/1000
 		self.circular_queu = [0 for i in xrange(self.ws)]
-		#self.frq_list = [0 for i in xrange(self.ws)]
+		self.orien_list = []		
 		self.frq_list = []
+		self.time_list = []
 		self.occur_list = []
+		self.roll_list = []
+		self.pitch_list = []
+		self.yaw_list = []
 		self.calculated_frq = 0
 		self.calculated_frq_dev = 0
 		self.prev_t = time.time()
@@ -100,10 +110,30 @@ class topic_data_structure(object):
 		return self.topic_name
 	def set_prev_t(self,prev_t):
 		self.prev_t = prev_t
+	def set_orientation(self,xyzw):
+		self.orien_list.append(xyzw)
+	def calcRPY(self):
+		for o in self.orien_list:
+			rpy = tf.transformations.euler_from_quaternion(o)
+			self.roll_list.append(rpy[0])
+			self.pitch_list.append(rpy[1])
+			self.yaw_list.append(rpy[2])
+	def get_orientation_list(self):
+		return self.orien_list
+	def getRoll(self):
+		return self.roll_list
+	def getPitch(self):
+		return self.pitch_list
+	def getYaw(self):
+		return self.yaw_list
 	def get_prev_t(self):
 		return self.prev_t
 	def set_occur(self,val):
 		self.occur_list.append(val)
+	def set_time(self,tm):
+		self.time_list.append(tm)
+	def get_time_list(self):
+		return self.time_list
 	def calc_frq(self,delta_t):
 		self.circular_queu.pop(0)
 		self.circular_queu.append(delta_t)
@@ -150,11 +180,28 @@ class topic_data_structure(object):
 		print self.topic_name, signal_mean, signal_dev
 	def print_frq_list(self):
 		print 'FILE: for'+self.topic_name
-		fl = open(self.topic_name[1:len(self.topic_name)]+".txt", "w")
-		for f in self.frq_list:
+		topic_name = self.topic_name.replace("/","_");
+		fl = open(topic_name[1:len(topic_name)]+".txt", "w")
+		i = 1
+		s = 0.0
+		for f in self.time_list:
 			fl.write(str(f)+"\n")
-			print f
+			if i == 1:
+				p = f
+				i = 2
+				continue
+			d = f - p
+			p = f
+			fl.write(str(d)+"\n")
+			s = s + float(d)
+			i = i + 1
+		av = s / i
+		fl.write("s="+str(s)+"\n")
+		fl.write("i="+str(i)+"\n")
+		fl.write("Avg="+str(round(av,4))+"\n")
+			#print f
 		fl.close()
+		
 		
 
 class Generator(object):
@@ -167,7 +214,7 @@ class Generator(object):
 		self.param_p_ws = rospy.get_param('~pob_ws', 10)
 		self.p_mismatch_th = rospy.get_param('~pob_mismatch_th', 5)
 		self.brd_topic = rospy.get_param('~board_topic', '/board_measurments')
-		#self.obs_time = rospy.get_param('~obs_time', 5)
+		self.orn_topics_field = rospy.get_param('~topics', 100)
 		self.nodes_list = []
 		self.topics_list = []
 		self.zero_frq_topic_list = []
@@ -181,55 +228,78 @@ class Generator(object):
 		self.param_dev = 0
 		self.maxCpu = 0
 		self.maxMem = 0
+		self.param_topics = []
+		self.param_fields = []
 
 
+	def orn_separate_topic_field(self):
+		pose_pose_orientation = 100
+		orientation = 200
+		print self.orn_topics_field
+		s = self.orn_topics_field[1:len(self.orn_topics_field)]
+		l = []
+		while '/' in s:
+			i = s.index('/')
+			s1 = s[0:i]
+			l.append(s1)
+			s = s[i+1:len(s)]
+		l.append(s)
+		for t in l:
+			i = t.index('+')
+			top = t[0:i];
+			self.param_topics.append('/'+top)
+			fld = t[i+1:len(t)]
+			fld1 = fld.replace('.','_')
+			print fld1
+			print  eval(fld1)
+			self.param_fields.append(fld)
+		pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
+		i = 0
+		for topic in topicList:
+			for t in self.param_topics:
+				if t == topic[0]:
+					print t+' matches '+ topic[0]
+					self.topics_list.append(topic[0])
+					msg_class = roslib.message.get_message_class(topic[1])
+					if topic[0] not in self.topic_data_structure:
+						self.topic_data_structure.append(topic_data_structure(topic[0],self.param_gen_ws))
+					rospy.Subscriber(topic[0], msg_class,self.callback_orien,[topic[0],self.param_fields[i]],10)
+					#rospy.Subscriber(topic[0], msg_class, self.callback, topic[0])
+					i = i + 1
+		#rospy.spin()
+
+	def callback_orien(self,msg,args):
+		curr_t = time.time()
+		topic = args[0]
+		field =  args[1]
+		x = eval('msg.%s.x' %field)
+		y = eval('msg.%s.y' %field)
+		z = eval('msg.%s.z' %field)
+		w = eval('msg.%s.w' %field)
+		orn = [x,y,z,w]
+		#print topic
+		#for tpc_ds in self.topic_data_structure:
+			#if topic == tpc_ds.get_topic_name():
+				#tpc_ds.set_orientation(orn)
+				#tpc_ds.set_time(curr_t)
+
+		
 	def start(self):
 		signal.signal(signal.SIGINT, self.signal_handler)
+		#self.orn_separate_topic_field()
 		self.extract_nodes_topics()
-		thread.start_new_thread(self.threaded_extract_nodes_topics, ())
-		thread.start_new_thread(self.threaded_extract_mem_cpu, ())
-		thread.start_new_thread(self.spin_thread, ())
+		#thread.start_new_thread(self.threaded_extract_nodes_topics, ())
+		#thread.start_new_thread(self.threaded_extract_mem_cpu, ())
+		#thread.start_new_thread(self.spin_thread, ())
 		while True:
 			if interrupted:
 		      		break;
-		#i = 1
-		#for tpc_ds in self.topic_data_structure:
-			#topic_name = tpc_ds.topic_name[1:len(tpc_ds.topic_name)]
-			#autocorr = self.auto_correlate(tpc_ds)
-			#print 'autocorr='
-			#print autocorr
-			#plt.plot(autocorr)
-			#topic_name = topic_name.replace("/","_")
-			#plt.savefig(topic_name+'.png')
-			#plt.close()
-			#del autocorr[2:5]
-			#for val in autocorr:
-            		#	autocorr.remove(val)
-			#if (topic_name == 'cmd_vel'):
-				#autocorr = self.auto_correlate(tpc_ds)
-				
-				#print 'autocorr='
-				#print autocorr
-				##plt.plot(autocorr)
-				##topic_name = topic_name.replace("/","_")
-				##plt.savefig(topic_name+'Only.png')
-				#xs1 = autocorr
-				#N = len(xs1)
-				#dwstat = []
-				#for lag in range(70000),
-				#    dxs = xs1((lag+1):N) - xs1(1:(N-lag));
-				#    dwstat = [dwstat sum(dxs1.^2) / sum(xs1.^2)];
-				    
-			#plt.show()
-			#else:
-			#	print 'No:'+tpc_ds.topic_name
 
 	def auto_correlate(self,tpc_ds):
 		lst = tpc_ds.occur_list
 		mean = numpy.mean(lst)
 		lst = lst-mean
 		autocorr = numpy.correlate(lst, lst, mode='full')
-		#autocorr = numpy.xcorr(s1n,"unbiased")
 		return autocorr
 			
 			
@@ -239,17 +309,59 @@ class Generator(object):
 		print 'START Time='+str(START_TIME)
 		interrupted = True
 		time.sleep(1)
-		print 'making observers started....'
-		self.make_obs_launch()
-		print 'making observers finished....'
-		print 'making model started....'
-		self.make_mdl_yaml()
-		print 'making model finished....'
+		print 'making matfile started....'
+		#self.make_mat()
+		#print 'making matfile finished....'
+		#print 'making Nodes matfile started....'
+		#self.make_node_mat()
+		#print 'making Nodes matfile finished....'
+		#self.make_obs_launch()
+		#print 'making observers finished....'
+		#print 'making model started....'
+		#self.make_mdl_yaml()
+		#print 'making model finished....'
 		END_TIME = time.time()
 		print 'END Time='+str(END_TIME)
 		print 'Total Calculated Time='+str(END_TIME - START_TIME)
 		#self.topic_signal_nature()
 		
+
+	def make_mat(self):
+		list_of_tdata = []
+		list_of_topics = []
+		list_of_rpy = []
+		for tpc_ds in self.topic_data_structure:
+			top_name = tpc_ds.get_topic_name()
+			list_of_tdata.append(tpc_ds.get_time_list())
+			list_of_topics.append(top_name)
+			if top_name in self.param_topics:
+				tpc_ds.calcRPY()
+				list_of_rpy.append(tpc_ds.getRoll())
+				list_of_rpy.append(tpc_ds.getPitch())
+				list_of_rpy.append(tpc_ds.getYaw())
+			
+		list_of_ndata = []
+		list_of_nodes = []
+		for nd_ds in self.node_data_structure:
+			list_of_ndata.append(nd_ds.get_cpu_list())
+			list_of_ndata.append(nd_ds.get_mem_list())
+			list_of_nodes.append(nd_ds.get_node_name())
+		#node_mat = {'nodes': list_of_nodes, 'nodes_time': list_of_ndata}
+		#topic_mat = {'topics': list_of_topics, 'topics_time': list_of_tdata}
+		mat_file = {'topics': list_of_topics, 'topics_time': list_of_tdata, 'topics_rpy': list_of_rpy,'nodes': list_of_nodes, 'nodes_cpu_mem': list_of_ndata}
+		#sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/topic_lists.mat', {'topics': topic_mat})
+		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/model_mat.mat', {'model': mat_file})
+
+	def make_node_mat(self):
+		list_of_ndata = []
+		list_of_nodes = []
+		for nd_ds in self.node_data_structure:
+			list_of_ndata.append(nd_ds.get_cpu_list())
+			list_of_ndata.append(nd_ds.get_mem_list())
+			list_of_nodes.append(nd_ds.get_node_name())
+		node_mat = {'nodes': list_of_nodes, 'nodes_time': list_of_ndata}
+		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/node_lists.mat', {'nodes': node_mat})
+
        
 	def spin_thread(self):
 		rospy.spin()
@@ -259,16 +371,12 @@ class Generator(object):
 			tpc_ds.get_signal_nature()
 
 	def callback(self,data,topic):
-		curr_t = time.time()
-		for tpc_ds in self.topic_data_structure:
-			occurance = 0
-			if topic == tpc_ds.get_topic_name():
-				delta_t = curr_t - tpc_ds.get_prev_t()
-				#tpc_ds.calc_frq(delta_t)
-				tpc_ds.calc_frq(curr_t)
-				tpc_ds.set_prev_t(curr_t)
-				occurance = 1
-			tpc_ds.set_occur(occurance)
+		print topic
+		#curr_t = time.time()
+		#for tpc_ds in self.topic_data_structure:
+			#occurance = 0
+			#if topic == tpc_ds.get_topic_name():
+				#tpc_ds.set_time(curr_t)
 				
 
 
@@ -418,13 +526,17 @@ class Generator(object):
 			file.write('\t<param name="mismatch_th" value="'+str(self.p_mismatch_th)+'" />\n')
 			file.write('\t<param name="ws" value="'+str(self.param_p_ws)+'" />\n')
 			file.write('</node>\n')
+		list_of_lists = []
+		list_of_names = []
 		for t in self.topics_list:
 			for tpc_ds in self.topic_data_structure:
 				if t == tpc_ds.get_topic_name():
 					tpc_ds.calculate_frq_dev()
-					y = 'imu'
-					if y in t:
-						tpc_ds.print_frq_list()
+					#y = 'imu'
+					#if y in t:
+					tpc_ds.print_frq_list()
+					list_of_lists.append(tpc_ds.get_time_list())
+					list_of_names.append(tpc_ds.get_topic_name())
 					self.param_frq = tpc_ds.get_calculated_frq()
 					self.param_dev = tpc_ds.get_calculated_frq_dev()
 					break
@@ -441,6 +553,9 @@ class Generator(object):
   			file.write('</node>\n')
 		file.write('</launch>')
 		file.close()
+		mat_list = {'list_names': list_of_names, 'list_data': list_of_lists }
+		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/time_lists.mat', {'time_lists': mat_list})
+
 
 	def make_mdl_yaml(self):
 		temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
@@ -485,7 +600,6 @@ class Generator(object):
 						continue
 					if node not in self.nodes_list:
 						self.nodes_list.append(node)
-					
 		i = 0
 		for node in self.nodes_list:
 			self.node_data_structure.append(node_data_structure(node))

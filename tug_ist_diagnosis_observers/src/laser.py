@@ -26,9 +26,9 @@ def test_node():
     pub = rospy.Publisher('laser_node_topic', String)
     while not rospy.is_shutdown():
         str = "laser data.."
-        rospy.loginfo(str)
+        #rospy.loginfo(str)
         pub.publish(String(str))
-        rospy.sleep(0.1)
+        rospy.sleep(0.01)
 if __name__ == '__main__':
     try:
         test_node()

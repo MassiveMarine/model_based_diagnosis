@@ -20,6 +20,7 @@
 ##
 
 import roslib.message;roslib.load_manifest('tug_ist_diagnosis_generator')
+import scipy.io as sio
 import rospy
 import sys
 import xmlrpclib
@@ -33,6 +34,7 @@ import signal
 interrupted = False
 import numpy
 import matplotlib.pyplot as plt
+import tf
 
 class node_data_structure(object):
 	def __init__(self,node_name):
@@ -58,8 +60,9 @@ class node_data_structure(object):
 		self.cpu_list.append(cpu)
 	def get_cpu(self):
 		n = len(self.cpu_list)
-		print 'cpu list len'+str(n)
-		print self.cpu_list
+		if n == 0:
+			return 0
+		print self.node_name, self.cpu_list
 		if n== 0:
 			mean = 0
 			sd = 0
@@ -68,82 +71,65 @@ class node_data_structure(object):
 			dev = [x - mean for x in self.cpu_list]
 			dev2 = [x*x for x in dev]
 			sd = sqrt( sum(dev2) / n)
-		return mean+2*sd
+		return mean+3*sd
 	def set_mem(self,mem):
 		self.mem_list.append(mem)
 	def get_mem(self):
 		n = len(self.mem_list)
+		if n == 0:
+			return 0
+		print self.node_name, self.mem_list
 		mean = sum(self.mem_list)/n
 		dev = [x - mean for x in self.mem_list]
 		dev2 = [x*x for x in dev]
 		sd = sqrt( sum(dev2) / n)
-		return mean+2*sd
+		print 'MeamMem=',mean,',SDMem=',sd,',3*sd=',3*sd
+		return mean+3*sd
 	def set_node_pid(self,pid):
 		self.node_pid = pid
 	def get_node_pid(self):
 		return self.node_pid
 
-
 class topic_data_structure(object):
 	def __init__(self,topic_name,ws):
 		self.topic_name = topic_name
-		self.ws = ws
-		self.circular_queu = [0 for i in xrange(self.ws)]
-		#self.frq_list = [0 for i in xrange(self.ws)]
-		self.frq_list = []
-		self.occur_list = []
-		self.calculated_frq = 0
-		self.calculated_frq_dev = 0
-		self.prev_t = time.time()
+		self.current_time_list = []
+		self.delta_time_list = []
+		self.mean_occ_time = 0
+		self.frq = 0
 	def get_topic_name(self):
 		return self.topic_name
-	def set_prev_t(self,prev_t):
-		self.prev_t = prev_t
-	def get_prev_t(self):
-		return self.prev_t
-	def set_occur(self,val):
-		self.occur_list.append(val)
-	def calc_frq(self,delta_t):
-		self.circular_queu.pop(0)
-		self.circular_queu.append(delta_t)
-		sm = numpy.sum(self.circular_queu)
-		#sm = 0
-		#for dt in self.circular_queu:
-		#	sm = sm + dt
-		frq = 1/(float(sm)/self.ws)
-		self.frq_list.append(frq)
-		#print 'size===',len(self.frq_list)
-	def calculate_frq_dev(self):
-		frq_list = self.frq_list[self.ws:]
-		n = len(frq_list)
-		if n!=0:
-			#mean = self.calculate_mean(frq_list)
-			mean = numpy.mean(frq_list)
-			#self.calculated_frq_dev = self.calculate_standard_deviation(frq_list)
-			self.calculated_frq_dev = numpy.std(frq_list)
-			self.calculated_frq = mean
-		else:
-			mean = 0
-			self.calculated_frq_dev = 0
-			self.calculated_frq = 0
-	def calculate_mean(self,par_list):
-		n = len(par_list)
-		s = sum(par_list)
-		return 	float(s)/n
-	def calculate_standard_deviation(self,par_list):
-		n = len(par_list)
-		mean = self.calculate_mean(par_list)
-		return float(sqrt(sum((x-mean)**2 for x in par_list))/n)
-	def get_calculated_frq(self):
-		return self.calculated_frq
-	def get_calculated_frq_dev(self):
-		return self.calculated_frq_dev
-	def get_signal_nature(self):
-		#signal_mean = self.calculate_mean(self.occur_list)
-		signal_mean = numpy.mean(self.occur_list)
-		#signal_dev =  self.calculate_standard_deviation(self.occur_list)
-		signal_dev =  numpy.std(self.occur_list)
-		print self.topic_name, signal_mean, signal_dev
+	def save_current_time(self,t):
+		self.current_time_list.append(t)
+	def get_current_time_list(self):
+		return self.current_time_list
+	def get_mean_occ_time(self):
+		return self.mean_occ_time
+	def get_deviation(self):
+		#print self.delta_time_list
+		n = len(self.delta_time_list)
+		if n == 0:
+			return 0
+		self.mean_occ_time = float(sum(self.delta_time_list))/n
+		dev = sqrt(sum((x-self.mean_occ_time)**2 for x in self.delta_time_list)/(n-1))
+		return dev
+	def get_frequency(self):
+		if len(self.current_time_list) == 0:
+			return 0
+		#pt = self.current_time_list[0]
+		for x in range(1, len(self.current_time_list)):
+			pt = self.current_time_list[x-1]		
+			t = self.current_time_list[x]		
+			self.delta_time_list.append(t-pt)
+		#for t in self.current_time_list:
+		#	#d = t-pt
+		#	self.delta_time_list.append(t-pt)
+		#	#s = s + d
+		#	pt = t
+		#if s==0:
+		#	return 0
+		#self.frq = 1/(float(s)/len(self.current_time_list))
+		#return self.frq
 	def print_frq_list(self):
 		print 'FILE: for'+self.topic_name
 		fl = open(self.topic_name[1:len(self.topic_name)]+".txt", "w")
@@ -151,7 +137,6 @@ class topic_data_structure(object):
 			fl.write(str(f)+"\n")
 			print f
 		fl.close()
-		
 
 class Generator(object):
 	def __init__(self):
@@ -177,6 +162,7 @@ class Generator(object):
 		self.param_dev = 0
 		self.maxCpu = 0
 		self.maxMem = 0
+		self.prev_t = time.time()
 
 
 	def start(self):
@@ -188,6 +174,7 @@ class Generator(object):
 		while True:
 			if interrupted:
 		      		break;
+			time.sleep(1)
 		#i = 1
 		#for tpc_ds in self.topic_data_structure:
 			#topic_name = tpc_ds.topic_name[1:len(tpc_ds.topic_name)]
@@ -230,21 +217,33 @@ class Generator(object):
 			
 			
         def signal_handler(self,signum, frame):
+		interrupted = True
 		global interrupted
 		START_TIME = time.time()
 		print 'START Time='+str(START_TIME)
-		interrupted = True
 		time.sleep(1)
 		print 'making observers started....'
 		self.make_obs_launch()
 		print 'making observers finished....'
-		print 'making model started....'
-		self.make_mdl_yaml()
-		print 'making model finished....'
+		#print 'making model started....'
+		#self.make_mdl_yaml()
+		#print 'making model finished....'
+		print 'matlabfile....'
+		self.make_mat()
 		END_TIME = time.time()
 		print 'END Time='+str(END_TIME)
 		print 'Total Calculated Time='+str(END_TIME - START_TIME)
 		#self.topic_signal_nature()
+
+	def make_mat(self):
+		list_of_tdata = []
+		list_of_topics = []
+		for tpc_ds in self.topic_data_structure:
+			top_name = tpc_ds.get_topic_name()
+			list_of_tdata.append(tpc_ds.get_current_time_list())
+			list_of_topics.append(top_name)
+		mat_file = {'topics': list_of_topics, 'curr_time': list_of_tdata}
+		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/curr_time.mat', {'Curr_time': mat_file})
 		
        
 	def spin_thread(self):
@@ -255,6 +254,13 @@ class Generator(object):
 			tpc_ds.get_signal_nature()
 
 	def callback(self,data,topic):
+		curr_t = rospy.get_rostime()
+		for tpc_ds in self.topic_data_structure:
+			if topic == tpc_ds.get_topic_name():
+				tpc_ds.save_current_time(curr_t.secs+curr_t.nsecs*1e-9)
+		self.prev_t = curr_t
+
+	def callbackB(self,data,topic):
 		curr_t = time.time()
 		for tpc_ds in self.topic_data_structure:
 			occurance = 0
@@ -276,13 +282,13 @@ class Generator(object):
 				self.out = p.communicate()[0]
 				self.out1 = shlex.split(self.out)
 				cpu = self.out1[8]
-				mem = self.out1[9]
-				#if cpu > self.maxCpu:
-				#	self.maxCpu = cpu
-				#if mem > self.maxMem:
-				#	self.maxMem = mem
+				print 'cpu=',cpu
 				node_ds.set_cpu(float(cpu))
-				node_ds.set_mem(float(mem))
+				p = subprocess.Popen("pmap -x %s" %node_pid, shell=True,stdout=subprocess.PIPE)
+				out = p.communicate()[0]
+				out1 = shlex.split(out)
+				mem = float(out1[len(out1)-3])
+				node_ds.set_mem(mem)
 				#print 'node_name=',node_name,' node_pid=',node_pid, ' Max_cpu=',self.maxCpu,' Max_Mem=',self.maxMem
 			time.sleep(0.25)
 
@@ -382,6 +388,7 @@ class Generator(object):
 		if self.brd_topic in self.topics_list:
 			file.write('<node pkg="tug_ist_diagnosis_observers" type="HObs.py" name="BoardHObs" >\n')
 			file.write('</node>\n')
+		N = 'Nodes:'
 		for nd_ds in self.node_data_structure:
 			node_name = nd_ds.get_node_name()
 			node_name = node_name[1:len(node_name)]
@@ -413,17 +420,24 @@ class Generator(object):
 			file.write('\t<param name="mismatch_th" value="'+str(self.p_mismatch_th)+'" />\n')
 			file.write('\t<param name="ws" value="'+str(self.param_p_ws)+'" />\n')
 			file.write('</node>\n')
+			N = N+'('+node_name+',CPU='+str(node_mxCpu)+',MEM='+str(node_mxMem)+')'
+		D = 'Delta = ['
+		S = 'Sigma = ['
+		T = 'Topics = ['
 		for t in self.topics_list:
 			for tpc_ds in self.topic_data_structure:
 				if t == tpc_ds.get_topic_name():
-					tpc_ds.calculate_frq_dev()
-					#y = 'imu'
-					#if y in t:
-					#	tpc_ds.print_frq_list()
-					self.param_frq = tpc_ds.get_calculated_frq()
-					self.param_dev = tpc_ds.get_calculated_frq_dev()
+					tpc_ds.get_frequency()
+					self.param_dev = tpc_ds.get_deviation()
+					self.param_frq = tpc_ds.get_mean_occ_time()
+					self.param_g_ws = self.param_frq
+					if self.param_frq != 0:
+						self.param_g_ws = 1/self.param_frq
+					N = N+'('+t+',MeanT='+str(self.param_frq)+',Dev='+str(self.param_dev)+')'
 					break
+			#print t, self.param_frq
 			if self.param_frq == 0:
+				print '<<'+str(self.param_frq)+'>>'
 				self.zero_frq_topic_list.append(t)
 				continue
 			topic_name = t[1:len(t)]
@@ -431,9 +445,19 @@ class Generator(object):
 			file.write('<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="'+gobs_name+'" >\n')
 			file.write('\t<param name="topic" value="'+topic_name+'" />\n')
   			file.write('\t<param name="frq" value="'+str(self.param_frq)+'" />\n')
-			file.write('\t<param name="dev" value="'+str(2*self.param_dev)+'" />\n')
+			file.write('\t<param name="dev" value="'+str(self.param_dev)+'" />\n')
   			file.write('\t<param name="ws" value="'+str(self.param_g_ws)+'" />\n')
   			file.write('</node>\n')
+			T = T + t + ', '
+			D = D + str(self.param_frq) + ', '
+			S = S + str(self.param_dev) + ', '
+		D = D + ']'
+		S = S + ']'
+		T = T + ']'
+		print D
+		print S
+		print T
+		print N
 		file.write('</launch>')
 		file.close()
 

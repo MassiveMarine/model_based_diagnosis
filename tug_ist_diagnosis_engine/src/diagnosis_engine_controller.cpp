@@ -349,6 +349,7 @@ public:
           while(recv_data[i++]!='\r' || recv_data[i++]!='\n')
                   diag+=recv_data[i];
           diag_vec.push_back(diag.c_str());
+	  //ROS_INFO("diag = %s", diag.c_str());
       }
      publishDiag(diag_vec);
   }

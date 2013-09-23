@@ -64,7 +64,10 @@ class Regression(object):
 				if self.choice == 'y':
 					r1 = self.linear_regression(self.ws,self.s[0],self.t)
 				else:
-					r1 = self.value
+					intg = integrate(s)
+					r1 = self.linear_regression(self.ws,intg,self.t)
+					#r1 = self.value
+				#print 'NB',nb,'R1',r1,self.choice
 				self.s[1].pop()
 				self.s[1].append(r1)
 				r2 = self.linear_regression(self.ws,self.s[1],self.t)
@@ -74,6 +77,7 @@ class Regression(object):
 				self.s[3].pop()
 				self.s[3].append(r3)
 				self.remove_tails()
+				#print 'nb',nb,'r1:',r1,'r2:',r2,'r3:',r3,'self.value:',self.value
 				if r1<nb:
 						self.prev_value = -1
 						return -1
@@ -102,6 +106,7 @@ class Regression(object):
 				Sum_y = 0.0
 				Sum_xx = 0.0
 				last_indx =  len(t) - 1
+				print ws,'len',len(t)
 				i = last_indx
 				n = 0
 				while (i >-1) & ( (t[last_indx]-t[i]) < ws ):
@@ -114,6 +119,8 @@ class Regression(object):
 					
 				
 				self.n = n
+				print 'ws:',ws,'n=',n,'denom',(n * Sum_xx - (Sum_x * Sum_x))
+				print 'Sum_xx:',Sum_xx,'Sum_x:',Sum_x
 				if (n * Sum_xx - (Sum_x * Sum_x)) <> 0 :
 					slope = (n*Sum_xy - Sum_x * Sum_y)/(n * Sum_xx - (Sum_x * Sum_x))
 					return slope
@@ -256,6 +263,14 @@ class Qualitative_Observer(object):
 							  break
 				  c = c + 1
 				return data
+
+    def integrate(self,sig):
+		for i in xrange(len(sig)):
+			s = 0			
+			for j in xrange(i):
+				s = s + sig(j)
+			sig1(i) = s
+		return sig1 
 
 
     def publish_output(self):
