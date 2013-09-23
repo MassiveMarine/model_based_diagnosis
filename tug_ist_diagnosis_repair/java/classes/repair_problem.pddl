@@ -1,0 +1,1 @@
+(define (problem repair_problem)(:domain repair_domain)(:requirements :strips :equality :typing :negative-preconditions)(:objects laser_node )(:init (not_running laser_node)(bad laser_node))(:goal (and (good laser_node))))

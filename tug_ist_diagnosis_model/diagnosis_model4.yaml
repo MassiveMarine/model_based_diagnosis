@@ -1,0 +1,59 @@
+ab: "AB"
+nab: "NAB"
+neg_prefix: "not_"
+
+props:
+  - running(rpy_4_odom_imu_map_node)
+  - ok(rpy_4_odom_imu_map_node,cpu)
+  - ok(rpy_4_odom_imu_map_node,mem)
+  - running(gmapping)
+  - ok(gmapping,cpu)
+  - ok(gmapping,mem)
+  - running(p2os)
+  - ok(p2os,cpu)
+  - ok(p2os,mem)
+  - running(xsens_driver)
+  - ok(xsens_driver,cpu)
+  - ok(xsens_driver,mem)
+  - running(sicklms)
+  - ok(sicklms,cpu)
+  - ok(sicklms,mem)
+  - running(joy_node)
+  - ok(joy_node,cpu)
+  - ok(joy_node,mem)
+  - running(teleop_joy)
+  - ok(teleop_joy,cpu)
+  - ok(teleop_joy,mem)
+  - ok(map_matedata)
+  - ok(map)
+  - matched(pose,twist_twist_angular_z,yaw_odom,data)
+
+rules:
+  - NAB(rpy_4_odom_imu_map_node) -> running(rpy_4_odom_imu_map_node)
+  - NAB(gmapping) -> running(gmapping)
+  - NAB(p2os) -> running(p2os)
+  - NAB(sicklms) -> running(sicklms)
+  - NAB(xsens_driver) -> running(xsens_driver)
+  - NAB(joy_node) -> running(joy_node)
+  - NAB(teleop_joy) -> running(teleop_joy)
+
+  - NAB(gmapping) -> ok(gmapping,cpu)
+  - NAB(gmapping) -> ok(gmapping,mem)
+  - NAB(p2os) -> ok(p2os,cpu)
+  - NAB(p2os) -> ok(p2os,mem)
+  - NAB(sicklms) -> ok(sicklms,cpu)
+  - NAB(sicklms) -> ok(sicklms,mem)
+  - NAB(xsens_driver) -> ok(xsens_driver,cpu)
+  - NAB(xsens_driver) -> ok(xsens_driver,mem)
+  - NAB(joy_node) -> ok(joy_node,cpu)
+  - NAB(joy_node) -> ok(joy_node,mem)
+  - NAB(teleop_joy) -> ok(teleop_joy,cpu)
+  - NAB(teleop_joy) -> ok(teleop_joy,mem)
+  - NAB(rpy_4_odom_imu_map_node) -> ok(rpy_4_odom_imu_map_node,cpu)
+  - NAB(rpy_4_odom_imu_map_node) -> ok(rpy_4_odom_imu_map_node,mem)
+
+  - NAB(gmapping) -> ok(map)
+  - NAB(gmapping) -> ok(map_metadata)
+
+  - NAB(p2os), NAB(rpy_4_odom_imu_map_node) -> matched(pose,twist_twist_angular_z,yaw_odom,data)
+ 

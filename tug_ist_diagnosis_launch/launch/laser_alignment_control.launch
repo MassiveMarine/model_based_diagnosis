@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <node pkg="LaserAlignmentControl" type="LaserAlignmentControl" name="laser_alignment_control" output="screen">
+        <param name="base_link_frame" value="base_link" />
+        <param name="la_laser_platform_frame" value="la_laser_platform" />
+        <param name="servo1_name" value="la_servo1" />
+        <param name="servo2_name" value="la_servo2" />
+        <param name="servo1_offset" value="-0.01" />
+        <param name="servo2_offset" value="-0.34" />
+        <param name="ang_vel" value="1.7" />
+        <param name="blocking" value="0" />
+    </node>
+    
+</launch>

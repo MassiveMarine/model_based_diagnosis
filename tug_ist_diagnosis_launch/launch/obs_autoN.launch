@@ -1,0 +1,416 @@
+<?xml version="1.0"?>
+<launch>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="map_serverNObs" >
+	<param name="node" value="map_server" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="map_serverCpuPObs" >
+	<param name="node" value="map_server" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="6" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="map_serverMemPObs" >
+	<param name="node" value="map_server" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="7.3" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="move_baseNObs" >
+	<param name="node" value="move_base" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="move_baseCpuPObs" >
+	<param name="node" value="move_base" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="6" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="move_baseMemPObs" >
+	<param name="node" value="move_base" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="7.3" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="DObs.py" name="p2osDObs" >
+	<param name="dev_node" value="p2os" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="p2osNObs" >
+	<param name="node" value="p2os" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="p2osCpuPObs" >
+	<param name="node" value="p2os" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="6" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="p2osMemPObs" >
+	<param name="node" value="p2os" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="7.3" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="amclNObs" >
+	<param name="node" value="amcl" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="amclCpuPObs" >
+	<param name="node" value="amcl" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="6" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="amclMemPObs" >
+	<param name="node" value="amcl" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="7.3" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="diagnosis_engineNObs" >
+	<param name="node" value="diagnosis_engine" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="diagnosis_engineCpuPObs" >
+	<param name="node" value="diagnosis_engine" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="6" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="diagnosis_engineMemPObs" >
+	<param name="node" value="diagnosis_engine" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="7.3" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="DObs.py" name="sicklmsDObs" >
+	<param name="dev_node" value="sicklms" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="sicklmsNObs" >
+	<param name="node" value="sicklms" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="sicklmsCpuPObs" >
+	<param name="node" value="sicklms" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="6" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="sicklmsMemPObs" >
+	<param name="node" value="sicklms" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="7.3" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="simple_navigation_goalsNObs" >
+	<param name="node" value="simple_navigation_goals" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="simple_navigation_goalsCpuPObs" >
+	<param name="node" value="simple_navigation_goals" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="6" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="simple_navigation_goalsMemPObs" >
+	<param name="node" value="simple_navigation_goals" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="7.3" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="150" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="map_metadataGObs" >
+	<param name="topic" value="map_metadata" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/global_costmap/robot_footprintGObs" >
+	<param name="topic" value="move_base/global_costmap/robot_footprint" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sonarGObs" >
+	<param name="topic" value="sonar" />
+	<param name="frq" value="10.0272790874" />
+	<param name="dev" value="0.413864679692" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/current_goalGObs" >
+	<param name="topic" value="move_base/current_goal" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/parameter_descriptionsGObs" >
+	<param name="topic" value="move_base/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="motor_stateGObs" >
+	<param name="topic" value="motor_state" />
+	<param name="frq" value="10.0256141553" />
+	<param name="dev" value="0.391342666542" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/global_costmap/inflated_obstaclesGObs" >
+	<param name="topic" value="move_base/global_costmap/inflated_obstacles" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/global_costmap/parameter_updatesGObs" >
+	<param name="topic" value="move_base/global_costmap/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="amcl_poseGObs" >
+	<param name="topic" value="amcl_pose" />
+	<param name="frq" value="1.08794041845" />
+	<param name="dev" value="0.557791972725" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="tfGObs" >
+	<param name="topic" value="tf" />
+	<param name="frq" value="17.8363341002" />
+	<param name="dev" value="3.25663393794" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/local_costmap/obstaclesGObs" >
+	<param name="topic" value="move_base/local_costmap/obstacles" />
+	<param name="frq" value="10.0351879023" />
+	<param name="dev" value="0.465977544529" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="poseGObs" >
+	<param name="topic" value="pose" />
+	<param name="frq" value="10.0265361833" />
+	<param name="dev" value="0.403845249658" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="scanGObs" >
+	<param name="topic" value="scan" />
+	<param name="frq" value="9.40265963229" />
+	<param name="dev" value="0.391106641727" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/NavfnROS/NavfnROS_costmap/unknown_spaceGObs" >
+	<param name="topic" value="move_base/NavfnROS/NavfnROS_costmap/unknown_space" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/local_costmap/unknown_spaceGObs" >
+	<param name="topic" value="move_base/local_costmap/unknown_space" />
+	<param name="frq" value="10.0333416999" />
+	<param name="dev" value="0.439741292842" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="dioGObs" >
+	<param name="topic" value="dio" />
+	<param name="frq" value="10.0268158437" />
+	<param name="dev" value="0.408008648213" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/TrajectoryPlannerROS/global_planGObs" >
+	<param name="topic" value="move_base/TrajectoryPlannerROS/global_plan" />
+	<param name="frq" value="19.9336831923" />
+	<param name="dev" value="0.698267651608" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="gripper_stateGObs" >
+	<param name="topic" value="gripper_state" />
+	<param name="frq" value="10.0264405929" />
+	<param name="dev" value="0.40360223645" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="battery_stateGObs" >
+	<param name="topic" value="battery_state" />
+	<param name="frq" value="10.0266726912" />
+	<param name="dev" value="0.407553106575" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/local_costmap/robot_footprintGObs" >
+	<param name="topic" value="move_base/local_costmap/robot_footprint" />
+	<param name="frq" value="10.0322787704" />
+	<param name="dev" value="0.431409144358" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/parameter_updatesGObs" >
+	<param name="topic" value="move_base/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/statusGObs" >
+	<param name="topic" value="move_base/status" />
+	<param name="frq" value="5.08034465151" />
+	<param name="dev" value="0.251955801462" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="particlecloudGObs" >
+	<param name="topic" value="particlecloud" />
+	<param name="frq" value="1.08772829498" />
+	<param name="dev" value="0.557285592162" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/resultGObs" >
+	<param name="topic" value="move_base/result" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/TrajectoryPlannerROS/parameter_descriptionsGObs" >
+	<param name="topic" value="move_base/TrajectoryPlannerROS/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="mapGObs" >
+	<param name="topic" value="map" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="diagnosticsGObs" >
+	<param name="topic" value="diagnostics" />
+	<param name="frq" value="1.86735360647" />
+	<param name="dev" value="0.0548813228848" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="cmd_velGObs" >
+	<param name="topic" value="cmd_vel" />
+	<param name="frq" value="19.9426028262" />
+	<param name="dev" value="0.595170673531" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/NavfnROS/NavfnROS_costmap/robot_footprintGObs" >
+	<param name="topic" value="move_base/NavfnROS/NavfnROS_costmap/robot_footprint" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/global_costmap/obstaclesGObs" >
+	<param name="topic" value="move_base/global_costmap/obstacles" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/local_costmap/parameter_updatesGObs" >
+	<param name="topic" value="move_base/local_costmap/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/goalGObs" >
+	<param name="topic" value="move_base/goal" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="amcl/parameter_descriptionsGObs" >
+	<param name="topic" value="amcl/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/TrajectoryPlannerROS/local_planGObs" >
+	<param name="topic" value="move_base/TrajectoryPlannerROS/local_plan" />
+	<param name="frq" value="19.3559977308" />
+	<param name="dev" value="3.48812142783" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/local_costmap/inflated_obstaclesGObs" >
+	<param name="topic" value="move_base/local_costmap/inflated_obstacles" />
+	<param name="frq" value="10.0357549957" />
+	<param name="dev" value="0.485121490584" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/TrajectoryPlannerROS/cost_cloudGObs" >
+	<param name="topic" value="move_base/TrajectoryPlannerROS/cost_cloud" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/global_costmap/unknown_spaceGObs" >
+	<param name="topic" value="move_base/global_costmap/unknown_space" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="amcl/parameter_updatesGObs" >
+	<param name="topic" value="amcl/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/NavfnROS/NavfnROS_costmap/inflated_obstaclesGObs" >
+	<param name="topic" value="move_base/NavfnROS/NavfnROS_costmap/inflated_obstacles" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/TrajectoryPlannerROS/parameter_updatesGObs" >
+	<param name="topic" value="move_base/TrajectoryPlannerROS/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="ptz_stateGObs" >
+	<param name="topic" value="ptz_state" />
+	<param name="frq" value="10.0256300117" />
+	<param name="dev" value="0.398783929095" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="aioGObs" >
+	<param name="topic" value="aio" />
+	<param name="frq" value="10.0245796307" />
+	<param name="dev" value="0.385216188976" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/local_costmap/parameter_descriptionsGObs" >
+	<param name="topic" value="move_base/local_costmap/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/NavfnROS/planGObs" >
+	<param name="topic" value="move_base/NavfnROS/plan" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/NavfnROS/NavfnROS_costmap/obstaclesGObs" >
+	<param name="topic" value="move_base/NavfnROS/NavfnROS_costmap/obstacles" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/feedbackGObs" >
+	<param name="topic" value="move_base/feedback" />
+	<param name="frq" value="20.0226241512" />
+	<param name="dev" value="0.231835925031" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/global_costmap/parameter_descriptionsGObs" >
+	<param name="topic" value="move_base/global_costmap/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="move_base/cancelGObs" >
+	<param name="topic" value="move_base/cancel" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="100" />
+</node>
+</launch>

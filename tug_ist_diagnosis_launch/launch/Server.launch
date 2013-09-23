@@ -1,0 +1,3 @@
+<launch>
+ <node pkg="diagnosis_engine" type="diagnosis_engine.sh" name="diagnosis_engine" />
+</launch>
