@@ -29,6 +29,8 @@ import shlex
 import thread
 from math import sqrt
 from geometry_msgs.msg import Quaternion
+from std_msgs.msg._Header import Header
+from rosgraph_msgs.msg._Log import Log
 import time
 import tf
 class Generator(object):
@@ -56,25 +58,25 @@ class Generator(object):
 
 	def callback(self,data,topic):
 		try:
+			self.fields = []
 			curr_t = time.time()
-			self.rec_call(data,topic)
+			self.rec_call(data,[topic,topic])
 
 		except AttributeError:
 			e = sys.exc_info()[0]	
 			print e			
 
 	def rec_call(self,data,field):
-		#self.ok_topics_list.append(field[0])
 		self.fields.append(field[1])
 		try:    
 			if data.__class__ == Quaternion:
 				#print topic, data.__class__
 				list_name = ''
-					for f in self.fields:
-						list_name = list_name + f + '_'
-					
+				for f in self.fields:
+					list_name = list_name + f + '_'
+				#print list_name
 				rpy = tf.transformations.euler_from_quaternion([data.x,data.y,data.z,data.w])
-				print field[0],'_',self.fields,'==',rpy[0], rpy[1], rpy[2],'\n\n--------------------'
+				print list_name,'=',rpy[0], rpy[1], rpy[2]
 				#self.topic = self.ok_topics_list.pop(0) + '_'
 				#self.ok_topics_list.clear()
 				self.fields.pop()
@@ -84,17 +86,26 @@ class Generator(object):
 					list_name = ''
 					for f in self.fields:
 						list_name = list_name + f + '_'
-					print field[0],'_',list_name,'==',data,'\n\n--------------------'
-					self.topic = self.ok_topics_list.pop(0) + '_'
-					self.ok_topics_list.clear()
+					#print list_name
+					print list_name,'=',data
 					self.fields.pop()
 				else:
-					st = data._slot_types
-					for l1 in data.__slots__:
-						#print l1
-						l = getattr(data,l1)
-						self.rec_call(l,[field[0],l1])
-					self.fields = []
+					if (type(data) != Header) & (type(data)!=bool) & (type(data)!=str) & (type(data) != Log) :
+						#print 'Hello'
+						#st = data._slot_types
+						#msg_cls = roslib.message.get_message_class(data)
+						#if type(data) == list:
+						#	print data #, msg_cls
+						#	break
+						#print type(data), data.__class__#,data.__slots__#, msg_cls
+						for l1 in data.__slots__:
+							#print l1
+							l = getattr(data,l1)
+							self.rec_call(l,[field[0],l1])
+						self.fields.pop()
+					else:
+						#print data.__class__
+						self.fields.pop()
 		except:
 			pass
 			#print sys.exc_info()[0]
@@ -138,10 +149,10 @@ class Generator(object):
 		pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
 		l = len(topicList)
 		for i in xrange(l):
-			#print '--------',topicList[i][0],i,'---------'
+			print '--------',topicList[i][0],i,'---------'
 			msg_class = roslib.message.get_message_class(topicList[i][1])
-			#print msg_class._slot_types
-			#print msg_class.__slots__
+			print msg_class._slot_types
+			print msg_class.__slots__
 			self.topic = topicList[i][0]
 			self.get_fieldsRecursive(topicList[i][0],topicList[i][1])
 			#if self.topic_has_value == True:
@@ -152,7 +163,7 @@ class Generator(object):
 		for topic in topicList:
 			if (topic[0] in self.ok_topics_list) & (topic[0].find('imu')<0):
 				msg_class = roslib.message.get_message_class(topic[1])
-				rospy.Subscriber(topic[0], msg_class, self.callback, [topic[0], ''], 100)
+				rospy.Subscriber(topic[0], msg_class, self.callback, topic[0], 100)
 		print 'call back started ...'
 		rospy.spin()		
         
