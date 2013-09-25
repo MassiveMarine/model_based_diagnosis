@@ -35,6 +35,27 @@ interrupted = False
 import numpy
 import matplotlib.pyplot as plt
 import tf
+from geometry_msgs.msg import Quaternion
+from std_msgs.msg._Header import Header
+from rosgraph_msgs.msg._Log import Log
+from tf.msg._tfMessage import tfMessage
+
+class ColumnsRPY(object):
+	def __init__(self, name):
+		self.name = name
+		self.roll = []
+		self.pitch = []
+		self.yaw = []
+	def set_RPY(self,roll,pitch,yaw):
+		self.roll.append(roll)
+		self.pitch.append(pitch)
+		self.yaw.append(yaw)
+	def get_roll(self):
+		return self.roll
+	def get_pitch(self):
+		return self.pitch
+	def get_yaw(self):
+		return self.yaw
 
 class node_data_structure(object):
 	def __init__(self,node_name):
@@ -148,7 +169,6 @@ class Generator(object):
 		self.param_p_ws = rospy.get_param('~pob_ws', 10)
 		self.p_mismatch_th = rospy.get_param('~pob_mismatch_th', 5)
 		self.brd_topic = rospy.get_param('~board_topic', '/board_measurments')
-		#self.obs_time = rospy.get_param('~obs_time', 5)
 		self.nodes_list = []
 		self.topics_list = []
 		self.zero_frq_topic_list = []
@@ -164,6 +184,21 @@ class Generator(object):
 		self.maxMem = 0
 		self.prev_t = time.time()
 
+		self.fields = []
+		self.topic = ''
+		self.ok_topics_list = []
+		self.topic_has_value = False
+		self.Columns_list = []
+		self.ColumnsRPY_list = []
+		self.counter = 0
+		self.mapping = []
+		self.dataMAT = [[]]
+		self.dataFile = open('safdarFile', 'w')
+		self.basic_data_types = ['int8','uint8','int16','uint16','int32','uint32','int64','uint64','float32','float64']
+		self.basic_NOT_data_types = ['bool','str','string','time','std_msgs/Header','byte', 'duration']
+		self.array_data_types = ['time','string[','float32[','float64[','int8[','uint8[','int16[','uint16[','int32[','uint32[','int64[','uint64[']
+
+
 
 	def start(self):
 		signal.signal(signal.SIGINT, self.signal_handler)
@@ -175,6 +210,18 @@ class Generator(object):
 			if interrupted:
 		      		break;
 			time.sleep(1)
+
+	def end(self):
+		for col in self.ColumnsRPY_list:
+			print col[0],'ROLL:',col[1].get_roll()
+			print col[0],'PITCH:',col[1].get_pitch()
+			print col[0],'YAW:',col[1].get_yaw()
+
+		for col in self.Columns_list:
+			print col[0],'DATA:',col[1]
+
+		self.dataFile.close()
+
 		#i = 1
 		#for tpc_ds in self.topic_data_structure:
 			#topic_name = tpc_ds.topic_name[1:len(tpc_ds.topic_name)]
@@ -207,6 +254,7 @@ class Generator(object):
 			#else:
 			#	print 'No:'+tpc_ds.topic_name
 
+
 	def auto_correlate(self,tpc_ds):
 		lst = tpc_ds.occur_list
 		mean = numpy.mean(lst)
@@ -221,13 +269,13 @@ class Generator(object):
 		global interrupted
 		START_TIME = time.time()
 		print 'START Time='+str(START_TIME)
-		time.sleep(1)
+		time.sleep(2)
 		print 'making observers started....'
 		self.make_obs_launch()
 		print 'making observers finished....'
-		#print 'making model started....'
-		#self.make_mdl_yaml()
-		#print 'making model finished....'
+		print 'making model started....'
+		self.make_mdl_yaml()
+		print 'making model finished....'
 		print 'matlabfile....'
 		self.make_mat()
 		END_TIME = time.time()
@@ -238,12 +286,31 @@ class Generator(object):
 	def make_mat(self):
 		list_of_tdata = []
 		list_of_topics = []
+		list_rpy_data = []
+		rpy_names = []
+		list_col_data = []
+		col_names = []
 		for tpc_ds in self.topic_data_structure:
 			top_name = tpc_ds.get_topic_name()
 			list_of_tdata.append(tpc_ds.get_current_time_list())
 			list_of_topics.append(top_name)
-		mat_file = {'topics': list_of_topics, 'curr_time': list_of_tdata}
-		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/curr_time.mat', {'Curr_time': mat_file})
+		
+		for col in self.ColumnsRPY_list:
+			#print col[0],'ROLL:',col[1].get_roll()
+			#print col[0],'PITCH:',col[1].get_pitch()
+			#print col[0],'YAW:',col[1].get_yaw()
+			rpy_names.append(col[0])
+			list_rpy_data.append(col[1].get_roll())
+			list_rpy_data.append(col[1].get_pitch())
+			list_rpy_data.append(col[1].get_yaw())
+
+		for col in self.Columns_list:
+			#print col[0],'DATA:',col[1]
+			col_names.append(col[0])
+			list_col_data.append(col[1])
+
+		mat_file = {'topics': list_of_topics, 'curr_time': list_of_tdata, 'rpy_names': rpy_names, 'list_rpy_data': list_rpy_data, 'col_names': col_names, 'list_col_data': list_col_data}
+		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'Curr_time': mat_file})
 		
        
 	def spin_thread(self):
@@ -254,25 +321,73 @@ class Generator(object):
 			tpc_ds.get_signal_nature()
 
 	def callback(self,data,topic):
-		curr_t = rospy.get_rostime()
-		for tpc_ds in self.topic_data_structure:
-			if topic == tpc_ds.get_topic_name():
-				tpc_ds.save_current_time(curr_t.secs+curr_t.nsecs*1e-9)
-		self.prev_t = curr_t
+		try:
+			curr_t = rospy.get_rostime()
+			for tpc_ds in self.topic_data_structure:
+				if topic == tpc_ds.get_topic_name():
+					tpc_ds.save_current_time(curr_t.secs+curr_t.nsecs*1e-9)
+			self.prev_t = curr_t
+			if topic in self.ok_topics_list:
+				fields = []
+				self.rec_call(data,topic,fields)
 
-	def callbackB(self,data,topic):
-		curr_t = time.time()
-		for tpc_ds in self.topic_data_structure:
-			occurance = 0
-			if topic == tpc_ds.get_topic_name():
-				delta_t = curr_t - tpc_ds.get_prev_t()
-				tpc_ds.calc_frq(delta_t)
-				tpc_ds.set_prev_t(curr_t)
-				occurance = 1
-			tpc_ds.set_occur(occurance)
+		except AttributeError:
+			e = sys.exc_info()[0]	
+			print e			
+
+
+	def rec_call(self,data,field,fields):
+		try:
+			fields.append(field)
+			if type(data) == Quaternion:
+				list_name = ''
+				l = len(fields)
+				for f in fields:
+					list_name = list_name + f + '_'
+				rpy = tf.transformations.euler_from_quaternion([data.x,data.y,data.z,data.w])
+				for col in self.ColumnsRPY_list:
+					if col[0] == list_name:
+						col[1].set_RPY(float(rpy[0]), float(rpy[1]), float(rpy[2]))
+						break
+				#print list_name, '==', rpy[0], rpy[1], rpy[2]
+				fields.pop()
+			else:
+				if (type(data) == int) | (type(data) == float):
+					list_name = ''
+					for f in fields:
+						list_name = list_name + f + '_'
+					#print list_name, '=', data
+					for col in self.Columns_list:
+						if col[0] == list_name:
+							col[1].append(float(data))
+							break
+					fields.pop()
+				else:
+					if (type(data) != Header) & (type(data)!=bool) & (type(data)!=str):
+						flds = data.__slots__
+						#print flds
+						i = 0
+						for typ in data._slot_types:
+							if typ == 'time':
+								i = i + 1
+								continue							
+							k= typ.find('[')
+							if k > -1:
+								if typ[0:k+1] in self.array_data_types:
+									i = i + 1
+									continue;
+							val = getattr(data,flds[i])
+							self.rec_call(val,flds[i],fields)
+							
+							i = i + 1
+						fields.pop()
+					else:
+						fields.pop()
+						
+		except:
+			pass
+			#print sys.exc_info()[0]
 				
-
-
 	def threaded_extract_mem_cpu(self):
 		while True :
 			for node_ds in self.node_data_structure:
@@ -289,34 +404,92 @@ class Generator(object):
 				out1 = shlex.split(out)
 				mem = float(out1[len(out1)-3])
 				node_ds.set_mem(mem)
-				#print 'node_name=',node_name,' node_pid=',node_pid, ' Max_cpu=',self.maxCpu,' Max_Mem=',self.maxMem
 			time.sleep(0.25)
 
+	def get_fieldsRecursive(self,field,msg_class):
+		self.fields.append(field)
+		if msg_class.find('Quaternion') > -1:
+			list_name = ''
+			for f in self.fields:
+				list_name = list_name + f + '_'
+			self.ColumnsRPY_list.append((list_name, ColumnsRPY(list_name)))		
+		t = ''
+		ln = len(msg_class)
+		msg_class_arr=''
+		if msg_class[ln-1] == ']':
+			j = msg_class.find('[')
+			t = msg_class[j+1:ln-1]
+			msg_class_arr = msg_class
+			msg_class = msg_class[0:j+1]
+		if (msg_class in self.basic_data_types):
+			list_name = ''
+			for f in self.fields:
+				list_name = list_name + f + '_'
+			self.counter = self.counter + 1
+			self.ok_topics_list.append(self.topic)
+			print self.counter, ':', list_name, msg_class
+			self.Columns_list.append((list_name, []))
+			self.fields.pop()
+		else:
+			if (msg_class not in self.basic_NOT_data_types) & (msg_class not in self.array_data_types):
+				if msg_class[len(msg_class)-1] == '[':
+					msg_class = msg_class[0:len(msg_class)-1]
+				msg_class = roslib.message.get_message_class(msg_class)
+				fields = msg_class.__slots__
+				x = 0
+				for itm in msg_class._slot_types:
+					self.get_fieldsRecursive(fields[x],itm)
+					x = x + 1
+				self.fields.pop()
+			else:
+				self.fields.pop()
+
 	def extract_nodes_topics(self):
+		#pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
+		#for topic in topicList:
+		#	if topic[0] not in self.topics_list:
+		#		self.topics_list.append(topic[0])
+		#		msg_class = roslib.message.get_message_class(topic[1])
+		#		self.topic_data_structure.append(topic_data_structure(topic[0],self.param_gen_ws))
+		#		rospy.Subscriber(topic[0], msg_class, self.callback, topic[0])
+#-------
 		pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
-		#print topicList			
+		l = len(topicList)
+		for i in xrange(l):
+			self.topic = topicList[i][0]
+			topic_type = topicList[i][1]
+			self.topics_list.append(self.topic)
+			#print '--------',self.topic,i,'---------'
+			msg_class = roslib.message.get_message_class(topic_type)
+			self.topic_data_structure.append(topic_data_structure(self.topic, self.param_gen_ws))
+			#print msg_class._slot_types
+			#print msg_class.__slots__
+			self.get_fieldsRecursive(self.topic, topic_type)
+
+#		for obj in self.Columns_list:
+#			print 'OBJ: name=',obj[0],' class:', obj[1]
+#		for obj in self.ColumnsRPY_list:
+#			print 'OBJRPY: name=',obj[0],' class:', obj[1]
+		
 		for topic in topicList:
-			#if (topic[0] == '/rosout') | (topic[0] == '/rosout_agg'):
-			#	continue
-			if topic[0] not in self.topics_list:
-				self.topics_list.append(topic[0])
+			if (topic[0] in self.ok_topics_list) & (topic[0].find('/tf')<0):
 				msg_class = roslib.message.get_message_class(topic[1])
-				self.topic_data_structure.append(topic_data_structure(topic[0],self.param_gen_ws))
-				rospy.Subscriber(topic[0], msg_class, self.callback, topic[0])
-		for n in self.nodes_list:
-			print n
-		for t in self.topics_list:
-			print t
-		print '==================='
+				rospy.Subscriber(topic[0], msg_class, self.callback, topic[0], 100)
+		#print 'call back started ...'
+		#rospy.spin()	
+#---------
+		#for n in self.nodes_list:
+		#	print n
+		#for t in self.topics_list:
+		#	print t
+		#print '==================='
 
 		code, statusMessage, sysState = self.m.getSystemState(self.caller_id)
-		#print sysState
 		Pubs = sysState[0]
 		Subs = sysState[1]
 		for lst in sysState:
 			for row in lst:
 				for node in row[1]:
-					#if (node == '/rosout') | (node == '/observers_generator') | ('rostopic' in node):
 					if (node == '/observers_generator') | ('rostopic' in node) :
 						continue
 					if node not in self.nodes_list:
@@ -335,30 +508,25 @@ class Generator(object):
 								nd_ds.add_sub_topic(item[0])
 						self.node_data_structure.append(nd_ds)
 						print 'node=',node,' pid=',pid
-					
+
+
 	def threaded_extract_nodes_topics(self):
 		while True :
 			pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
-			#print topicList			
 			for topic in topicList:
-				#if (topic[0] == '/rosout') | (topic[0] == '/rosout_agg') :
-				#	continue
 				if topic[0] not in self.topics_list:
 					self.topics_list.append(topic[0])
 					msg_class = roslib.message.get_message_class(topic[1])
 					self.topic_data_structure.append(topic_data_structure(topic[0],self.param_gen_ws))
 					rospy.Subscriber(topic[0], msg_class, self.callback, topic[0])
 
-			#print '------------------------'
-	
+			
 			code, statusMessage, sysState = self.m.getSystemState(self.caller_id)
-			#print sysState
 			Pubs = sysState[0]
 			Subs = sysState[1]
 			for lst in sysState:
 				for row in lst:
 					for node in row[1]:
-						#if (node == '/rosout') | (node == '/observers_generator')  | ('rostopic' in node):
 						if (node == '/observers_generator') | ('rostopic' in node) :
 							continue
 						if node not in self.nodes_list:
@@ -377,7 +545,6 @@ class Generator(object):
 								if (node in item[1]) & (item[0] in self.topics_list):
 									nd_ds.add_sub_topic(item[0])
 							self.node_data_structure.append(nd_ds)
-							#print 'node=',node,' pid=',pid
 
 			time.sleep(0.5)
 			
@@ -420,7 +587,7 @@ class Generator(object):
 			file.write('\t<param name="mismatch_th" value="'+str(self.p_mismatch_th)+'" />\n')
 			file.write('\t<param name="ws" value="'+str(self.param_p_ws)+'" />\n')
 			file.write('</node>\n')
-			N = N+'('+node_name+',CPU='+str(node_mxCpu)+',MEM='+str(node_mxMem)+')'
+			N = N+'('+node_name+', CPU='+str(node_mxCpu)+', MEM='+str(node_mxMem)+')'
 		D = 'Delta = ['
 		S = 'Sigma = ['
 		T = 'Topics = ['
@@ -580,3 +747,4 @@ class Generator(object):
 if __name__ == '__main__':
 	generator = Generator()
 	generator.start()
+	#generator.end()

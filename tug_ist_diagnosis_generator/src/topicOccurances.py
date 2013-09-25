@@ -126,6 +126,7 @@ class Generator(object):
 				else:
 					if (type(data) != Header) & (type(data)!=bool) & (type(data)!=str):
 						flds = data.__slots__
+						print flds
 						i = 0
 						for typ in data._slot_types:
 							if typ == 'time':
@@ -212,7 +213,7 @@ class Generator(object):
 			print 'OBJRPY: name=',obj[0],' class:', obj[1]
 		
 		for topic in topicList:
-			if (topic[0] in self.ok_topics_list) & (topic[0].find('/tf')<0):
+			if (topic[0] in self.ok_topics_list) & (topic[0].find('/tf')>-1):
 				msg_class = roslib.message.get_message_class(topic[1])
 				rospy.Subscriber(topic[0], msg_class, self.callback, topic[0], 100)
 
