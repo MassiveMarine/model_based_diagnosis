@@ -310,7 +310,7 @@ class Generator(object):
 			list_col_data.append(col[1])
 
 		mat_file = {'topics': list_of_topics, 'curr_time': list_of_tdata, 'rpy_names': rpy_names, 'list_rpy_data': list_rpy_data, 'col_names': col_names, 'list_col_data': list_col_data}
-		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'Curr_time': mat_file})
+		sio.savemat('/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'Curr_time': mat_file})
 		
        
 	def spin_thread(self):
@@ -550,7 +550,8 @@ class Generator(object):
 			time.sleep(0.5)
 			
 	def make_obs_launch(self):
-		temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
+		#temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
+		temp_path = "/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
 		file = open(temp_path, 'wb')
 		file.write('<?xml version="1.0"?>\n<launch>\n')
 		if self.brd_topic in self.topics_list:
@@ -630,7 +631,7 @@ class Generator(object):
 		file.close()
 
 	def make_mdl_yaml(self):
-		temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		temp_path = "/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
 		file = open(temp_path, 'wb')
 		file.write('ab: "AB"\nnab: "NAB"\nneg_prefix: "not_"\n\nprops:\n')
 		for n in self.nodes_list:
@@ -737,7 +738,7 @@ class Generator(object):
 
 	def run_model_server(self):
 		command = "rosrun tug_ist_diagnosis_model diagnosis_model_server.py"
-		param = "_model:=/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		param = "_model:=/home/tedusar/code/fuerte_ws/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
 		output = subprocess.Popen(command+param , shell=True,stdout=subprocess.PIPE)
 		
 	
