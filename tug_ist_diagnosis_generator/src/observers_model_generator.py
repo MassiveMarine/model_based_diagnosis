@@ -20,7 +20,7 @@
 ##
 
 import roslib.message;roslib.load_manifest('tug_ist_diagnosis_generator')
-import scipy.io as sio
+#import scipy.io as sio
 import rospy
 import sys
 import xmlrpclib
@@ -33,7 +33,7 @@ from math import sqrt
 import signal
 interrupted = False
 import numpy
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import tf
 from geometry_msgs.msg import Quaternion
 from std_msgs.msg._Header import Header
@@ -132,7 +132,7 @@ class topic_data_structure(object):
 		if n == 0:
 			return 0
 		self.mean_occ_time = float(sum(self.delta_time_list))/n
-		dev = sqrt(sum((x-self.mean_occ_time)**2 for x in self.delta_time_list)/(n-1))
+		dev = sqrt(sum((x-self.mean_occ_time)**2 for x in self.delta_time_list)/n)
 		return dev
 	def get_frequency(self):
 		if len(self.current_time_list) == 0:
@@ -397,7 +397,7 @@ class Generator(object):
 				self.out = p.communicate()[0]
 				self.out1 = shlex.split(self.out)
 				cpu = self.out1[8]
-				print 'cpu=',cpu
+				#print 'cpu=',cpu
 				node_ds.set_cpu(float(cpu))
 				p = subprocess.Popen("pmap -x %s" %node_pid, shell=True,stdout=subprocess.PIPE)
 				out = p.communicate()[0]
@@ -471,10 +471,6 @@ class Generator(object):
 #		for obj in self.ColumnsRPY_list:
 #			print 'OBJRPY: name=',obj[0],' class:', obj[1]
 		
-		for topic in topicList:
-			if (topic[0] in self.ok_topics_list) & (topic[0].find('/tf')<0):
-				msg_class = roslib.message.get_message_class(topic[1])
-				rospy.Subscriber(topic[0], msg_class, self.callback, topic[0], 100)
 		#print 'call back started ...'
 		#rospy.spin()	
 #---------
@@ -508,6 +504,11 @@ class Generator(object):
 								nd_ds.add_sub_topic(item[0])
 						self.node_data_structure.append(nd_ds)
 						print 'node=',node,' pid=',pid
+		for topic in topicList:
+			if (topic[0] in self.ok_topics_list) & (topic[0].find('/tf')<0):
+				msg_class = roslib.message.get_message_class(topic[1])
+				rospy.Subscriber(topic[0], msg_class, self.callback, topic[0], 100)
+
 
 
 	def threaded_extract_nodes_topics(self):
@@ -604,7 +605,7 @@ class Generator(object):
 					break
 			#print t, self.param_frq
 			if self.param_frq == 0:
-				print '<<'+str(self.param_frq)+'>>'
+				#print '<<'+str(self.param_frq)+'>>'
 				self.zero_frq_topic_list.append(t)
 				continue
 			topic_name = t[1:len(t)]
@@ -621,10 +622,10 @@ class Generator(object):
 		D = D + ']'
 		S = S + ']'
 		T = T + ']'
-		print D
-		print S
-		print T
-		print N
+		#print D
+		#print S
+		#print T
+		#print N
 		file.write('</launch>')
 		file.close()
 
