@@ -402,6 +402,7 @@ class Generator(object):
 				p = subprocess.Popen("pmap -x %s" %node_pid, shell=True,stdout=subprocess.PIPE)
 				out = p.communicate()[0]
 				out1 = shlex.split(out)
+				print out1
 				mem = float(out1[len(out1)-3])
 				node_ds.set_mem(mem)
 			time.sleep(0.25)
