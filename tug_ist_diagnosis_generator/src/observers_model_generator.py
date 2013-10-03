@@ -20,7 +20,7 @@
 ##
 
 import roslib.message;roslib.load_manifest('tug_ist_diagnosis_generator')
-#import scipy.io as sio
+import scipy.io as sio
 import rospy
 import sys
 import xmlrpclib
@@ -46,6 +46,8 @@ class ColumnsRPY(object):
 		self.roll = []
 		self.pitch = []
 		self.yaw = []
+	def get_name(self):
+		return self.name
 	def set_RPY(self,roll,pitch,yaw):
 		self.roll.append(roll)
 		self.pitch.append(pitch)
@@ -137,20 +139,10 @@ class topic_data_structure(object):
 	def get_frequency(self):
 		if len(self.current_time_list) == 0:
 			return 0
-		#pt = self.current_time_list[0]
 		for x in range(1, len(self.current_time_list)):
 			pt = self.current_time_list[x-1]		
 			t = self.current_time_list[x]		
 			self.delta_time_list.append(t-pt)
-		#for t in self.current_time_list:
-		#	#d = t-pt
-		#	self.delta_time_list.append(t-pt)
-		#	#s = s + d
-		#	pt = t
-		#if s==0:
-		#	return 0
-		#self.frq = 1/(float(s)/len(self.current_time_list))
-		#return self.frq
 	def print_frq_list(self):
 		print 'FILE: for'+self.topic_name
 		fl = open(self.topic_name[1:len(self.topic_name)]+".txt", "w")
@@ -208,51 +200,24 @@ class Generator(object):
 		thread.start_new_thread(self.spin_thread, ())
 		while True:
 			if interrupted:
-		      		break;
+		     		break;
 			time.sleep(1)
 
-	def end(self):
-		for col in self.ColumnsRPY_list:
-			print col[0],'ROLL:',col[1].get_roll()
-			print col[0],'PITCH:',col[1].get_pitch()
-			print col[0],'YAW:',col[1].get_yaw()
-
-		for col in self.Columns_list:
-			print col[0],'DATA:',col[1]
-
-		self.dataFile.close()
-
-		#i = 1
-		#for tpc_ds in self.topic_data_structure:
-			#topic_name = tpc_ds.topic_name[1:len(tpc_ds.topic_name)]
-			#autocorr = self.auto_correlate(tpc_ds)
-			#print 'autocorr='
-			#print autocorr
-			#plt.plot(autocorr)
-			#topic_name = topic_name.replace("/","_")
-			#plt.savefig(topic_name+'.png')
-			#plt.close()
-			#del autocorr[2:5]
-			#for val in autocorr:
-            		#	autocorr.remove(val)
-			#if (topic_name == 'cmd_vel'):
-				#autocorr = self.auto_correlate(tpc_ds)
-				
-				#print 'autocorr='
-				#print autocorr
-				##plt.plot(autocorr)
-				##topic_name = topic_name.replace("/","_")
-				##plt.savefig(topic_name+'Only.png')
-				#xs1 = autocorr
-				#N = len(xs1)
-				#dwstat = []
-				#for lag in range(70000),
-				#    dxs = xs1((lag+1):N) - xs1(1:(N-lag));
-				#    dwstat = [dwstat sum(dxs1.^2) / sum(xs1.^2)];
-				    
-			#plt.show()
-			#else:
-			#	print 'No:'+tpc_ds.topic_name
+	def end1(self):
+		START_TIME = time.time()
+		print 'START Time='+str(START_TIME)
+		time.sleep(2)
+		print 'making observers started....'
+		self.make_obs_launch()
+		print 'making observers finished....'
+		print 'making model started....'
+		self.make_mdl_yaml()
+		print 'making model finished....'
+		print 'matlabfile....'
+		self.make_mat()
+		END_TIME = time.time()
+		print 'END Time='+str(END_TIME)
+		print 'Total Calculated Time='+str(END_TIME - START_TIME)
 
 
 	def auto_correlate(self,tpc_ds):
@@ -263,6 +228,19 @@ class Generator(object):
 		#autocorr = numpy.xcorr(s1n,"unbiased")
 		return autocorr
 			
+	def end(self):
+		i = 0
+		for col in self.ColumnsRPY_list:
+			i = i + 1
+			print i, col.get_name(),'ROLL:',len(col.get_roll())
+			i = i + 1
+			print i, col.get_name(),'PITCH:',len(col.get_pitch())
+			i = i + 1
+			print i, col.get_name(),'YAW:',len(col.get_yaw())
+
+		for col in self.Columns_list:
+			i = i + 1
+			print i, col[0],'DATA:',len(col[1])
 			
         def signal_handler(self,signum, frame):
 		interrupted = True
@@ -279,6 +257,7 @@ class Generator(object):
 		print 'matlabfile....'
 		self.make_mat()
 		END_TIME = time.time()
+		self.end()
 		print 'END Time='+str(END_TIME)
 		print 'Total Calculated Time='+str(END_TIME - START_TIME)
 		#self.topic_signal_nature()
@@ -296,13 +275,10 @@ class Generator(object):
 			list_of_topics.append(top_name)
 		
 		for col in self.ColumnsRPY_list:
-			#print col[0],'ROLL:',col[1].get_roll()
-			#print col[0],'PITCH:',col[1].get_pitch()
-			#print col[0],'YAW:',col[1].get_yaw()
-			rpy_names.append(col[0])
-			list_rpy_data.append(col[1].get_roll())
-			list_rpy_data.append(col[1].get_pitch())
-			list_rpy_data.append(col[1].get_yaw())
+			rpy_names.append(col.get_name())
+			list_rpy_data.append(col.get_roll())
+			list_rpy_data.append(col.get_pitch())
+			list_rpy_data.append(col.get_yaw())
 
 		for col in self.Columns_list:
 			#print col[0],'DATA:',col[1]
@@ -310,7 +286,7 @@ class Generator(object):
 			list_col_data.append(col[1])
 
 		mat_file = {'topics': list_of_topics, 'curr_time': list_of_tdata, 'rpy_names': rpy_names, 'list_rpy_data': list_rpy_data, 'col_names': col_names, 'list_col_data': list_col_data}
-		sio.savemat('/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'Curr_time': mat_file})
+		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'Curr_time': mat_file})
 		
        
 	def spin_thread(self):
@@ -329,65 +305,93 @@ class Generator(object):
 			self.prev_t = curr_t
 			if topic in self.ok_topics_list:
 				fields = []
-				self.rec_call(data,topic,fields)
-
+				#print topic
+				self.rec_call(data,type(data),topic,fields)
+						
 		except AttributeError:
 			e = sys.exc_info()[0]	
 			print e			
 
-
-	def rec_call(self,data,field,fields):
+	def rec_call(self,data,data_type,field,fields):
+		#print data_type, data
+		fields.append(field)
+		data_type_str = str(data_type)
+		j = data_type_str.find('[')
 		try:
-			fields.append(field)
 			if type(data) == Quaternion:
 				list_name = ''
 				l = len(fields)
 				for f in fields:
 					list_name = list_name + f + '_'
+				if fields[0] == '/tf':
+					list_name = list_name+self.frame_id+'_to_'+self.child_frame_id
 				rpy = tf.transformations.euler_from_quaternion([data.x,data.y,data.z,data.w])
+				found =  False
 				for col in self.ColumnsRPY_list:
-					if col[0] == list_name:
-						col[1].set_RPY(float(rpy[0]), float(rpy[1]), float(rpy[2]))
+					if col.get_name() == list_name:
+						found = True
+						col.set_RPY(float(rpy[0]), float(rpy[1]), float(rpy[2]))
 						break
-				#print list_name, '==', rpy[0], rpy[1], rpy[2]
+				if not found:
+					obj = ColumnsRPY(list_name)
+					obj.set_RPY(float(rpy[0]), float(rpy[1]), float(rpy[2]))
+					self.ColumnsRPY_list.append(obj)
+			
 				fields.pop()
+
 			else:
-				if (type(data) == int) | (type(data) == float):
+				if (data_type in self.basic_data_types):
 					list_name = ''
+					l = len(fields)
 					for f in fields:
 						list_name = list_name + f + '_'
-					#print list_name, '=', data
+					if fields[0] == '/tf':
+						list_name = list_name+self.frame_id+'_to_'+self.child_frame_id
+					found = False
 					for col in self.Columns_list:
 						if col[0] == list_name:
-							col[1].append(float(data))
+							col[1].append(data)
+							found = True
 							break
+					if not found:
+						lst = []
+						lst.append(data)
+						self.Columns_list.append((list_name, lst))
 					fields.pop()
-				else:
-					if (type(data) != Header) & (type(data)!=bool) & (type(data)!=str):
-						flds = data.__slots__
-						#print flds
-						i = 0
-						for typ in data._slot_types:
-							if typ == 'time':
-								i = i + 1
-								continue							
-							k= typ.find('[')
-							if k > -1:
-								if typ[0:k+1] in self.array_data_types:
-									i = i + 1
-									continue;
-							val = getattr(data,flds[i])
-							self.rec_call(val,flds[i],fields)
-							
-							i = i + 1
-						fields.pop()
+				else:	
+					if j > -1 :
+						data_type = data_type_str[0:j+1]
+					if (data_type not in self.basic_NOT_data_types) & (data_type not in self.array_data_types):
+						if j > -1 :
+							#print fields[0], data_type
+							l= len(data)
+							for d in xrange(l):
+								data1 = data[d]
+								flds1 = data1.__slots__
+								if data_type == 'geometry_msgs/TransformStamped[':
+									vd = getattr(data1,flds1[0])
+									self.frame_id = getattr(vd,vd.__slots__[2])
+									self.child_frame_id = getattr(data1,flds1[1])
+
+								x1 = 0
+								for typ1 in data1._slot_types:
+									val1 = getattr(data1,flds1[x1])
+									self.rec_call(val1,typ1,flds1[x1],fields)
+									x1 = x1 + 1
+							fields.pop()
+						else:
+							flds = data.__slots__
+							x = 0
+							for typ in data._slot_types:
+								val = getattr(data,flds[x])
+								self.rec_call(val,typ,flds[x],fields)
+								x = x + 1
+							fields.pop()
 					else:
 						fields.pop()
-						
 		except:
 			pass
-			#print sys.exc_info()[0]
-				
+
 	def threaded_extract_mem_cpu(self):
 		while True :
 			for node_ds in self.node_data_structure:
@@ -402,7 +406,7 @@ class Generator(object):
 				p = subprocess.Popen("pmap -x %s" %node_pid, shell=True,stdout=subprocess.PIPE)
 				out = p.communicate()[0]
 				out1 = shlex.split(out)
-				print out1[len(out1)-3]
+				#print out1[len(out1)-3]
 				mem = float(out1[len(out1)-3])
 				node_ds.set_mem(mem)
 			time.sleep(0.25)
@@ -413,7 +417,7 @@ class Generator(object):
 			list_name = ''
 			for f in self.fields:
 				list_name = list_name + f + '_'
-			self.ColumnsRPY_list.append((list_name, ColumnsRPY(list_name)))		
+			#self.ColumnsRPY_list.append((list_name, ColumnsRPY(list_name)))		
 		t = ''
 		ln = len(msg_class)
 		msg_class_arr=''
@@ -428,8 +432,8 @@ class Generator(object):
 				list_name = list_name + f + '_'
 			self.counter = self.counter + 1
 			self.ok_topics_list.append(self.topic)
-			print self.counter, ':', list_name, msg_class
-			self.Columns_list.append((list_name, []))
+			#print self.counter, ':', list_name, msg_class
+			#self.Columns_list.append((list_name, []))
 			self.fields.pop()
 		else:
 			if (msg_class not in self.basic_NOT_data_types) & (msg_class not in self.array_data_types):
@@ -467,10 +471,12 @@ class Generator(object):
 			#print msg_class.__slots__
 			self.get_fieldsRecursive(self.topic, topic_type)
 
-#		for obj in self.Columns_list:
-#			print 'OBJ: name=',obj[0],' class:', obj[1]
-#		for obj in self.ColumnsRPY_list:
-#			print 'OBJRPY: name=',obj[0],' class:', obj[1]
+		#for obj in self.Columns_list:
+		#	print 'OBJ: name=',obj[0],' class:', obj[1]
+		#for obj in self.ColumnsRPY_list:
+		#	print 'OBJRPY: name=',obj[0],' class:', obj[1]
+		#ind = self.ColumnsRPY_list.index('/tf_transforms_transform_rotation_')
+		#print 'INDEXXX', ind, 
 		
 		#print 'call back started ...'
 		#rospy.spin()	
@@ -504,11 +510,13 @@ class Generator(object):
 							if (node in item[1]) & (item[0] in self.topics_list):
 								nd_ds.add_sub_topic(item[0])
 						self.node_data_structure.append(nd_ds)
-						print 'node=',node,' pid=',pid
+						#print 'node=',node,' pid=',pid
 		for topic in topicList:
-			if (topic[0] in self.ok_topics_list) & (topic[0].find('/tf')<0):
+			#if (topic[0] in self.ok_topics_list) & (topic[0].find('/tf')>-1):
+			if topic[0] in self.ok_topics_list:
 				msg_class = roslib.message.get_message_class(topic[1])
 				rospy.Subscriber(topic[0], msg_class, self.callback, topic[0], 100)
+		#rospy.spin()
 
 
 
@@ -552,7 +560,7 @@ class Generator(object):
 			
 	def make_obs_launch(self):
 		#temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
-		temp_path = "/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
+		temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
 		file = open(temp_path, 'wb')
 		file.write('<?xml version="1.0"?>\n<launch>\n')
 		if self.brd_topic in self.topics_list:
@@ -606,10 +614,10 @@ class Generator(object):
 					N = N+'('+t+',MeanT='+str(self.param_frq)+',Dev='+str(self.param_dev)+')'
 					break
 			#print t, self.param_frq
-			if self.param_frq == 0:
-				#print '<<'+str(self.param_frq)+'>>'
-				self.zero_frq_topic_list.append(t)
-				continue
+			#if self.param_frq == 0:
+			#	print t+'<<'+str(self.param_frq)+'>>'
+			#	self.zero_frq_topic_list.append(t)
+			#	continue
 			topic_name = t[1:len(t)]
 			gobs_name = topic_name+'GObs'
 			file.write('<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="'+gobs_name+'" >\n')
@@ -632,7 +640,7 @@ class Generator(object):
 		file.close()
 
 	def make_mdl_yaml(self):
-		temp_path = "/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
 		file = open(temp_path, 'wb')
 		file.write('ab: "AB"\nnab: "NAB"\nneg_prefix: "not_"\n\nprops:\n')
 		for n in self.nodes_list:
@@ -739,7 +747,7 @@ class Generator(object):
 
 	def run_model_server(self):
 		command = "rosrun tug_ist_diagnosis_model diagnosis_model_server.py"
-		param = "_model:=/home/tedusar/code/fuerte_ws/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		param = "_model:=/home/safdar/my_workspace/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
 		output = subprocess.Popen(command+param , shell=True,stdout=subprocess.PIPE)
 		
 	
