@@ -32,8 +32,8 @@ def callback2(data):
 def test_node():
     rospy.init_node('laser_node')
     pub = rospy.Publisher('laser_topic', String)
-    rospy.Subscriber("chatter1", String, callback1)
-    rospy.Subscriber("chatter2", String, callback2)
+    #rospy.Subscriber("chatter1", String, callback1)
+    #rospy.Subscriber("chatter2", String, callback2)
     while not rospy.is_shutdown():
         str = "publishing fake laser data.."
         rospy.loginfo(str)

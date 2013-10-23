@@ -34,7 +34,14 @@ from math import sqrt
 import numpy
 import matplotlib.pyplot as plt
 
+node = '/laser_node'
+a = subprocess.Popen("rosnode info " + node , shell=True,stdout=subprocess.PIPE)
+parts = shlex.split(a.communicate()[0])
+indx = parts.index("Pid:")
+pid = parts[indx+1]
 
+print pid
+									
 
 def autocorr(x):
     result = numpy.correlate(x, x, mode='full')
@@ -45,26 +52,26 @@ def make_func(value_to_print):
         print value_to_print
     return _function
 
-f1 = make_func(1)
+#f1 = make_func(1)
 #f1()
-f2 = make_func(2)
+#f2 = make_func(2)
 #f2()
 
 
 #print autocorr([1, 0, 1, 0, 1, 0, 1, 0])
 #print autocorr([1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0])
-x = [1, 0, 1, 0, 1, 0, 1, 0]
-s1 = [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0]
+#x = [1, 0, 1, 0, 1, 0, 1, 0]
+#s1 = [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0]
 #s2 = [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1]
-s2 = [0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1]
-m1 = numpy.mean(s1)
-m2 = numpy.mean(s2)
-s11 = s1-m1
-s22 = s2-m2
-r1 = numpy.correlate(s11, s11, mode='full')
-r2 = numpy.correlate(s22, s22, mode='full')
-r1 = r1 * len(s1)
-r2 = r2 * len(s2)
+#s2 = [0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1]
+#m1 = numpy.mean(s1)
+#m2 = numpy.mean(s2)
+#s11 = s1-m1
+#s22 = s2-m2
+#r1 = numpy.correlate(s11, s11, mode='full')
+#r2 = numpy.correlate(s22, s22, mode='full')
+#r1 = r1 * len(s1)
+#r2 = r2 * len(s2)
 
 
 #signal = NP.array([3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,7,7,7,7,7,4,4,1,1,1,1,1,1,1])
@@ -78,10 +85,10 @@ r2 = r2 * len(s2)
 #print r2
 #plt.plot(r2)
 #plt.show()
-s1 = [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0]
-s2 = [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0]
-s3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-s1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-print numpy.correlate(s1, s3)
+#s1 = [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0]
+#s2 = [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0]
+#s3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+#s1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+#print numpy.correlate(s1, s3)
 
 

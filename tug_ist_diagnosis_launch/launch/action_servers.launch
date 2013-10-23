@@ -3,8 +3,8 @@
  <!-- master auto="start"/ -->
  
  <node pkg="tug_ist_diagnosis_board" 
-       type="NodeActionServer" 
-       name="NodeActionServers" 
+       type="node_action_servers" 
+       name="node_action_servers" 
        output="screen">
  </node>
 
