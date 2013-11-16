@@ -370,21 +370,26 @@ class Generator(object):
 	def threaded_extract_mem_cpu(self):
 		while True :
 			for node_ds in self.node_data_structure:
-				node_name = node_ds.get_node_name()
-				node_pid = node_ds.get_node_pid()
-				p = subprocess.Popen("top -b -n 1 | grep -i %s" %node_pid, shell=True,stdout=subprocess.PIPE)
-				self.out = p.communicate()[0]
-				self.out1 = shlex.split(self.out)
-				cpu = self.out1[8]
-				print 'node_name=',node_name, 'node_pid', node_pid
-				print 'cpu=',cpu
-				node_ds.set_cpu(float(cpu))
-				p = subprocess.Popen("pmap -x %s" %node_pid, shell=True,stdout=subprocess.PIPE)
-				out = p.communicate()[0]
-				out1 = shlex.split(out)
-				print 'mem=',out1[len(out1)-3]
-				mem = float(out1[len(out1)-3])
-				node_ds.set_mem(mem)
+				try:
+					node_name = node_ds.get_node_name()
+					node_pid = node_ds.get_node_pid()
+					p = subprocess.Popen("top -b -n 1 | grep -i %s" %node_pid, shell=True,stdout=subprocess.PIPE)
+					self.out = p.communicate()[0]
+					self.out1 = shlex.split(self.out)
+					cpu = self.out1[8]
+					print 'node_name=',node_name, 'node_pid', node_pid
+					print 'cpu=',cpu
+					node_ds.set_cpu(float(cpu))
+					p = subprocess.Popen("pmap -x %s" %node_pid, shell=True,stdout=subprocess.PIPE)
+					out = p.communicate()[0]
+					out1 = shlex.split(out)
+					print 'mem=',out1[len(out1)-3]
+					mem = float(out1[len(out1)-3])
+					node_ds.set_mem(mem)
+				except:
+					e = sys.exec_info()
+					print e
+					pass
 			time.sleep(0.25)
 
 	def get_fieldsRecursive(self,field,msg_class):
