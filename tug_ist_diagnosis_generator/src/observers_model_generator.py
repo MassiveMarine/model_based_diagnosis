@@ -88,6 +88,8 @@ class node_data_structure(object):
 		return self.sub_topic_list
 	def set_cpu(self,cpu):
 		self.cpu_list.append(cpu)
+	def get_cpu_list(self):
+		return self.cpu_list
 	def get_cpu(self):
 		n = len(self.cpu_list)
 		if n == 0:
@@ -104,6 +106,8 @@ class node_data_structure(object):
 		return mean+3*sd
 	def set_mem(self,mem):
 		self.mem_list.append(mem)
+	def get_mem_list(self):
+		return self.mem_list
 	def get_mem(self):
 		n = len(self.mem_list)
 		if n == 0:
@@ -142,7 +146,7 @@ class topic_data_structure(object):
 		self.mean_occ_time = float(sum(self.delta_time_list))/n
 		dev = sqrt(sum((x-self.mean_occ_time)**2 for x in self.delta_time_list)/n)
 		return dev
-	def get_frequency(self):
+	def process_data(self):
 		if len(self.current_time_list) == 0:
 			return 0
 		for x in range(1, len(self.current_time_list)):
@@ -165,6 +169,7 @@ class Generator(object):
 		self.param_gen_ws = rospy.get_param('~gen_ws', 10)
 		self.param_g_ws = rospy.get_param('~gob_ws', 10)
 		self.param_p_ws = rospy.get_param('~pob_ws', 10)
+		self.c = rospy.get_param('~occ_c', 10)
 		self.p_mismatch_th = rospy.get_param('~pob_mismatch_th', 5)
 		self.brd_topic = rospy.get_param('~board_topic', '/board_measurments')
 		self.nodes_list = []
@@ -176,7 +181,7 @@ class Generator(object):
 		self.topics_type_list = []
 		self.counter = 0
 		self.global_list = []
-		self.param_frq = 0
+		self.mean_delta_t = 0
 		self.param_dev = 0
 		self.maxCpu = 0
 		self.maxMem = 0
@@ -189,7 +194,10 @@ class Generator(object):
 		self.topic_has_value = False
 		self.Columns_list = []
 		self.ColumnsRPY_list = []
-		self.topic_delta_sigma_list = []
+		#self.topic_delta_sigma_list = []
+		self.all_nodes_names_list = []
+		self.all_nodes_cpu_list = []
+		self.all_nodes_mem_list = []
 		self.topic_names_list = []
 		self.counter = 0
 		self.mapping = []
@@ -278,8 +286,9 @@ class Generator(object):
 			list_col_data.append(col[2])
 		
 			
-		mat_file = {'all_topic_names': self.topic_names_list, 'all_topic_occ_times': list_of_tdata, 'rpy_topic_names': rpy_topic_names, 'rpy_fileds_names': rpy_list_names,'rpy_fileds_data': list_rpy_data, 'col_topic_names': col_topic_names, 'col_fields_names': col_list_names,'col_fields_data': list_col_data, 'topic_delta_segma': self.topic_delta_sigma_list}
-		sio.savemat('/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'model': mat_file})
+		mat_file = {'all_topic_names': self.topic_names_list, 'all_topic_occ_times': list_of_tdata, 'rpy_topic_names': rpy_topic_names, 'rpy_fileds_names': rpy_list_names,'rpy_fileds_data': list_rpy_data, 'col_topic_names': col_topic_names, 'col_fields_names': col_list_names,'col_fields_data': list_col_data, 'all_nodes_names': self.all_nodes_names_list, 'all_nodes_cpu': self.all_nodes_cpu_list, 'all_nodes_mem': self.all_nodes_mem_list}
+		sio.savemat('/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'model': mat_file})
+		#sio.savemat('/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'model': mat_file})
 		
        
 	def spin_thread(self):
@@ -367,12 +376,13 @@ class Generator(object):
 				self.out = p.communicate()[0]
 				self.out1 = shlex.split(self.out)
 				cpu = self.out1[8]
+				print 'node_name=',node_name, 'node_pid', node_pid
 				print 'cpu=',cpu
 				node_ds.set_cpu(float(cpu))
 				p = subprocess.Popen("pmap -x %s" %node_pid, shell=True,stdout=subprocess.PIPE)
 				out = p.communicate()[0]
 				out1 = shlex.split(out)
-				#print out1[len(out1)-3]
+				print 'mem=',out1[len(out1)-3]
 				mem = float(out1[len(out1)-3])
 				node_ds.set_mem(mem)
 			time.sleep(0.25)
@@ -534,9 +544,9 @@ class Generator(object):
 			time.sleep(0.5)
 			
 	def make_obs_launch(self):
-		#temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
-		temp_path = "/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
-		file = open(temp_path, 'wb')
+		#obs_file_path = "/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
+		obs_file_path = "/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
+		file = open(bs_file_path, 'wb')
 		file.write('<?xml version="1.0"?>\n<launch>\n')
 		if self.brd_topic in self.topics_list:
 			file.write('<node pkg="tug_ist_diagnosis_observers" type="HObs.py" name="BoardHObs" >\n')
@@ -574,35 +584,39 @@ class Generator(object):
 			file.write('\t<param name="ws" value="'+str(self.param_p_ws)+'" />\n')
 			file.write('</node>\n')
 			N = N+'('+node_name+', CPU='+str(node_mxCpu)+', MEM='+str(node_mxMem)+')'
+			self.all_nodes_names_list.append(node_name)
+			self.all_nodes_mem_list.append(nd_ds.get_mem_list())
+			self.all_nodes_cpu_list.append(nd_ds.get_cpu_list())
+		
 
 		for t in self.topics_list:
 			for tpc_ds in self.topic_data_structure:
 				if t == tpc_ds.get_topic_name():
-					tpc_ds.get_frequency()
+					tpc_ds.process_data()
 					self.param_dev = tpc_ds.get_deviation()
-					self.param_frq = tpc_ds.get_mean_occ_time()
-					self.param_g_ws = self.param_frq
-					if self.param_frq != 0:
-						self.param_g_ws = 1/self.param_frq
-					N = N+'('+t+',MeanT='+str(self.param_frq)+',Dev='+str(self.param_dev)+')'
+					self.mean_delta_t = tpc_ds.get_mean_occ_time()
+					self.param_g_ws = self.mean_delta_t
+					self.param_g_ws = self.c * self.mean_delta_t
+					N = N+'('+t+',MeanT='+str(self.mean_delta_t)+',Dev='+str(self.param_dev)+')'
 					break
 			topic_name = t[1:len(t)]
 			gobs_name = topic_name+'GObs'
 			file.write('<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="'+gobs_name+'" >\n')
 			file.write('\t<param name="topic" value="'+topic_name+'" />\n')
-  			file.write('\t<param name="frq" value="'+str(self.param_frq)+'" />\n')
+  			file.write('\t<param name="frq" value="'+str(self.mean_delta_t)+'" />\n')
 			file.write('\t<param name="dev" value="'+str(self.param_dev)+'" />\n')
   			file.write('\t<param name="ws" value="'+str(self.param_g_ws)+'" />\n')
   			file.write('</node>\n')
 			self.topic_names_list.append(t)
-			self.topic_delta_sigma_list.append((self.param_frq, self.param_dev))
+			#self.topic_delta_sigma_list.append((self.mean_delta_t, self.param_dev))
 
 		file.write('</launch>')
 		file.close()
 
 	def make_mdl_yaml(self):
-		temp_path = "/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
-		file = open(temp_path, 'wb')
+		#model_file_path = "/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		model_file_path = "/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		file = open(model_file_path, 'wb')
 		file.write('ab: "AB"\nnab: "NAB"\nneg_prefix: "not_"\n\nprops:\n')
 		for n in self.nodes_list:
 			node_name = n[1:len(n)]
@@ -685,7 +699,8 @@ class Generator(object):
 
 	def run_model_server(self):
 		command = "rosrun tug_ist_diagnosis_model diagnosis_model_server.py"
-		param = "_model:=/home/safdar/fuerte_workspace/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		param = "_model:=/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		#param = "_model:=/home/safdar/fuerte_workspace/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
 		output = subprocess.Popen(command+param , shell=True,stdout=subprocess.PIPE)
 	
 	def report_error(self):
