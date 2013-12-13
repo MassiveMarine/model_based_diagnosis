@@ -29,8 +29,31 @@ import shlex
 import thread
 from math import sqrt
 from geometry_msgs.msg import Quaternion
+from std_msgs.msg._Header import Header
+from rosgraph_msgs.msg._Log import Log
+from tf.msg._tfMessage import tfMessage
 import time
 import tf
+import signal
+
+class ColumnsRPY(object):
+	def __init__(self, name):
+		self.name = name
+		self.roll = []
+		self.pitch = []
+		self.yaw = []
+	def set_RPY(self,roll,pitch,yaw):
+		self.roll.append(roll)
+		self.pitch.append(pitch)
+		self.yaw.append(yaw)
+	def get_roll(self):
+		return self.roll
+	def get_pitch(self):
+		return self.pitch
+	def get_yaw(self):
+		return self.yaw
+
+
 class Generator(object):
 	def __init__(self):
 		rospy.init_node('observers_generator', anonymous=False)
@@ -40,124 +63,99 @@ class Generator(object):
 		self.topic = ''
 		self.ok_topics_list = []
 		self.topic_has_value = False
+		self.Columns_list = []
+		self.ColumnsRPY_list = []
 		self.counter = 0
 		self.mapping = []
 		self.dataMAT = [[]]
 		self.dataFile = open('safdarFile', 'w')
+		self.basic_data_types = ['int8','uint8','int16','uint16','int32','uint32','int64','uint64','float32','float64']
+		self.basic_NOT_data_types = ['bool','str','string','time','std_msgs/Header','byte', 'duration']
+		self.array_data_types = ['time','string[','float32[','float64[','int8[','uint8[','int16[','uint16[','int32[','uint32[','int64[','uint64[']
 		
 	def start(self):
 		self.extract_nodes_topics()
-		#self.get_fields()
 
 	def end(self):
+		for col in self.ColumnsRPY_list:
+			print col[0],'ROLL:',col[1].get_roll()
+			print col[0],'PITCH:',col[1].get_pitch()
+			print col[0],'YAW:',col[1].get_yaw()
+
+		for col in self.Columns_list:
+			print col[0],'DATA:',col[1]
+
 		self.dataFile.close()
 
-	#def rec_call(self,data,topic):
-	#	try:    
-	#		if data.__class__ == Quaternion:
-				#print topic, data.__class__
-	#			rpy = tf.transformations.euler_from_quaternion([data.x,data.y,data.z,data.w])
-				#rpy = tf.transformations.euler_from_quaternion([eval(data.x),eval(data.y),eval(data.z),eval(data.w)])
-				#print topic,rpy[0], rpy[1], rpy[2]
-			#else:
-			#	print topic,data.__class__
-	#		st = data._slot_types
-			#print st,len(st)
-	#		for l1 in data.__slots__:
-	#			l = getattr(data,l1)
-	#			self.rec_call(l,topic)
-				#print '+++++',l1
-			#print st
-			#	if (c.find('Header')<0) and (c.find('string')<0) and (c.find('int')<0) and (c.find('float')<0):
-			#		l = getattr(st,c)
-			
-	#	except:
-	#		pass
-				
 	def callback(self,data,topic):
 		try:
+			fields = []
 			curr_t = time.time()
-			#if topic == '/pose':
-			#print '--------------'
-			self.rec_call(data,topic)
-			#self.dataFile.write(str(curr_t)+'\n')
-			#for l1 in data.__slots__:
-			#	print l1,type(l1), l1.__slots__
-			#str1 = type(data)
-			#print type(data)
-			#print 'TOPIC = ',topic,': types:',data._slot_types
-			#if topic == '/pose':
-			#	print '+++++++++++++++'
-			#	for l1 in data.__slots__:
-			#		l = getattr(data,l1)
-			#		try:
-			#			print l1,l._slot_types
-			#			for l3 in l.__slots__:
-			#				m = getattr(l,l3)
-			#				try:
-			#					print l3
-			#					#for l4 in m.__slots__:
-			#					#	o = getattr(m,l4)
-			#					#try:
-			#					#	print l4,o.__slots__
-			#					#except: 
-			#					#	pass
-			#				except:
-			#					pass
-			#		except:
-			#		 	pass
-				#print '------------------'
-				#for l1 in data._slot_types:
-					#print l1				
-				#for l1 in data.__slots__:
-				#	l = getattr(data,l1)
-				#	print l._slot_types,str(l).find('string')
-					#l = getattr(data,l1)
-					#print l1,l._slot_types
-					#print l1._slot_types, l1.__slots__
-			#	for l2 in l1._slot_types:
-			#		print l2
-			#print '------------\n'
-			#for l1 in data.__slots__:
-			#	print l1,type(l1),l1.__slot__types,'#####'
-			#	#print l1.__slots__
-			#	l = getattr(data,l1)
-			#	for l2 in l.__slots__:
-			#		print l2,type(l2)
-			#msg_class = roslib.message.get_message_class(topic)
-			#print msg_class
-			#rospy.loginfo('type = '+str(data))
+			self.rec_call(data,topic,fields)
+
 		except AttributeError:
 			e = sys.exc_info()[0]	
 			print e			
-			#pass
 
-	def rec_call(self,data,field):
-		self.ok_topics_list.append(field[0])
-		self.topic = field[1] + '_'
-		try:    
-			if data.__class__ == Quaternion:
-				#print topic, data.__class__
+	def rec_call(self,data,field,fields):
+		try:
+			fields.append(field)
+			if type(data) == Quaternion:
+				list_name = ''
+				l = len(fields)
+				for f in fields:
+					list_name = list_name + f + '_'
 				rpy = tf.transformations.euler_from_quaternion([data.x,data.y,data.z,data.w])
+				for col in self.ColumnsRPY_list:
+					if col[0] == list_name:
+						col[1].set_RPY(rpy[0], rpy[1], rpy[2])
+						break
+				#print list_name, '==', rpy[0], rpy[1], rpy[2]
+				fields.pop()
 			else:
 				if (type(data) == int) | (type(data) == float):
-					print field[0],'_',self.topic,'==',data,'\n\n--------------------'
-					self.topic = self.ok_topics_list.pop(0) + '_'
-					self.ok_topics_list.clear()
+					list_name = ''
+					for f in fields:
+						list_name = list_name + f + '_'
+					#print list_name, '=', data
+					for col in self.Columns_list:
+						if col[0] == list_name:
+							col[1].append(data)
+							break
+					fields.pop()
 				else:
-					st = data._slot_types
-					for l1 in data.__slots__:
-						print l1
-						l = getattr(data,l1)
-						self.rec_call(l,[field[0],l1])
+					if (type(data) != Header) & (type(data)!=bool) & (type(data)!=str):
+						flds = data.__slots__
+						print flds
+						i = 0
+						for typ in data._slot_types:
+							if typ == 'time':
+								i = i + 1
+								continue							
+							k= typ.find('[')
+							if k > -1:
+								if typ[0:k+1] in self.array_data_types:
+									i = i + 1
+									continue;
+							val = getattr(data,flds[i])
+							self.rec_call(val,flds[i],fields)
+							
+							i = i + 1
+						fields.pop()
+					else:
+						fields.pop()
+						
 		except:
-			#pass
-			print sys.exc_info()[0]
-
+			pass
+			#print sys.exc_info()[0]
+ 
 	def get_fieldsRecursive(self,field,msg_class):
 		self.fields.append(field)
-		basic_data_types = ['int8','uint8','int16','uint16','int32','uint32','int64','uint64','float32','float64']
-		basic_NOT_data_types = ['bool','string','time','std_msgs/Header','string[','float32[','float64[','int8[','uint[','int16[','uint16[','int32[','uint32[','int64[','uint64[','byte']
+		if msg_class.find('Quaternion') > -1:
+			list_name = ''
+			for f in self.fields:
+				list_name = list_name + f + '_'
+			self.ColumnsRPY_list.append((list_name, ColumnsRPY(list_name)))		
 		t = ''
 		ln = len(msg_class)
 		msg_class_arr=''
@@ -166,21 +164,23 @@ class Generator(object):
 			t = msg_class[j+1:ln-1]
 			msg_class_arr = msg_class
 			msg_class = msg_class[0:j+1]
-		if (msg_class in basic_data_types):
+		if (msg_class in self.basic_data_types):
 			list_name = ''
 			for f in self.fields:
 				list_name = list_name + f + '_'
 			self.counter = self.counter + 1
 			self.topic_has_value = True
 			self.ok_topics_list.append(self.topic)
-			print self.counter, ':', list_name[0:len(list_name)-1], msg_class
+			print self.counter, ':', list_name, msg_class
+			self.Columns_list.append((list_name, []))
 			self.fields.pop()
 		else:
-			if msg_class not in basic_NOT_data_types:
+			if (msg_class not in self.basic_NOT_data_types) & (msg_class not in self.array_data_types):
 				if msg_class[len(msg_class)-1] == '[':
 					msg_class = msg_class[0:len(msg_class)-1]
+
 				msg_class = roslib.message.get_message_class(msg_class)
-				print msg_class
+				#print msg_class
 				fields = msg_class.__slots__
 				x = 0
 				for itm in msg_class._slot_types:
@@ -189,12 +189,14 @@ class Generator(object):
 				self.fields.pop()
 			else:
 				self.fields.pop()
+
 	def extract_nodes_topics(self):
 		pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
 		l = len(topicList)
 		for i in xrange(l):
 			print '--------',topicList[i][0],i,'---------'
 			msg_class = roslib.message.get_message_class(topicList[i][1])
+			print msg_class
 			#print msg_class._slot_types
 			#print msg_class.__slots__
 			self.topic = topicList[i][0]
@@ -204,10 +206,18 @@ class Generator(object):
 			#	self.topic_has_value = False
 			#else:
 			#	print self.topic,' REJECTED!!!'
+
+		for obj in self.Columns_list:
+			print 'OBJ: name=',obj[0],' class:', obj[1]
+
+		for obj in self.ColumnsRPY_list:
+			print 'OBJRPY: name=',obj[0],' class:', obj[1]
+		
 		for topic in topicList:
-			if (topic[0] in self.ok_topics_list) & (topic[0].find('imu')<0):
+			if (topic[0] in self.ok_topics_list) & (topic[0].find('/tf')>-1):
 				msg_class = roslib.message.get_message_class(topic[1])
-				rospy.Subscriber(topic[0], msg_class, self.callback, [topic[0], ''], 100)
+				rospy.Subscriber(topic[0], msg_class, self.callback, topic[0], 100)
+
 		print 'call back started ...'
 		rospy.spin()		
         
@@ -215,3 +225,4 @@ if __name__ == '__main__':
       generator = Generator()
       generator.start()
       generator.end()
+
