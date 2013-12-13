@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<launch>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="laser_nodeNObs" >
+	<param name="node" value="laser_node" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="laser_nodeCpuPObs" >
+	<param name="node" value="laser_node" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="4.16176045808" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="laser_nodeMemPObs" >
+	<param name="node" value="laser_node" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="359848.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="rosoutNObs" >
+	<param name="node" value="rosout" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rosoutCpuPObs" >
+	<param name="node" value="rosout" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="3.73938769134" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rosoutMemPObs" >
+	<param name="node" value="rosout" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="389176.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="laser_topicGObs" >
+	<param name="topic" value="laser_topic" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="rosoutGObs" >
+	<param name="topic" value="rosout" />
+	<param name="frq" value="0.100568325623" />
+	<param name="dev" value="0.00957146339806" />
+	<param name="ws" value="1.00568325623" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="rosout_aggGObs" >
+	<param name="topic" value="rosout_agg" />
+	<param name="frq" value="0.101378844335" />
+	<param name="dev" value="0.00563839092563" />
+	<param name="ws" value="1.01378844335" />
+</node>
+</launch>

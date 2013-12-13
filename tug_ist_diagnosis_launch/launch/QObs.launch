@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<launch>
+
+<node pkg="tug_ist_diagnosis_observers" type="BiQObs.py" name="QObs6" >
+	<param name="topic1" value="/pose" />
+	<param name="field1" value="twist.twist.angular.z" />
+	<param name="ws1" value="10" />
+	<param name="pb1" value="0.0329" />
+	<param name="nb1" value="-0.0161" />
+	<param name="topic2" value="/yaw_odom" />
+	<param name="field2" value="data" />
+	<param name="ws2" value="10" />
+	<param name="pb2" value="0.0053" />
+	<param name="nb2" value="-0.000966" />
+	<param name="reg" value="ny" />
+</node>
+
+
+<node pkg="tug_ist_diagnosis_observers" type="BiQObs.py" name="QObs1" >
+	<param name="topic1" value="/pose" />
+	<param name="field1" value="pose.pose.position.y" />
+	<param name="pb1" value="0.3046" />
+	<param name="nb1" value="-0.2792" />
+	<param name="ws1" value="10" />
+	<param name="topic2" value="/pose" />
+	<param name="field2" value="pose.pose.position.x" />
+	<param name="pb2" value="47.6861" />
+	<param name="nb2" value="-77.8642" />
+	<param name="ws2" value="10" />
+	<param name="reg" value="yn" />
+</node>
+
+<node pkg="tug_ist_diagnosis_observers" type="BiQObs.py" name="QObs2" >
+	<param name="topic1" value="/pose" />
+	<param name="field1" value="pose.pose.position.y" />
+	<param name="ws1" value="10" />
+	<param name="pb1" value="0.3046" />
+	<param name="nb1" value="-0.2792" />
+	<param name="topic2" value="/yaw_odom" />
+	<param name="field2" value="data" />
+	<param name="ws2" value="10" />
+	<param name="pb2" value="23.9164" />
+	<param name="nb2" value="-12.0596" />
+	<param name="reg" value="yn" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="BiQObs.py" name="QObs3" >
+	<param name="topic1" value="/pose" />
+	<param name="field1" value="twist.twist.angular.z" />
+	<param name="ws1" value="10" />
+	<param name="pb1" value="0.0066" />
+	<param name="nb1" value="-0.0059" />
+	<param name="topic2" value="/yaw_odom" />
+	<param name="field2" value="data" />
+	<param name="ws2" value="10" />
+	<param name="pb2" value="0.0053" />
+	<param name="nb2" value="-0.000966" />
+	<param name="reg" value="yy" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="BiQObs.py" name="QObs4" >
+	<param name="topic1" value="/pose" />
+	<param name="field1" value="twist.twist.angular.z" />
+	<param name="ws1" value="10" />
+	<param name="pb1" value="0.0329" />
+	<param name="nb1" value="-0.0161" />
+	<param name="topic2" value="/yaw_imu" />
+	<param name="field2" value="data" />
+	<param name="ws2" value="100" />
+	<param name="pb2" value="0.0303" />
+	<param name="nb2" value="-0.0279" />
+	<param name="reg" value="ny" />
+</node>
+
+<node pkg="tug_ist_diagnosis_observers" type="BiQObs.py" name="QObs5" >
+	<param name="topic1" value="/yaw_imu" />
+	<param name="field1" value="data" />
+	<param name="pb1" value="0.0303" />
+	<param name="nb1" value="-0.0279" />
+	<param name="ws1" value="100" />
+	<param name="topic2" value="/yaw_odom" />
+	<param name="field2" value="data" />
+	<param name="pb2" value="0.0053" />
+	<param name="nb2" value="-0.000966" />
+	<param name="ws2" value="10" />
+	<param name="reg" value="yy" />
+</node>-->
+
+</launch>

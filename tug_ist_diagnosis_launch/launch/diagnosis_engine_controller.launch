@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+ <node pkg="tug_ist_diagnosis_engine" type="diagnosis_engine_controller" name="diagnosis_engine_controller" />
+</launch>

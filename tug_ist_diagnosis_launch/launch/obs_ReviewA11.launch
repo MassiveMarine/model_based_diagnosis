@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<launch>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="gmappingNObs" >
+	<param name="node" value="gmapping" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="gmappingCpuPObs" >
+	<param name="node" value="gmapping" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="59.5358448715" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="gmappingMemPObs" >
+	<param name="node" value="gmapping" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="1022187.40956" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="p2osNObs" >
+	<param name="node" value="p2os" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="p2osCpuPObs" >
+	<param name="node" value="p2os" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="2.86312097067" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="p2osMemPObs" >
+	<param name="node" value="p2os" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="393590.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="xsens_driverNObs" >
+	<param name="node" value="xsens_driver" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="xsens_driverCpuPObs" >
+	<param name="node" value="xsens_driver" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="9.73327400695" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="xsens_driverMemPObs" >
+	<param name="node" value="xsens_driver" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="487720.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="rpy_4_odom_imu_map_nodeNObs" >
+	<param name="node" value="rpy_4_odom_imu_map_node" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rpy_4_odom_imu_map_nodeCpuPObs" >
+	<param name="node" value="rpy_4_odom_imu_map_node" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="6.57559344151" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rpy_4_odom_imu_map_nodeMemPObs" >
+	<param name="node" value="rpy_4_odom_imu_map_node" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="466820.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="sicklmsNObs" >
+	<param name="node" value="sicklms" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="sicklmsCpuPObs" >
+	<param name="node" value="sicklms" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="4.54800656099" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="sicklmsMemPObs" >
+	<param name="node" value="sicklms" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="466625.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="joy_nodeNObs" >
+	<param name="node" value="joy_node" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="joy_nodeCpuPObs" >
+	<param name="node" value="joy_node" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="1.18800763434" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="joy_nodeMemPObs" >
+	<param name="node" value="joy_node" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="390661.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="teleop_joyNObs" >
+	<param name="node" value="teleop_joy" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="teleop_joyCpuPObs" >
+	<param name="node" value="teleop_joy" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="1.18800763434" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="teleop_joyMemPObs" >
+	<param name="node" value="teleop_joy" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="390609.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="map_metadataGObs" >
+	<param name="topic" value="map_metadata" />
+	<param name="frq" value="6.27369838148" />
+	<param name="dev" value="0.827519130565" />
+	<param name="ws" value="62.7369838148" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="mapGObs" >
+	<param name="topic" value="map" />
+	<param name="frq" value="6.26569300085" />
+	<param name="dev" value="0.870251970093" />
+	<param name="ws" value="62.6569300085" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="BiQObs.py" name="QObs1" >
+	<param name="topic1" value="/pose" />
+	<param name="field1" value="twist.twist.angular.z" />
+	<param name="ws1" value="10" />
+	<param name="pb1" value="0.0329" />
+	<param name="nb1" value="-0.0161" />
+	<param name="topic2" value="/yaw_odom" />
+	<param name="field2" value="data" />
+	<param name="ws2" value="10" />
+	<param name="pb2" value="0.0053" />
+	<param name="nb2" value="-0.000966" />
+	<param name="reg" value="ny" />
+</node>
+</launch>

@@ -1,0 +1,335 @@
+<?xml version="1.0"?>
+<launch>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="gmappingNObs" >
+	<param name="node" value="gmapping" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="gmappingCpuPObs" >
+	<param name="node" value="gmapping" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="138.085675098" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="gmappingMemPObs" >
+	<param name="node" value="gmapping" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="1036090.30557" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="p2osNObs" >
+	<param name="node" value="p2os" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="p2osCpuPObs" >
+	<param name="node" value="p2os" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="3.17647058824" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="p2osMemPObs" >
+	<param name="node" value="p2os" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="393584.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="xsens_driverNObs" >
+	<param name="node" value="xsens_driver" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="xsens_driverCpuPObs" >
+	<param name="node" value="xsens_driver" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="10.9411764706" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="xsens_driverMemPObs" >
+	<param name="node" value="xsens_driver" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="971048.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="rpy_4_odom_imu_map_nodeNObs" >
+	<param name="node" value="rpy_4_odom_imu_map_node" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rpy_4_odom_imu_map_nodeCpuPObs" >
+	<param name="node" value="rpy_4_odom_imu_map_node" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="6.80419089697" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rpy_4_odom_imu_map_nodeMemPObs" >
+	<param name="node" value="rpy_4_odom_imu_map_node" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="466820.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="static_tfNObs" >
+	<param name="node" value="static_tf" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="static_tfCpuPObs" >
+	<param name="node" value="static_tf" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="2.1684325559" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="static_tfMemPObs" >
+	<param name="node" value="static_tf" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="392968.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="sicklmsNObs" >
+	<param name="node" value="sicklms" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="sicklmsCpuPObs" >
+	<param name="node" value="sicklms" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="5.42936786628" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="sicklmsMemPObs" >
+	<param name="node" value="sicklms" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="466624.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="joy_nodeNObs" >
+	<param name="node" value="joy_node" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="joy_nodeCpuPObs" >
+	<param name="node" value="joy_node" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="2.1684325559" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="joy_nodeMemPObs" >
+	<param name="node" value="joy_node" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="390660.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="teleop_joyNObs" >
+	<param name="node" value="teleop_joy" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="teleop_joyCpuPObs" >
+	<param name="node" value="teleop_joy" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="2.67780401116" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="teleop_joyMemPObs" >
+	<param name="node" value="teleop_joy" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="390608.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="record_1375542199133332855NObs" >
+	<param name="node" value="record_1375542199133332855" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="record_1375542199133332855CpuPObs" >
+	<param name="node" value="record_1375542199133332855" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="27.3561727995" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="record_1375542199133332855MemPObs" >
+	<param name="node" value="record_1375542199133332855" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="1322068.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="rosoutNObs" >
+	<param name="node" value="rosout" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rosoutCpuPObs" >
+	<param name="node" value="rosout" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="4.46440008939" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rosoutMemPObs" >
+	<param name="node" value="rosout" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="316920.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="map_metadataGObs" >
+	<param name="topic" value="map_metadata" />
+	<param name="frq" value="6.23189444012" />
+	<param name="dev" value="1.07402768676" />
+	<param name="ws" value="62.3189444012" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sonarGObs" >
+	<param name="topic" value="sonar" />
+	<param name="frq" value="0.100213779084" />
+	<param name="dev" value="0.0710878681773" />
+	<param name="ws" value="1.00213779084" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="motor_stateGObs" >
+	<param name="topic" value="motor_state" />
+	<param name="frq" value="0.100213897618" />
+	<param name="dev" value="0.0708454262323" />
+	<param name="ws" value="1.00213897618" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="pitch_imuGObs" >
+	<param name="topic" value="pitch_imu" />
+	<param name="frq" value="0.00999638132676" />
+	<param name="dev" value="0.0620229334931" />
+	<param name="ws" value="0.0999638132676" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="tfGObs" >
+	<param name="topic" value="tf" />
+	<param name="frq" value="0.0250207973128" />
+	<param name="dev" value="0.0484159074723" />
+	<param name="ws" value="0.250207973128" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="poseGObs" >
+	<param name="topic" value="pose" />
+	<param name="frq" value="0.100214075336" />
+	<param name="dev" value="0.0723950265804" />
+	<param name="ws" value="1.00214075336" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="roll_imuGObs" >
+	<param name="topic" value="roll_imu" />
+	<param name="frq" value="0.00999625200732" />
+	<param name="dev" value="0.0623433199367" />
+	<param name="ws" value="0.0999625200732" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="scanGObs" >
+	<param name="topic" value="scan" />
+	<param name="frq" value="0.106700652606" />
+	<param name="dev" value="0.0728463911745" />
+	<param name="ws" value="1.06700652606" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="velocityGObs" >
+	<param name="topic" value="velocity" />
+	<param name="frq" value="0.0100002143277" />
+	<param name="dev" value="0.0236447714607" />
+	<param name="ws" value="0.100002143277" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="pitch_odomGObs" >
+	<param name="topic" value="pitch_odom" />
+	<param name="frq" value="0.100217752237" />
+	<param name="dev" value="0.0721515909876" />
+	<param name="ws" value="1.00217752237" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="imu_dataGObs" >
+	<param name="topic" value="imu_data" />
+	<param name="frq" value="0.0100003568403" />
+	<param name="dev" value="0.0309341484482" />
+	<param name="ws" value="0.100003568403" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="dioGObs" >
+	<param name="topic" value="dio" />
+	<param name="frq" value="0.100213402032" />
+	<param name="dev" value="0.0737719874046" />
+	<param name="ws" value="1.00213402032" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="gripper_stateGObs" >
+	<param name="topic" value="gripper_state" />
+	<param name="frq" value="0.100212902038" />
+	<param name="dev" value="0.0709885067265" />
+	<param name="ws" value="1.00212902038" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="battery_stateGObs" >
+	<param name="topic" value="battery_state" />
+	<param name="frq" value="0.100212087511" />
+	<param name="dev" value="0.0715875845" />
+	<param name="ws" value="1.00212087511" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="yaw_imuGObs" >
+	<param name="topic" value="yaw_imu" />
+	<param name="frq" value="0.0099958847004" />
+	<param name="dev" value="0.0624237256076" />
+	<param name="ws" value="0.099958847004" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="mapGObs" >
+	<param name="topic" value="map" />
+	<param name="frq" value="6.22276439269" />
+	<param name="dev" value="1.13765427641" />
+	<param name="ws" value="62.2276439269" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="diagnosticsGObs" >
+	<param name="topic" value="diagnostics" />
+	<param name="frq" value="0.360471794332" />
+	<param name="dev" value="0.54580158541" />
+	<param name="ws" value="3.60471794332" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="cmd_velGObs" >
+	<param name="topic" value="cmd_vel" />
+	<param name="frq" value="0.0757338343618" />
+	<param name="dev" value="0.10485873432" />
+	<param name="ws" value="0.757338343618" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="rosoutGObs" >
+	<param name="topic" value="rosout" />
+	<param name="frq" value="0.00908704695096" />
+	<param name="dev" value="0.0591187234968" />
+	<param name="ws" value="0.0908704695096" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="yaw_odomGObs" >
+	<param name="topic" value="yaw_odom" />
+	<param name="frq" value="0.100030723376" />
+	<param name="dev" value="0.069875827393" />
+	<param name="ws" value="1.00030723376" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="rosout_aggGObs" >
+	<param name="topic" value="rosout_agg" />
+	<param name="frq" value="0.00907211054033" />
+	<param name="dev" value="0.05832567736" />
+	<param name="ws" value="0.0907211054033" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="roll_odomGObs" >
+	<param name="topic" value="roll_odom" />
+	<param name="frq" value="0.100030877128" />
+	<param name="dev" value="0.0717611582948" />
+	<param name="ws" value="1.00030877128" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="ptz_stateGObs" >
+	<param name="topic" value="ptz_state" />
+	<param name="frq" value="0.100214181254" />
+	<param name="dev" value="0.0709153733444" />
+	<param name="ws" value="1.00214181254" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="aioGObs" >
+	<param name="topic" value="aio" />
+	<param name="frq" value="0.10021449828" />
+	<param name="dev" value="0.0710837893599" />
+	<param name="ws" value="1.0021449828" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="gmapping/entropyGObs" >
+	<param name="topic" value="gmapping/entropy" />
+	<param name="frq" value="6.66710833347" />
+	<param name="dev" value="2.87702030172" />
+	<param name="ws" value="66.6710833347" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="joyGObs" >
+	<param name="topic" value="joy" />
+	<param name="frq" value="0.231754022861" />
+	<param name="dev" value="2.55248341875" />
+	<param name="ws" value="2.31754022861" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="gyro_imuGObs" >
+	<param name="topic" value="gyro_imu" />
+	<param name="frq" value="0.00997728637043" />
+	<param name="dev" value="0.0620575276554" />
+	<param name="ws" value="0.0997728637043" />
+</node>
+</launch>

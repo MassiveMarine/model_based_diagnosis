@@ -22,11 +22,16 @@ import roslib; roslib.load_manifest('tug_ist_diagnosis_observers')
 import rospy
 from std_msgs.msg import String
 def test_node():
-    rospy.init_node('laser')
-    pub = rospy.Publisher('laser_node_topic', String)
+    rospy.init_node('laser_node')
+    pub = rospy.Publisher('scan', String)
     while not rospy.is_shutdown():
+<<<<<<< HEAD
         str = "laser data.."
         #rospy.loginfo(str)
+=======
+        str = "laser fake data published...."
+        rospy.loginfo('laser node running...')
+>>>>>>> safdar
         pub.publish(String(str))
         rospy.sleep(0.01)
 if __name__ == '__main__':

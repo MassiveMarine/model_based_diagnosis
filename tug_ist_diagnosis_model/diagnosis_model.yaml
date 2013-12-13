@@ -1,0 +1,45 @@
+ab: "AB"
+nab: "NAB"
+neg_prefix: "not_"
+
+props:
+<<<<<<< HEAD
+  - running(p2os)
+  - running(sicklms)
+  - running(tf_node)
+  - running(map_server)
+  - running(amcl)
+  - running(move_base)
+  - running(navigation)
+
+rules:
+  - NAB(p2os) -> running(p2os)
+  - NAB(sicklms) -> running(sicklms)
+  - NAB(tf_node) -> running(tf_node)
+  - NAB(map_server) -> running(map_server)
+  - NAB(amcl) -> running(amcl)
+  - NAB(move_base) -> running(move_base)
+  - NAB(navigation) -> running(navigation)
+
+
+=======
+  - running(laser_node)
+  - ok(laser_node,cpu)
+  - ok(laser_node,mem)
+  - running(rosout)
+  - ok(rosout,cpu)
+  - ok(rosout,mem)
+  - ok(laser_topic)
+  - ok(rosout)
+  - ok(rosout_agg)
+rules:
+  - NAB(laser_node) -> running(laser_node)
+  - NAB(laser_node), running(laser_node) -> ok(laser_node,cpu)
+  - NAB(laser_node), running(laser_node) -> ok(laser_node,mem)
+  - NAB(laser_node) -> ok(laser_topic)
+  - NAB(laser_node) -> ok(rosout)
+  - NAB(rosout) -> running(rosout)
+  - NAB(rosout), running(rosout) -> ok(rosout,cpu)
+  - NAB(rosout), running(rosout) -> ok(rosout,mem)
+  - NAB(rosout), ok(rosout) -> ok(rosout_agg)
+>>>>>>> 5b269fe16efd8d2988de493a91345a7c76567336
