@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 (define (problem repair_problem)(:domain repair_domain)(:requirements :strips :equality :typing :negative-preconditions)(:objects base_hokuyo_node_mem robot_pose_ekf_mem robot_pose_ekf_odom_comb base_hokuyo_node base_hokuyo_node_cpu robot_pose_ekf robot_pose_ekf_cpu )(:init (ok base_hokuyo_node_mem)(ok robot_pose_ekf_mem)(ok robot_pose_ekf_odom_comb)(running base_hokuyo_node)(ok base_hokuyo_node_cpu)(running robot_pose_ekf)(not_ok robot_pose_ekf_cpu)(good base_hokuyo_node)(bad robot_pose_ekf))(:goal (and (good base_hokuyo_node)(good robot_pose_ekf))))
+=======
+(define (problem repair_problem)(:domain repair_domain)(:requirements :strips :equality :typing :negative-preconditions)(:objects map_server amcl p2os move_base tf_node navigation sicklms )(:init (running map_server)(running amcl)(running p2os)(running move_base)(running tf_node)(running navigation)(not_running sicklms)(good p2os)(good tf_node)(good map_server)(good amcl)(good move_base)(good navigation)(bad sicklms))(:goal (and (good p2os)(good tf_node)(good map_server)(good amcl)(good move_base)(good navigation)(good sicklms))))
+>>>>>>> 02c1f26a4d8d387dd671fb2484817f155f66fa36
