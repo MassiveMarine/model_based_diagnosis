@@ -287,8 +287,8 @@ class Generator(object):
 		
 			
 		mat_file = {'all_topic_names': self.topic_names_list, 'all_topic_occ_times': list_of_tdata, 'rpy_topic_names': rpy_topic_names, 'rpy_fileds_names': rpy_list_names,'rpy_fileds_data': list_rpy_data, 'col_topic_names': col_topic_names, 'col_fields_names': col_list_names,'col_fields_data': list_col_data, 'all_nodes_names': self.all_nodes_names_list, 'all_nodes_cpu': self.all_nodes_cpu_list, 'all_nodes_mem': self.all_nodes_mem_list}
-		sio.savemat('/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'model': mat_file})
-		#sio.savemat('/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'model': mat_file})
+		#sio.savemat('/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'model': mat_file})
+		sio.savemat('/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'model': mat_file})
 		
        
 	def spin_thread(self):
@@ -387,7 +387,7 @@ class Generator(object):
 					mem = float(out1[len(out1)-3])
 					node_ds.set_mem(mem)
 				except:
-					e = sys.exec_info()
+					e = sys.exc_info()
 					print e
 					pass
 			time.sleep(0.25)
@@ -549,8 +549,8 @@ class Generator(object):
 			time.sleep(0.5)
 			
 	def make_obs_launch(self):
-		#obs_file_path = "/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
-		obs_file_path = "/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
+		obs_file_path = "/home/safdar/fuerte_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
+		#obs_file_path = "/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
 		file = open(bs_file_path, 'wb')
 		file.write('<?xml version="1.0"?>\n<launch>\n')
 		if self.brd_topic in self.topics_list:
@@ -657,7 +657,6 @@ class Generator(object):
 		for lst in sysState:
 			for row in lst:
 				for node in row[1]:
-					#if (node == '/rosout') | (node == '/observers_generator') | (node == '/tf') | (node == '/board_controller') :
 					if (node == '/observers_generator'):
 						continue
 					if node not in self.nodes_list:
@@ -681,8 +680,6 @@ class Generator(object):
 		pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
 		i = 0
 		for topic in topicList:
-			#if (topic[0] == '/rosout') | (topic[0] == '/rosout_agg') | (topic[0] == '/tf') | (topic[0] == '/map_metadata') | (topic[0] == '/map') | ('/board_controller' in topic[0]) :
-			#	continue
 			if topic[0] not in self.topics_list:
 				self.topics_list.append(topic[0])
 			print 'topic 0', topic[0],'  topic 1', topic[1]
@@ -704,8 +701,8 @@ class Generator(object):
 
 	def run_model_server(self):
 		command = "rosrun tug_ist_diagnosis_model diagnosis_model_server.py"
-		param = "_model:=/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
-		#param = "_model:=/home/safdar/fuerte_workspace/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		#param = "_model:=/home/tedusar/code/fuerte_ws/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+		param = "_model:=/home/safdar/fuerte_workspace/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
 		output = subprocess.Popen(command+param , shell=True,stdout=subprocess.PIPE)
 	
 	def report_error(self):

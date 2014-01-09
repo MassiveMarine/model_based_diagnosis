@@ -194,6 +194,7 @@ public:
   void observationsCB(const tug_ist_diagnosis_msgs::ObservationsConstPtr & obs_msg){
                 for(int o=0;o<obs_msg->obs.size();o++){
                    std::string s = obs_msg->obs[o].c_str();
+		   std::replace(s.begin(), s.end(), '/', '_');
                    if (std::find(obs_list.begin(), obs_list.end(), s) != obs_list.end()){
   			// DO NOTHING 
 		   } 

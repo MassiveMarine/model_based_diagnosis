@@ -183,10 +183,12 @@ public:
            char a[32];
            FALSE_RULES = "";
            for(int p=0;p<no_of_props;p++){
-              FALSE_RULES.append(model.props[p].c_str());
+	      std::string prop = model.props[p].c_str();
+	      std::replace(prop.begin(), prop.end(), '/', '_');
+              FALSE_RULES.append(prop);
               FALSE_RULES.append(",");
               FALSE_RULES.append(model.neg_prefix.c_str());
-              FALSE_RULES.append(model.props[p].c_str());
+              FALSE_RULES.append(prop);
               FALSE_RULES.append("->false.\r\n");
            }
            NUM_FALSE_RULES = no_of_props;
@@ -200,7 +202,9 @@ public:
 	   str.append(a);
            str.append("\r\n\r\n");
            for(int r=0;r<no_of_rules;r++){
-              str.append(model.rules[r].c_str());
+	      std::string rule = model.rules[r].c_str();
+	      std::replace(rule.begin(), rule.end(), '/', '_');
+              str.append(rule);
               str.append(".\r\n"); 
            }
            str.append("\r\n\r\n");
@@ -214,6 +218,7 @@ public:
 		this_time = clock();
                 for(int o=0;o<obs_msg->obs.size();o++){
                    std::string s = obs_msg->obs[o].c_str();
+		   std::replace(s.begin(), s.end(), '/', '_');
                    std::string ns = "@";
                    if(s.at(0)=='~'){ 
                        ns = s.substr(1);
@@ -348,6 +353,7 @@ public:
           diag = "";
           while(recv_data[i++]!='\r' || recv_data[i++]!='\n')
                   diag+=recv_data[i];
+	  ROS_INFO("NAB=%s",diag.c_str());
           diag_vec.push_back(diag.c_str());
       }
      publishDiag(diag_vec);

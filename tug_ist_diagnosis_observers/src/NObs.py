@@ -47,7 +47,7 @@ class Node_Observer(object):
 			print "NObs is up...."
 			if self.param_node_name[0] != '/':
 				self.param_node_name = "/%s" % (self.param_node_name)
-			r = rospy.Rate(10) # 10hz
+			r = rospy.Rate(5) # 10hz
 			while not rospy.is_shutdown():
 				found = False
 				code, statusMessage, sysState = self.m.getSystemState(self.caller_id)
