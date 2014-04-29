@@ -39,7 +39,10 @@
 #include <tug_ist_diagnosis_msgs/DiagnosisRepairAction.h>
 #include <tug_ist_diagnosis_msgs/DiagnosisRepairGoal.h>
 #include <tug_ist_diagnosis_msgs/DiagnosisRepairResult.h>
+
 typedef actionlib::SimpleActionClient<tug_ist_diagnosis_msgs::DiagnosisRepairAction> Node_client;
+typedef actionlib::SimpleActionClient<tug_ist_diagnosis_msgs::DiagnosisRepairAction> Powerup_shutdown_client;
+
 using std::vector;
 using namespace std;
 class Diagnosis_Repair_Client
@@ -59,13 +62,14 @@ protected:
          tug_ist_diagnosis_msgs::DiagnosisRepairGoal goal;
 	 tug_ist_diagnosis_msgs::DiagnosisRepairResult result;
          Node_client strn,stpn;
+         Powerup_shutdown_client powr_up, shut_dwn;
          bool executing_plan;
          map<string,Node_client> ac_map;
          int total_chunk;
          
 public:
 
-    Diagnosis_Repair_Client(ros::NodeHandle nh) : strn("start_node", true), stpn("stop_node", true)
+    Diagnosis_Repair_Client(ros::NodeHandle nh) : strn("start_node", true), powr_up("power_up", true), shut_dwn("shutdown", true), stpn("stop_node", true)
     {      nh_ = nh;
            executing_plan = false;  
 	   last_rcv_indx = 0;                              
@@ -74,6 +78,10 @@ public:
            ROS_INFO("\nWaiting for the Node Action Servers.......");
            strn.waitForServer();
            stpn.waitForServer();
+           ROS_INFO("\nWaiting for the PowerShut Action Servers.......");
+           powr_up.waitForServer();
+           shut_dwn.waitForServer();
+	   ROS_INFO("\nConnected with Action servers!");
            connect_to_Server();
            send_data = "upload domain_file\r\n\r\n\r\n";
            send(sock,send_data,strlen(send_data), 0);
@@ -120,9 +128,12 @@ public:
 
   void execute_plan(std::string action_server ,vector<std::string> params){
         ROS_INFO("ac:%s, params:%s",action_server.c_str(),params[0].c_str());
-	std::string str_start,str_stop;
+	std::string str_start,str_stop, str_powr_up, str_shut_dwn;
 	str_start = "start_node";
         str_stop = "stop_node";
+	str_powr_up = "power_up";
+	str_shut_dwn = "shut_down";
+      
         if(action_server.compare(str_start.c_str())==0){
 		ROS_INFO("start_node compared");
                 goal.parameter = params;
@@ -136,6 +147,22 @@ public:
                 goal.parameter = params;
 		stpn.sendGoal(goal);
         	bool finished_before_timeout = stpn.waitForResult(ros::Duration(30.0));
+		if(finished_before_timeout)
+	    		executing_plan = false;
+        }
+        else if(action_server.compare(str_powr_up.c_str())==0){
+        	ROS_INFO("power_up compared");
+                goal.parameter = params;
+		powr_up.sendGoal(goal);
+        	bool finished_before_timeout = powr_up.waitForResult(ros::Duration(30.0));
+		if(finished_before_timeout)
+	    		executing_plan = false;
+        }
+        else if(action_server.compare(str_shut_dwn.c_str())==0){
+        	ROS_INFO("shut_down compared");
+                goal.parameter = params;
+		shut_dwn.sendGoal(goal);
+        	bool finished_before_timeout = shut_dwn.waitForResult(ros::Duration(30.0));
 		if(finished_before_timeout)
 	    		executing_plan = false;
         }

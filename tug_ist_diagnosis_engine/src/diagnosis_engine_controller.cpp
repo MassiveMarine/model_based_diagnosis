@@ -44,6 +44,7 @@
 #define POST_REPLACE_OBS_HEADER "POST sessionA REPLACE_SENTENCES OBS ATP\r\nNumber-Rules: "
 
 const int NUM_SECONDS = 1;
+using namespace std;
 
 typedef actionlib::SimpleActionClient<tug_ist_diagnosis_msgs::SystemModelAction> modelClient;
 using std::vector;
@@ -71,34 +72,39 @@ protected:
          clock_t this_time;
     	 clock_t last_time;
 	 int time_counter;
-
-         
-         
+         tug_ist_diagnosis_msgs::SystemModelGoal goal;
+  	 tug_ist_diagnosis_msgs::SystemModelResult result;
+	 modelClient mc;
          
 public:
 
-    Diagnosis_Client(ros::NodeHandle nh)
+    Diagnosis_Client(ros::NodeHandle nh) : mc("diagnosis_model_server", true)
     {      nh_ = nh;
            diag_pub = nh_.advertise<tug_ist_diagnosis_msgs::Diagnosis>("/diagnosis", 100); 
-           mdl_sub = nh_.subscribe("/diagnosis_model", 1, &Diagnosis_Client::modelCB, this);
            obs_sub = nh_.subscribe("/observations", 1, &Diagnosis_Client::observationsCB, this);
-           ROS_INFO("\nWaiting for the Diagnosis Model Action Server.......");
-           modelClient mc("diagnosis_model_server", true);
-           tug_ist_diagnosis_msgs::SystemModelGoal goal;
-  	   tug_ist_diagnosis_msgs::SystemModelResult result;
-  	   goal.goal = 1;
+           string ip;
+	   int port;
+	   nh_.param<string>("ip", ip, "127.0.0.1");
+           nh_.param<int>("port", port, 10000);
+	   ROS_INFO("\nWaiting for the Diagnosis Model Action Server.......");
+           goal.goal = 1;
            mc.waitForServer();
-           mc.sendGoal(goal);
+	   connect_to_Server(ip, port); //
+           last_time = clock(); //
+           time_counter = 0; //
+           /*mc.sendGoal(goal);
 	   printf("\nGetting model.....");
            mc.waitForResult(ros::Duration(5.0));
-  	   if (mc.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+  	   if (mc.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
+		result = *mc.getResult();
                 printf("\nGot the model!\n");
-	   else
+	        connect_to_Server(ip, port);
+		make_model(result);
+	        last_time = clock();
+	        time_counter = 0;
+	   }else
                 printf("\nCould not get the Model!");
-           connect_to_Server();
-	   last_time = clock();
-	   time_counter = 0;
-    	   
+     	   */
 
 
   }
@@ -143,9 +149,10 @@ public:
            send(sock,data,strlen(data), 0); 
   }
 
-  void connect_to_Server() {
-        set_ip("127.0.0.1");
-        set_port(10000);
+  void connect_to_Server(string ip, int port) {
+        char* i_p=const_cast<char*>(ip.data());
+        set_ip(i_p);
+        set_port(port);
         if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
             perror("Socket Error!");
             exit(1);
@@ -208,7 +215,7 @@ public:
               str.append(".\r\n"); 
            }
            str.append("\r\n\r\n");
-           
+           //printf("makeSD_str=%s",str.c_str());
 	   char* c=const_cast<char*>(str.data());
            send_SD_to_server(c);
            recieve_from_server();
@@ -260,17 +267,13 @@ public:
       }
   }
 
-  void modelCB(const tug_ist_diagnosis_msgs::SystemModelResultConstPtr & mdl_msg){
-           disconnect_to_Server();
-           connect_to_Server();
-           no_of_rules = mdl_msg->rules.size();
-           no_of_props = mdl_msg->props.size();
-           neg_prefix = mdl_msg->neg_prefix.c_str();
-           
-     	   make_SD_rules(*mdl_msg);
-           make_false_rule(*mdl_msg);          
-           ROS_INFO("model received.........");
-           getCOMP(*mdl_msg);
+  void make_model(tug_ist_diagnosis_msgs::SystemModelResult mdl_msg){
+           no_of_rules = mdl_msg.rules.size();
+           no_of_props = mdl_msg.props.size();
+           neg_prefix = mdl_msg.neg_prefix.c_str();
+           make_SD_rules(mdl_msg);
+           make_false_rule(mdl_msg);          
+           getCOMP(mdl_msg);
   }
   
   void spin(){
@@ -343,6 +346,19 @@ public:
   }
   void callDiag(){
       char *send_data = "GET sessionA MIN_DIAG\r\nUse-Fault-Modes: true\r\n\r\n\r\n";
+           mc.sendGoal(goal);
+	   printf("\nGetting model.....");
+           mc.waitForResult(ros::Duration(5.0));
+  	   if (mc.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
+		result = *mc.getResult();
+                //printf("\nGot the model!\n");
+	        //connect_to_Server(ip, port);
+		make_model(result);
+	        last_time = clock();
+	        time_counter = 0;
+	   }else
+                printf("\nCould not get the Model!");
+
       send_QUERY_to_server(send_data);
       recieve_from_server();
       vector<std::string> diag_vec;

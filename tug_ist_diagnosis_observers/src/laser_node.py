@@ -23,15 +23,9 @@ import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Int32
 
-def callback1(data):
-    rospy.loginfo(rospy.get_name() + ": 1111111111111 %s" % data.data)
-
-def callback2(data):
-    rospy.loginfo(rospy.get_name() + ": 2222222222222 %s" % data.data)
-
 def test_node():
     rospy.init_node('laser_node')
-    pub = rospy.Publisher('laser_topic', String)
+    pub = rospy.Publisher('scan', String)
     #rospy.Subscriber("chatter1", String, callback1)
     #rospy.Subscriber("chatter2", String, callback2)
     while not rospy.is_shutdown():

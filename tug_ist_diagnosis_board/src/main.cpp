@@ -42,8 +42,8 @@ void power_up(const tug_ist_diagnosis_msgs::DiagnosisRepairGoalConstPtr& goal, s
   if(chnl!=-1)
   {
   char status;
-  status = 1;
-  contl->CallMessageChannelOnOff(chnl,status);
+  status = '1';
+  contl->CallMessageChannelOnOff(chnl+48,status);
 	sleep(3);
   result_.result = 255;
   as->setSucceeded(result_);
@@ -52,23 +52,22 @@ void power_up(const tug_ist_diagnosis_msgs::DiagnosisRepairGoalConstPtr& goal, s
        ROS_INFO("Can not Power Up %s.",goal->parameter[0].c_str());
 }
 
-
 void shut_down(const tug_ist_diagnosis_msgs::DiagnosisRepairGoalConstPtr& goal, switchServer* as)
 {
   tug_ist_diagnosis_msgs::DiagnosisRepairResult result_;
   char chnl = contl->get_chnl_from_map(goal->parameter[0].c_str());
-  ROS_INFO("Request Call for Shut down for dev %s on Channel %c is received.",goal->parameter[0].c_str(),chnl);
+  ROS_INFO("Request Call for Shut down for dev %s on Channel %d is received.",goal->parameter[0].c_str(),chnl);
   if(chnl!=-1)
   {
   char status;
-  string str_goal = goal->parameter[0].c_str();
-  chnl = str_goal[7];
-  status = 0;
-  contl->CallMessageChannelOnOff(chnl,status);
+  //string str_goal = goal->parameter[0].c_str();
+  //chnl = str_goal[7];
+  status = '0';
+  contl->CallMessageChannelOnOff(chnl+48,status);
 	sleep(3);
   result_.result = 255;
   as->setSucceeded(result_);
-  ROS_INFO("Request Done for Shut down for dev %s on Channel %c.",goal->parameter[0].c_str(),chnl);
+  ROS_INFO("Request Done for Shut down for dev %s on Channel %d.",goal->parameter[0].c_str(),chnl);
   }else
       ROS_INFO("Can not Shut down Channel %s.",goal->parameter[0].c_str());
   //contl->CallMessageRequest();
@@ -108,7 +107,7 @@ void execute(const tug_ist_diagnosis_msgs::BoardGoalConstPtr& goal, boardServer*
 int main( int argc, char **argv)
 {
 ros::init(argc, argv,"board_controller");
-ros::NodeHandle n("~");
+ros::NodeHandle n;
 int port;
 string ip; 
 n.param<int>("port", port, 5000);

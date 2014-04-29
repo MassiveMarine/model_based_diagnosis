@@ -3,10 +3,7 @@ nab: "NAB"
 neg_prefix: "not_"
  
 props:
-  - ok(odom)
-  - ok(scan)
+  - running(laser_node)
 rules:
-  - NAB(USB),NAB(ARIA)->ok(odom)
-  - NAB(USB),NAB(LASER)->ok(scan)
-  - AB(USB)->n_ok(odom)
-  - AB(USB)->n_ok(scan)
+  - NAB(laser_node) -> running(laser_node)
+
