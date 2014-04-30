@@ -34,7 +34,7 @@ Controller::Controller(unsigned char frq, string ip, int port)
 
 Controller::~Controller()
 {
-
+ close(sock);
 }
 
 void Controller::initController()
@@ -191,12 +191,24 @@ void Controller::CallMessageRequest()
 
 void Controller::CallMessageChannelOnOff(char chnl, char status)
 {
-    unsigned char *p;
+          unsigned char nbuffer[255];
+      	  char delim = 2;
+          char command = 4;
+          ushort length = 2;
+          memcpy(nbuffer,&delim, sizeof(delim));
+          memcpy(&nbuffer[sizeof(delim)],&command, sizeof(command));
+          memcpy(&nbuffer[sizeof(delim)+sizeof(command)], &length, sizeof(length));
+          memcpy(&nbuffer[sizeof(delim)+sizeof(command)+sizeof(length)], &chnl, sizeof(chnl));
+          memcpy(&nbuffer[sizeof(delim)+sizeof(command)+sizeof(length)+sizeof(chnl)], &status, sizeof(status));            
+          send(sock,(void*)&nbuffer,sizeof(nbuffer), 0); 
+          printf("\nCOMMAND SENT: delim = %i , command = %i , length = %d  , channel#= %c, ON/OFF= %c" ,*nbuffer, *(&nbuffer[sizeof(delim)]), *(&nbuffer[sizeof(delim)+sizeof(command)]),*(&nbuffer[sizeof(delim)+sizeof(command)+sizeof(length)]),*(&nbuffer[sizeof(delim)+sizeof(command)+sizeof(length)+sizeof(chnl)]));
+
+    /*unsigned char *p;
     msg = new MessageChannelOnOff(chnl,status);
     int buf_len;
     p = msg->getBuffer(buf_len);
     send(sock,p,buf_len, 0);
     printf("d=%i,c=%i,l=%i,channel=%i, state=%i, size=%d",*p,*(p+1),*(p+2),*(p+4),*(p+5),buf_len);
-    delete p;
+    delete p;*/
 }
 

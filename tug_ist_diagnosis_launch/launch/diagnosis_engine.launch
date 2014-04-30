@@ -2,8 +2,12 @@
 <launch>
  <node pkg="tug_ist_diagnosis_engine" type="diagnosis_engine.sh" name="diagnosis_engine" args="127.0.0.1 10000"/>
 <<<<<<< HEAD
+<<<<<<< HEAD
  <node pkg="tug_ist_diagnosis_engine" type="diagnosis_engine_controller" name="diagnosis_engine_controller" output="screen"/>
 =======
  <node pkg="tug_ist_diagnosis_engine" type="diagnosis_engine_controller" name="diagnosis_engine_controller" />
+>>>>>>> safdar
+=======
+ <node pkg="tug_ist_diagnosis_engine" type="diagnosis_engine_controller" name="diagnosis_engine_controller" output="screen"/>
 >>>>>>> safdar
 </launch>

@@ -33,12 +33,12 @@ void startnode(const tug_ist_diagnosis_msgs::DiagnosisRepairGoalConstPtr& goal, 
   i++;
   tug_ist_diagnosis_msgs::DiagnosisRepairResult result_;
 	string command("roslaunch tug_ist_diagnosis_launch " + goal->parameter[0] + ".launch &");
-  ROS_INFO("START NODE Server Started. for %s",goal->parameter[0].c_str());
+  ROS_INFO("START NODE Server Started for %s",goal->parameter[0].c_str());
   int k = system(command.c_str());
   sleep(3);
   result_.result = i;
   as->setSucceeded(result_);
-  ROS_INFO("START NODE Server Finished.");
+  ROS_INFO("START NODE Server Finished for %s",goal->parameter[0].c_str());
   
 }
 
@@ -46,13 +46,13 @@ void startnode(const tug_ist_diagnosis_msgs::DiagnosisRepairGoalConstPtr& goal, 
 void stopnode(const tug_ist_diagnosis_msgs::DiagnosisRepairGoalConstPtr& goal, switchServer* as)
 {
   tug_ist_diagnosis_msgs::DiagnosisRepairResult result_;
-	ROS_INFO("STOP NODE Server Started.");
+	ROS_INFO("STOP NODE Server Started for %s",goal->parameter[0].c_str());
   string command("rosnode kill /" + goal->parameter[0]);
   int k=system(command.c_str());
   sleep(3);
   result_.result = k;
   as->setSucceeded(result_);
-  ROS_INFO("STOP NODE Server Finished.");
+  ROS_INFO("STOP NODE Server Finished for %s",goal->parameter[0].c_str());
 }
 
 

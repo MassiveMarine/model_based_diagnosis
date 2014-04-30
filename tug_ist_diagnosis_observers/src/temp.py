@@ -24,6 +24,8 @@ import roslib.message; roslib.load_manifest('tug_ist_diagnosis_observers')
 import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan
+import numpy as np
+
 class testNode(object):
 
     def __init__(self):
@@ -31,10 +33,11 @@ class testNode(object):
 	self.pub = rospy.Publisher('testNode_topic', String)
          
     def start(self):
-	rospy.Subscriber("scan", LaserScan, self.access_dataA)
+	#rospy.Subscriber("scan", LaserScan, self.access_dataA)
 	#rospy.Subscriber("laser_node_topic", String, self.access_dataL)
-	rospy.spin()
-
+	#rospy.spin
+	x = np.sqrt(0.651666667)
+	print "\nx =",x
     def access_dataA(self,data):
 	print data
 	type1 = data._connection_header['topic']

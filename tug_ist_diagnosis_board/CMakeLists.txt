@@ -43,7 +43,7 @@ rosbuild_add_executable(diagnosis_board_controller src/main.cpp src/Message.cpp 
 rosbuild_add_executable(diagnosis_board_simulator src/ClientMain.cpp src/Client.cpp)
 rosbuild_link_boost(virtual_diagnosis_board thread)
 rosbuild_add_executable(node_action_servers src/NodeActionServer.cpp)
-#rosbuild_add_executable(RPY src/RPY.cpp)
+rosbuild_add_executable(switch_node src/switch_node.cpp)
 
 
 

@@ -35,6 +35,32 @@ interrupted = False
 import numpy
 import matplotlib.pyplot as plt
 import tf
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
+=======
+from geometry_msgs.msg import Quaternion
+from std_msgs.msg._Header import Header
+from rosgraph_msgs.msg._Log import Log
+from tf.msg._tfMessage import tfMessage
+
+class ColumnsRPY(object):
+	def __init__(self, name):
+		self.name = name
+		self.roll = []
+		self.pitch = []
+		self.yaw = []
+	def get_name(self):
+		return self.name
+	def set_RPY(self,roll,pitch,yaw):
+		self.roll.append(roll)
+		self.pitch.append(pitch)
+		self.yaw.append(yaw)
+	def get_roll(self):
+		return self.roll
+	def get_pitch(self):
+		return self.pitch
+	def get_yaw(self):
+		return self.yaw
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 
 class node_data_structure(object):
 	def __init__(self,node_name):
@@ -58,8 +84,6 @@ class node_data_structure(object):
 		return self.sub_topic_list
 	def set_cpu(self,cpu):
 		self.cpu_list.append(cpu)
-	def get_cpu_list(self):
-		return self.cpu_list
 	def get_cpu(self):
 		n = len(self.cpu_list)
 		print 'cpu list len'+str(n)
@@ -75,8 +99,6 @@ class node_data_structure(object):
 		return mean+2*sd
 	def set_mem(self,mem):
 		self.mem_list.append(mem)
-	def get_mem_list(self):
-		return self.mem_list
 	def get_mem(self):
 		n = len(self.mem_list)
 		mean = sum(self.mem_list)/n
@@ -108,6 +130,7 @@ class topic_data_structure(object):
 		self.prev_t = time.time()
 	def get_topic_name(self):
 		return self.topic_name
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 	def set_prev_t(self,prev_t):
 		self.prev_t = prev_t
 	def set_orientation(self,xyzw):
@@ -178,6 +201,29 @@ class topic_data_structure(object):
 		#signal_dev =  self.calculate_standard_deviation(self.occur_list)
 		signal_dev =  numpy.std(self.occur_list)
 		print self.topic_name, signal_mean, signal_dev
+=======
+	def save_current_time(self,t):
+		self.current_time_list.append(t)
+	def get_current_time_list(self):
+		return self.current_time_list
+	def get_mean_occ_time(self):
+		return self.mean_occ_time
+	def get_deviation(self):
+		#print self.delta_time_list
+		n = len(self.delta_time_list)
+		if n == 0:
+			return 0
+		self.mean_occ_time = float(sum(self.delta_time_list))/n
+		dev = sqrt(sum((x-self.mean_occ_time)**2 for x in self.delta_time_list)/n)
+		return dev
+	def get_frequency(self):
+		if len(self.current_time_list) == 0:
+			return 0
+		for x in range(1, len(self.current_time_list)):
+			pt = self.current_time_list[x-1]		
+			t = self.current_time_list[x]		
+			self.delta_time_list.append(t-pt)
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 	def print_frq_list(self):
 		print 'FILE: for'+self.topic_name
 		topic_name = self.topic_name.replace("/","_");
@@ -228,8 +274,27 @@ class Generator(object):
 		self.param_dev = 0
 		self.maxCpu = 0
 		self.maxMem = 0
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 		self.param_topics = []
 		self.param_fields = []
+=======
+		self.prev_t = time.time()
+
+		self.fields = []
+		self.topic = ''
+		self.ok_topics_list = []
+		self.topic_has_value = False
+		self.Columns_list = []
+		self.ColumnsRPY_list = []
+		self.counter = 0
+		self.mapping = []
+		self.dataMAT = [[]]
+		self.dataFile = open('safdarFile', 'w')
+		self.basic_data_types = ['int8','uint8','int16','uint16','int32','uint32','int64','uint64','float32','float64']
+		self.basic_NOT_data_types = ['bool','str','string','time','std_msgs/Header','byte', 'duration']
+		self.array_data_types = ['time','string[','float32[','float64[','int8[','uint8[','int16[','uint16[','int32[','uint32[','int64[','uint64[']
+
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 
 
 	def orn_separate_topic_field(self):
@@ -295,6 +360,23 @@ class Generator(object):
 			if interrupted:
 		      		break;
 
+	def end1(self):
+		START_TIME = time.time()
+		print 'START Time='+str(START_TIME)
+		time.sleep(2)
+		print 'making observers started....'
+		self.make_obs_launch()
+		print 'making observers finished....'
+		print 'making model started....'
+		self.make_mdl_yaml()
+		print 'making model finished....'
+		print 'matlabfile....'
+		self.make_mat()
+		END_TIME = time.time()
+		print 'END Time='+str(END_TIME)
+		print 'Total Calculated Time='+str(END_TIME - START_TIME)
+
+
 	def auto_correlate(self,tpc_ds):
 		lst = tpc_ds.occur_list
 		mean = numpy.mean(lst)
@@ -302,8 +384,27 @@ class Generator(object):
 		autocorr = numpy.correlate(lst, lst, mode='full')
 		return autocorr
 			
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 			
         def signal_handler(self,signum, frame):
+=======
+	def end(self):
+		i = 0
+		for col in self.ColumnsRPY_list:
+			i = i + 1
+			print i, col.get_name(),'ROLL:',len(col.get_roll())
+			i = i + 1
+			print i, col.get_name(),'PITCH:',len(col.get_pitch())
+			i = i + 1
+			print i, col.get_name(),'YAW:',len(col.get_yaw())
+
+		for col in self.Columns_list:
+			i = i + 1
+			print i, col[0],'DATA:',len(col[1])
+			
+        def signal_handler(self,signum, frame):
+		interrupted = True
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 		global interrupted
 		START_TIME = time.time()
 		print 'START Time='+str(START_TIME)
@@ -329,6 +430,7 @@ class Generator(object):
 	def make_mat(self):
 		list_of_tdata = []
 		list_of_topics = []
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 		list_of_rpy = []
 		for tpc_ds in self.topic_data_structure:
 			top_name = tpc_ds.get_topic_name()
@@ -362,6 +464,31 @@ class Generator(object):
 		node_mat = {'nodes': list_of_nodes, 'nodes_time': list_of_ndata}
 		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/node_lists.mat', {'nodes': node_mat})
 
+=======
+		list_rpy_data = []
+		rpy_names = []
+		list_col_data = []
+		col_names = []
+		for tpc_ds in self.topic_data_structure:
+			top_name = tpc_ds.get_topic_name()
+			list_of_tdata.append(tpc_ds.get_current_time_list())
+			list_of_topics.append(top_name)
+		
+		for col in self.ColumnsRPY_list:
+			rpy_names.append(col.get_name())
+			list_rpy_data.append(col.get_roll())
+			list_rpy_data.append(col.get_pitch())
+			list_rpy_data.append(col.get_yaw())
+
+		for col in self.Columns_list:
+			#print col[0],'DATA:',col[1]
+			col_names.append(col[0])
+			list_col_data.append(col[1])
+
+		mat_file = {'topics': list_of_topics, 'curr_time': list_of_tdata, 'rpy_names': rpy_names, 'list_rpy_data': list_rpy_data, 'col_names': col_names, 'list_col_data': list_col_data}
+		sio.savemat('/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_generator/matlab/generator.mat', {'Curr_time': mat_file})
+		
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
        
 	def spin_thread(self):
 		rospy.spin()
@@ -371,6 +498,7 @@ class Generator(object):
 			tpc_ds.get_signal_nature()
 
 	def callback(self,data,topic):
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 		print topic
 		#curr_t = time.time()
 		#for tpc_ds in self.topic_data_structure:
@@ -379,6 +507,102 @@ class Generator(object):
 				#tpc_ds.set_time(curr_t)
 				
 
+=======
+		try:
+			curr_t = rospy.get_rostime()
+			for tpc_ds in self.topic_data_structure:
+				if topic == tpc_ds.get_topic_name():
+					tpc_ds.save_current_time(curr_t.secs+curr_t.nsecs*1e-9)
+			self.prev_t = curr_t
+			if topic in self.ok_topics_list:
+				fields = []
+				#print topic
+				self.rec_call(data,type(data),topic,fields)
+						
+		except AttributeError:
+			e = sys.exc_info()[0]	
+			print e			
+
+	def rec_call(self,data,data_type,field,fields):
+		#print data_type, data
+		fields.append(field)
+		data_type_str = str(data_type)
+		j = data_type_str.find('[')
+		try:
+			if type(data) == Quaternion:
+				list_name = ''
+				l = len(fields)
+				for f in fields:
+					list_name = list_name + f + '_'
+				if fields[0] == '/tf':
+					list_name = list_name+self.frame_id+'_to_'+self.child_frame_id
+				rpy = tf.transformations.euler_from_quaternion([data.x,data.y,data.z,data.w])
+				found =  False
+				for col in self.ColumnsRPY_list:
+					if col.get_name() == list_name:
+						found = True
+						col.set_RPY(float(rpy[0]), float(rpy[1]), float(rpy[2]))
+						break
+				if not found:
+					obj = ColumnsRPY(list_name)
+					obj.set_RPY(float(rpy[0]), float(rpy[1]), float(rpy[2]))
+					self.ColumnsRPY_list.append(obj)
+			
+				fields.pop()
+
+			else:
+				if (data_type in self.basic_data_types):
+					list_name = ''
+					l = len(fields)
+					for f in fields:
+						list_name = list_name + f + '_'
+					if fields[0] == '/tf':
+						list_name = list_name+self.frame_id+'_to_'+self.child_frame_id
+					found = False
+					for col in self.Columns_list:
+						if col[0] == list_name:
+							col[1].append(data)
+							found = True
+							break
+					if not found:
+						lst = []
+						lst.append(data)
+						self.Columns_list.append((list_name, lst))
+					fields.pop()
+				else:	
+					if j > -1 :
+						data_type = data_type_str[0:j+1]
+					if (data_type not in self.basic_NOT_data_types) & (data_type not in self.array_data_types):
+						if j > -1 :
+							#print fields[0], data_type
+							l= len(data)
+							for d in xrange(l):
+								data1 = data[d]
+								flds1 = data1.__slots__
+								if data_type == 'geometry_msgs/TransformStamped[':
+									vd = getattr(data1,flds1[0])
+									self.frame_id = getattr(vd,vd.__slots__[2])
+									self.child_frame_id = getattr(data1,flds1[1])
+
+								x1 = 0
+								for typ1 in data1._slot_types:
+									val1 = getattr(data1,flds1[x1])
+									self.rec_call(val1,typ1,flds1[x1],fields)
+									x1 = x1 + 1
+							fields.pop()
+						else:
+							flds = data.__slots__
+							x = 0
+							for typ in data._slot_types:
+								val = getattr(data,flds[x])
+								self.rec_call(val,typ,flds[x],fields)
+								x = x + 1
+							fields.pop()
+					else:
+						fields.pop()
+		except:
+			pass
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 
 	def threaded_extract_mem_cpu(self):
 		while True :
@@ -389,6 +613,7 @@ class Generator(object):
 				self.out = p.communicate()[0]
 				self.out1 = shlex.split(self.out)
 				cpu = self.out1[8]
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 				mem = self.out1[9]
 				#if cpu > self.maxCpu:
 				#	self.maxCpu = cpu
@@ -415,6 +640,93 @@ class Generator(object):
 		for t in self.topics_list:
 			print t
 		print '==================='
+=======
+				#print 'cpu=',cpu
+				node_ds.set_cpu(float(cpu))
+				p = subprocess.Popen("pmap -x %s" %node_pid, shell=True,stdout=subprocess.PIPE)
+				out = p.communicate()[0]
+				out1 = shlex.split(out)
+				#print out1[len(out1)-3]
+				mem = float(out1[len(out1)-3])
+				node_ds.set_mem(mem)
+			time.sleep(0.25)
+
+	def get_fieldsRecursive(self,field,msg_class):
+		self.fields.append(field)
+		if msg_class.find('Quaternion') > -1:
+			list_name = ''
+			for f in self.fields:
+				list_name = list_name + f + '_'
+			#self.ColumnsRPY_list.append((list_name, ColumnsRPY(list_name)))		
+		t = ''
+		ln = len(msg_class)
+		msg_class_arr=''
+		if msg_class[ln-1] == ']':
+			j = msg_class.find('[')
+			t = msg_class[j+1:ln-1]
+			msg_class_arr = msg_class
+			msg_class = msg_class[0:j+1]
+		if (msg_class in self.basic_data_types):
+			list_name = ''
+			for f in self.fields:
+				list_name = list_name + f + '_'
+			self.counter = self.counter + 1
+			self.ok_topics_list.append(self.topic)
+			#print self.counter, ':', list_name, msg_class
+			#self.Columns_list.append((list_name, []))
+			self.fields.pop()
+		else:
+			if (msg_class not in self.basic_NOT_data_types) & (msg_class not in self.array_data_types):
+				if msg_class[len(msg_class)-1] == '[':
+					msg_class = msg_class[0:len(msg_class)-1]
+				msg_class = roslib.message.get_message_class(msg_class)
+				fields = msg_class.__slots__
+				x = 0
+				for itm in msg_class._slot_types:
+					self.get_fieldsRecursive(fields[x],itm)
+					x = x + 1
+				self.fields.pop()
+			else:
+				self.fields.pop()
+
+	def extract_nodes_topics(self):
+		#pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
+		#for topic in topicList:
+		#	if topic[0] not in self.topics_list:
+		#		self.topics_list.append(topic[0])
+		#		msg_class = roslib.message.get_message_class(topic[1])
+		#		self.topic_data_structure.append(topic_data_structure(topic[0],self.param_gen_ws))
+		#		rospy.Subscriber(topic[0], msg_class, self.callback, topic[0])
+#-------
+		pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
+		l = len(topicList)
+		for i in xrange(l):
+			self.topic = topicList[i][0]
+			topic_type = topicList[i][1]
+			self.topics_list.append(self.topic)
+			#print '--------',self.topic,i,'---------'
+			msg_class = roslib.message.get_message_class(topic_type)
+			self.topic_data_structure.append(topic_data_structure(self.topic, self.param_gen_ws))
+			#print msg_class._slot_types
+			#print msg_class.__slots__
+			self.get_fieldsRecursive(self.topic, topic_type)
+
+		#for obj in self.Columns_list:
+		#	print 'OBJ: name=',obj[0],' class:', obj[1]
+		#for obj in self.ColumnsRPY_list:
+		#	print 'OBJRPY: name=',obj[0],' class:', obj[1]
+		#ind = self.ColumnsRPY_list.index('/tf_transforms_transform_rotation_')
+		#print 'INDEXXX', ind, 
+		
+		#print 'call back started ...'
+		#rospy.spin()	
+#---------
+		#for n in self.nodes_list:
+		#	print n
+		#for t in self.topics_list:
+		#	print t
+		#print '==================='
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 
 		code, statusMessage, sysState = self.m.getSystemState(self.caller_id)
 		#print sysState
@@ -441,8 +753,21 @@ class Generator(object):
 							if (node in item[1]) & (item[0] in self.topics_list):
 								nd_ds.add_sub_topic(item[0])
 						self.node_data_structure.append(nd_ds)
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 						print 'node=',node,' pid=',pid
 					
+=======
+						#print 'node=',node,' pid=',pid
+		for topic in topicList:
+			#if (topic[0] in self.ok_topics_list) & (topic[0].find('/tf')>-1):
+			if topic[0] in self.ok_topics_list:
+				msg_class = roslib.message.get_message_class(topic[1])
+				rospy.Subscriber(topic[0], msg_class, self.callback, topic[0], 100)
+		#rospy.spin()
+
+
+
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 	def threaded_extract_nodes_topics(self):
 		while True :
 			pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
@@ -456,8 +781,12 @@ class Generator(object):
 					self.topic_data_structure.append(topic_data_structure(topic[0],self.param_gen_ws))
 					rospy.Subscriber(topic[0], msg_class, self.callback, topic[0])
 
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 			#print '------------------------'
 	
+=======
+			
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 			code, statusMessage, sysState = self.m.getSystemState(self.caller_id)
 			#print sysState
 			Pubs = sysState[0]
@@ -489,6 +818,10 @@ class Generator(object):
 			time.sleep(0.5)
 			
 	def make_obs_launch(self):
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
+=======
+		#temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 		temp_path = "/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_launch/launch/obs_auto.launch"
 		file = open(temp_path, 'wb')
 		file.write('<?xml version="1.0"?>\n<launch>\n')
@@ -526,6 +859,7 @@ class Generator(object):
 			file.write('\t<param name="mismatch_th" value="'+str(self.p_mismatch_th)+'" />\n')
 			file.write('\t<param name="ws" value="'+str(self.param_p_ws)+'" />\n')
 			file.write('</node>\n')
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 		list_of_lists = []
 		list_of_names = []
 		for t in self.topics_list:
@@ -543,14 +877,52 @@ class Generator(object):
 			if self.param_frq == 0:
 				self.zero_frq_topic_list.append(t)
 				continue
+=======
+			N = N+'('+node_name+', CPU='+str(node_mxCpu)+', MEM='+str(node_mxMem)+')'
+		D = 'Delta = ['
+		S = 'Sigma = ['
+		T = 'Topics = ['
+		for t in self.topics_list:
+			for tpc_ds in self.topic_data_structure:
+				if t == tpc_ds.get_topic_name():
+					tpc_ds.get_frequency()
+					self.param_dev = tpc_ds.get_deviation()
+					self.param_frq = tpc_ds.get_mean_occ_time()
+					self.param_g_ws = self.param_frq
+					if self.param_frq != 0:
+						self.param_g_ws = 1/self.param_frq
+					N = N+'('+t+',MeanT='+str(self.param_frq)+',Dev='+str(self.param_dev)+')'
+					break
+			#print t, self.param_frq
+			#if self.param_frq == 0:
+			#	print t+'<<'+str(self.param_frq)+'>>'
+			#	self.zero_frq_topic_list.append(t)
+			#	continue
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 			topic_name = t[1:len(t)]
 			gobs_name = topic_name+'GObs'
 			file.write('<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="'+gobs_name+'" >\n')
 			file.write('\t<param name="topic" value="'+topic_name+'" />\n')
   			file.write('\t<param name="frq" value="'+str(self.param_frq)+'" />\n')
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 			file.write('\t<param name="dev" value="'+str(2*self.param_dev)+'" />\n')
   			file.write('\t<param name="ws" value="'+str(self.param_g_ws)+'" />\n')
   			file.write('</node>\n')
+=======
+			file.write('\t<param name="dev" value="'+str(self.param_dev)+'" />\n')
+  			file.write('\t<param name="ws" value="'+str(self.param_g_ws)+'" />\n')
+  			file.write('</node>\n')
+			T = T + t + ', '
+			D = D + str(self.param_frq) + ', '
+			S = S + str(self.param_dev) + ', '
+		D = D + ']'
+		S = S + ']'
+		T = T + ']'
+		#print D
+		#print S
+		#print T
+		#print N
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 		file.write('</launch>')
 		file.close()
 		mat_list = {'list_names': list_of_names, 'list_data': list_of_lists }
@@ -664,7 +1036,11 @@ class Generator(object):
 
 	def run_model_server(self):
 		command = "rosrun tug_ist_diagnosis_model diagnosis_model_server.py"
+<<<<<<< HEAD:tug_ist_diagnosis_generator/src/observers_model_generatorNew.py
 		param = "_model:=/home/safdar/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+=======
+		param = "_model:=/home/safdar/my_workspace/my_workspace/model_based_diagnosis/tug_ist_diagnosis_model/diagnosis_model.yaml"
+>>>>>>> safdar:tug_ist_diagnosis_generator/src/observers_model_generator.py
 		output = subprocess.Popen(command+param , shell=True,stdout=subprocess.PIPE)
 		
 	

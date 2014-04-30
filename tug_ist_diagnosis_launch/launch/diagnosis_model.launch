@@ -5,7 +5,7 @@
  <node pkg="tug_ist_diagnosis_model" 
         type="diagnosis_model_server.py" 
         name="DiagnosisModelServer" 
-        output="log">
+        output="screen">
   <param name="model" value="$(find tug_ist_diagnosis_model)/diagnosis_model.yaml" />
   </node>
 

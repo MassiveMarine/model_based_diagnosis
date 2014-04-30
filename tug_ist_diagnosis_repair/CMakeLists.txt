@@ -37,7 +37,8 @@ set(_targetname ${EXECUTABLE_OUTPUT_PATH}/${_exe_name})
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-rosbuild_add_executable(diagnosis_repair src/diagnosis_repair.cpp)
+#rosbuild_add_executable(diagnosis_repair src/diagnosis_repair.cpp)
+rosbuild_add_executable(diagnosis_repairDomProbFiles src/diagnosis_repairDomProbFiles.cpp)
 
 
 
