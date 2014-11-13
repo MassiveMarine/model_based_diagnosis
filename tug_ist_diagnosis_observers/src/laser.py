@@ -18,19 +18,22 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-import roslib; roslib.load_manifest('tug_ist_diagnosis_observers')
+import roslib
 import rospy
+
 from std_msgs.msg import String
+
+
 def test_node():
     rospy.init_node('laser')
-    pub = rospy.Publisher('laser_node_topic', String)
+    pub = rospy.Publisher('laser_node_topic', String, queue_size=5)
     while not rospy.is_shutdown():
         str = "laser data.."
-        rospy.loginfo(str)
+        rospy.logdebug(str)
         pub.publish(String(str))
         rospy.sleep(0.1)
 if __name__ == '__main__':
     try:
         test_node()
-    except rospy.ROSInterruptException: pass
-
+    except rospy.ROSInterruptException:
+        pass

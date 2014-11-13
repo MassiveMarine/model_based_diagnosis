@@ -7,3 +7,6 @@ build
 lib
 *.class
 msg_gen
+.project
+.cproject
+.pydevproject

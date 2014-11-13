@@ -1,0 +1,34 @@
+<package>
+  <name>tug_ist_diagnosis_model</name>
+  <version>0.1.0</version>
+  <description>Diagnosis Model Server is an action server that provides diagnosis model of the system. It reads this model from YAML file which is a description of the correct behavior of the robot system. Diagnosis Model description contains three strings AB for Abnormal, NAB for Not Abnormal, neg_prefix for a prefix denoting a negative literal, and two sets each for propositions and rules. Propositions are first order logic sentences while rules use these propositions to define rules.</description>
+  <maintainer email="">Safdar Zaman</maintainer>
+  <maintainer email="">Gerald Steinbauer</maintainer>
+
+  <license>GPLv3</license>
+
+  <url type="website">http://ros.org/wiki/tug_ist_diagnosis_model</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author>Safdar Zaman</author>
+  <author>Gerald Steinbauer</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>actionlib</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>tug_ist_diagnosis_msgs</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>actionlib</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>tug_ist_diagnosis_msgs</run_depend>
+
+  <!-- Dependencies needed only for running tests. -->
+  <!-- <test_depend>actionlib</test_depend> -->
+  <!-- <test_depend>rospy</test_depend> -->
+  <!-- <test_depend>tug_ist_diagnosis_msgs</test_depend> -->
+
+</package>

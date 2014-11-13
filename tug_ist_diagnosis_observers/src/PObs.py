@@ -20,94 +20,95 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-# The Property Observer observers a specific hardware/software property related to a node. 
+# The Property Observer observers a specific hardware/software property related to a node.
 # A property could be CPU usage , Memory usage or any other resourse.
-# It publishes this property over /observations topic compatible for our Model Based Diagnosis.
+# It publishes this property over /observations topic compatible for our
+# Model Based Diagnosis.
 
 
-import roslib; roslib.load_manifest('tug_ist_diagnosis_observers')
 import commands
 import rospy
 import subprocess
 import sys
 import os
 import shlex
-from tug_ist_diagnosis_msgs.msg import Observations
 import time
 import numpy
+
+from tug_ist_diagnosis_msgs.msg import Observations
+
+
 class Property_Observer(object):
 
-		def __init__(self, argv):
-			rospy.init_node('PObs', anonymous=True)
-			self.pub = rospy.Publisher('/observations', Observations)
-			self.param_node = rospy.get_param('~node', 'Node')
-			self.param_property = rospy.get_param('~property', 'MEM')
-			self.param_max = rospy.get_param('~max_val', 0.2)
-			self.param_mis_th = rospy.get_param('~mismatch_thr', 5)
-			self.param_ws = rospy.get_param('~ws', 10)
-			self.circular_queu = [0 for i in xrange(self.param_ws)]
-			self.mismatch_counter = 0
-			self.args = argv
-			self.sum = 0
-			if self.param_node[0] == '/':
-				self.node = self.node[1:len(self.node)]
-         
-		def start(self):
-			print 'PObs is up and has started publishsing observations.......'
-			a = subprocess.Popen("rosnode info " + self.param_node , shell=True,stdout=subprocess.PIPE)
-			parts = shlex.split(a.communicate()[0])
-			indx = parts.index("Pid:")
-			pid = parts[indx+1]
-			p = subprocess.Popen("top -b -n 1 | grep -i %s" %pid, shell=True,stdout=subprocess.PIPE)
-			self.out = p.communicate()[0]
-			self.out1 = shlex.split(self.out)
-			if (self.param_property == 'CPU') | (self.param_property == 'cpu') :
-				indx = 8
-			else:
-				indx = 9
-			while not rospy.is_shutdown():
-				self.circular_queu.pop(0)
-				p = subprocess.Popen("top -b -n 1 | grep -i %s" %pid, shell=True,stdout=subprocess.PIPE)
-				self.out = p.communicate()[0]
-				print self.out
-				self.out1 = shlex.split(self.out)
-				self.circular_queu.append(float(self.out1[indx]))
-				avg_val = numpy.mean(self.circular_queu)
-				self.publish_output(avg_val)
-				time.sleep(0.1);
+    def __init__(self, argv):
+        rospy.init_node('PObs', anonymous=True)
+        self.pub = rospy.Publisher('/observations', Observations, queue_size=5)
+        self.param_node = rospy.get_param('~node', 'Node')
+        self.param_property = rospy.get_param('~property', 'MEM')
+        self.param_max = rospy.get_param('~max_val', 0.2)
+        self.param_mis_th = rospy.get_param('~mismatch_thr', 5)
+        self.param_ws = rospy.get_param('~ws', 10)
+        self.circular_queu = [0 for i in xrange(self.param_ws)]
+        self.mismatch_counter = 0
+        self.args = argv
+        self.sum = 0
+        if self.param_node[0] == '/':
+            self.node = self.node[1:len(self.node)]
 
-				
-		def publish_output(self,obtained_val):
-			obs_msg = []
-			if (obtained_val <= float(self.param_max)):
-				if self.mismatch_counter > 0:
-					self.mismatch_counter = self.mismatch_counter - 1	
-				print 'ok('+self.param_node+','+self.param_property+')'
-				obs_msg.append('ok('+self.param_node+','+self.param_property+')')
-				self.pub.publish(Observations(time.time(),obs_msg))
-			else:
-				self.mismatch_counter = self.mismatch_counter + 1
-				if self.mismatch_counter < self.param_mis_th:
-					print 'ok('+self.param_node+','+self.param_property+')'
-					obs_msg.append('ok('+self.param_node+','+self.param_property+')')
-					self.pub.publish(Observations(time.time(),obs_msg))
-				else:
-					print '~ok('+self.param_node+','+self.param_property+')'
-					obs_msg.append('~ok('+self.param_node+','+self.param_property+')')
-					self.pub.publish(Observations(time.time(),obs_msg))
-			
+    def start(self):
+        print 'PObs is up and has started publishsing observations.......'
+        a = subprocess.Popen("rosnode info " + self.param_node, shell=True, stdout=subprocess.PIPE)
+        parts = shlex.split(a.communicate()[0])
+        indx = parts.index("Pid:")
+        pid = parts[indx + 1]
+        p = subprocess.Popen("top -b -n 1 | grep -i %s" % pid, shell=True, stdout=subprocess.PIPE)
+        self.out = p.communicate()[0]
+        self.out1 = shlex.split(self.out)
+        if (self.param_property == 'CPU') | (self.param_property == 'cpu'):
+            indx = 8
+        else:
+            indx = 9
+        while not rospy.is_shutdown():
+            self.circular_queu.pop(0)
+            p = subprocess.Popen("top -b -n 1 | grep -i %s" % pid, shell=True, stdout=subprocess.PIPE)
+            self.out = p.communicate()[0]
+            print self.out
+            self.out1 = shlex.split(self.out)
+            self.circular_queu.append(float(self.out1[indx]))
+            avg_val = numpy.mean(self.circular_queu)
+            self.publish_output(avg_val)
+            time.sleep(0.1)
+
+    def publish_output(self, obtained_val):
+        obs_msg = []
+        if (obtained_val <= float(self.param_max)):
+            if self.mismatch_counter > 0:
+                self.mismatch_counter = self.mismatch_counter - 1
+            print 'ok(' + self.param_node + ',' + self.param_property + ')'
+            obs_msg.append('ok(' + self.param_node + ',' + self.param_property + ')')
+            self.pub.publish(Observations(time.time(), obs_msg))
+        else:
+            self.mismatch_counter = self.mismatch_counter + 1
+            if self.mismatch_counter < self.param_mis_th:
+                print 'ok(' + self.param_node + ',' + self.param_property + ')'
+                obs_msg.append('ok(' + self.param_node + ',' + self.param_property + ')')
+                self.pub.publish(Observations(time.time(), obs_msg))
+            else:
+                print '~ok(' + self.param_node + ',' + self.param_property + ')'
+                obs_msg.append('~ok(' + self.param_node + ',' + self.param_property + ')')
+                self.pub.publish(Observations(time.time(), obs_msg))
+
 
 def report_error():
-	print """
-rosrun tug_ist_diagnosis_observers PObs.py _node:=<Node_name> _property:=<Mem/Cpu> _max_value:=<maximumLimit> _mismatch_thr:=<mistmachthr> _ws:=<windowsize>
-e.g rosrun tug_ist_diagnosis_observers PObs.py _node:=openni_camera _property:=CPU _max_value:=0.2 _mismatch_thr:=5'
-"""
-	sys.exit(os.EX_USAGE)        
-    
-if __name__ == '__main__':
-			print len(sys.argv)
-			if len(sys.argv) < 2: 
-				report_error()
-			pObs = Property_Observer(sys.argv)
-			pObs.start()
+    print """
+			rosrun tug_ist_diagnosis_observers PObs.py _node:=<Node_name> _property:=<Mem/Cpu> _max_value:=<maximumLimit> _mismatch_thr:=<mistmachthr> _ws:=<windowsize>
+			e.g rosrun tug_ist_diagnosis_observers PObs.py _node:=openni_camera _property:=CPU _max_value:=0.2 _mismatch_thr:=5'
+		  """
+    sys.exit(os.EX_USAGE)
 
+if __name__ == '__main__':
+    print len(sys.argv)
+    if len(sys.argv) < 2:
+        report_error()
+    pObs = Property_Observer(sys.argv)
+    pObs.start()

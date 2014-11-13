@@ -1,5 +1,17 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+# Catkin User Guide: http://www.ros.org/doc/groovy/api/catkin/html/user_guide/user_guide.html
+# Catkin CMake Standard: http://www.ros.org/doc/groovy/api/catkin/html/user_guide/standards.html
+cmake_minimum_required(VERSION 2.8.3)
+project(tug_ist_diagnosis_board)
+# Load catkin and all dependencies required for this package
+# TODO: remove all from COMPONENTS that are not catkin packages.
+find_package(catkin REQUIRED COMPONENTS roscpp tug_ist_diagnosis_msgs actionlib_msgs actionlib geometry_msgs nav_msgs sensor_msgs std_msgs tf)
+
+# include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+# CATKIN_MIGRATION: removed during catkin migration
+# cmake_minimum_required(VERSION 2.4.6)
+
+# CATKIN_MIGRATION: removed during catkin migration
+# include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -13,7 +25,9 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #include(${actionlib_msgs_PACKAGE_PATH}/cmake/actionbuild.cmake)
 #genaction()
 
-rosbuild_init()
+
+# CATKIN_MIGRATION: removed during catkin migration
+# rosbuild_init()
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -21,31 +35,56 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #uncomment if you have defined messages
-#rosbuild_genmsg()
+#add_message_files(
+  FILES
+  # TODO: List your msg files here
+)
 #uncomment if you have defined services
-#rosbuild_gensrv()
+#add_service_files(
+  FILES
+  # TODO: List your msg files here
+)
 
 #common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
+#add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
+#
+# CATKIN_MIGRATION: removed during catkin migration
+# rosbuild_add_boost_directories()
+#find_package(Boost REQUIRED COMPONENTS thread)
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+#add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
-#rosbuild_add_executable(Imu2RPY src/Imu2RPY.cpp)
-#rosbuild_add_executable(Odom2RPY src/Odom2RPY.cpp)
-#rosbuild_add_executable(mapYaw src/mapYaw.cpp)
-#rosbuild_add_executable(rpy_4_odom_imu_map src/rpy_4_odom_imu_map.cpp)
-
-rosbuild_add_boost_directories()
-rosbuild_add_executable(virtual_diagnosis_board src/Board.cpp)
-rosbuild_add_executable(diagnosis_board_controller src/main.cpp src/Message.cpp src/Controller.cpp src/Measurment.cpp src/Specification.cpp)
-rosbuild_add_executable(diagnosis_board_simulator src/ClientMain.cpp src/Client.cpp)
-rosbuild_link_boost(virtual_diagnosis_board thread)
-rosbuild_add_executable(node_action_servers src/NodeActionServer.cpp)
-#rosbuild_add_executable(RPY src/RPY.cpp)
+#add_executable(Imu2RPY src/Imu2RPY.cpp)
+#add_executable(Odom2RPY src/Odom2RPY.cpp)
+#add_executable(mapYaw src/mapYaw.cpp)
+#add_executable(rpy_4_odom_imu_map src/rpy_4_odom_imu_map.cpp)
 
 
+# CATKIN_MIGRATION: removed during catkin migration
+# rosbuild_add_boost_directories()
+add_executable(virtual_diagnosis_board src/Board.cpp)
+add_executable(diagnosis_board_controller src/main.cpp src/Message.cpp src/Controller.cpp src/Measurment.cpp src/Specification.cpp)
+add_executable(diagnosis_board_simulator src/ClientMain.cpp src/Client.cpp)
+target_link_libraries(virtual_diagnosis_board ${Boost_LIBRARIES})
+add_executable(node_action_servers src/NodeActionServer.cpp)
+#add_executable(RPY src/RPY.cpp)
 
 
 
+
+
+## Generate added messages and services with any dependencies listed here
+generate_messages(
+    #TODO DEPENDENCIES geometry_msgs std_msgs
+)
+
+# catkin_package parameters: http://ros.org/doc/groovy/api/catkin/html/dev_guide/generated_cmake_api.html#catkin-package
+# TODO: fill in what other packages will need to use this package
+catkin_package(
+    DEPENDS roscpp tug_ist_diagnosis_msgs actionlib_msgs actionlib geometry_msgs nav_msgs sensor_msgs std_msgs tf
+    CATKIN_DEPENDS # TODO
+    INCLUDE_DIRS # TODO include
+    LIBRARIES # TODO
+)
