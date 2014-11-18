@@ -128,6 +128,7 @@ class Qualitative_Observer(object):
         self.param_topic = rospy.get_param('~topic', '/pose')
         self.param_ws = rospy.get_param('~ws', 1000)
         self.param_b = rospy.get_param('~b', 0.0000005)
+        self.topic_timeout = rospy.get_param('topic_timeout', 25.0) # wait up to 25 s for the topic
         self.ws = float(self.param_ws) / 1000.0
         self.topic = ""
         self.topic_type = ""
@@ -149,16 +150,23 @@ class Qualitative_Observer(object):
             self.params.append(field[0:i])
             field = field[i + 1:len(field)]
         self.params.append(field)
-        pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
+
         topic_found = False
-        for item in topicList:
-            if item[0] == self.param_topic:
-                self.topic = item[0]
-                self.topic_type = item[1]
-                topic_found = True
+        start_time = rospy.get_time()
+        while topic_found == False and (rospy.get_time() - start_time) < self.topic_timeout:
+            rospy.sleep(0.1)
+            pubcode, statusMessage, topicList = self.m.getPublishedTopics(self.caller_id, "")
+            for item in topicList:
+                if item[0] == self.param_topic:
+                    self.topic = item[0]
+                    self.topic_type = item[1]
+                    topic_found = True
+            
         if topic_found == True:
             msg_class = roslib.message.get_message_class(self.topic_type)
         else:
+            rospy.logerr("Topic '%s' didn't show up after %f seconds; is it published?"
+                          % (self.param_topic, self.topic_timeout))
             self.report_error()
         rospy.Subscriber(self.topic, msg_class, self.call_back)
         rospy.spin()
