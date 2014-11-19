@@ -31,6 +31,7 @@ import os
 import time
 
 from tug_ist_diagnosis_msgs.msg import Observations
+from std_msgs.msg import String
 
 
 class Node_Observer(object):
@@ -41,6 +42,7 @@ class Node_Observer(object):
         self.m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
         self.msg = ""
         self.pub = rospy.Publisher('/observations', Observations, queue_size=5)
+        self.kill_pub = rospy.Publisher('/nodeKilled', String, queue_size=1)
         self.param_node_name = rospy.get_param('~node', '/NoNode')
 
     def start(self):
@@ -48,6 +50,7 @@ class Node_Observer(object):
         if self.param_node_name[0] != '/':
             self.param_node_name = "/%s" % (self.param_node_name)
         r = rospy.Rate(10)  # 10hz
+        isRunning = False
         while not rospy.is_shutdown():
             found = False
             code, statusMessage, sysState = self.m.getSystemState(
@@ -65,12 +68,16 @@ class Node_Observer(object):
                 rospy.logdebug('running(' + self.param_node_name[1:len(self.param_node_name)] + ')')
                 obs_msg.append(self.msg)
                 self.pub.publish(Observations(time.time(), obs_msg))
+                isRunning = True
             else:
                 self.msg = '~running(' + \
                     self.param_node_name[1:len(self.param_node_name)] + ')'
                 rospy.logdebug('~running(' + self.param_node_name[1:len(self.param_node_name)] + ')')
                 obs_msg.append(self.msg)
                 self.pub.publish(Observations(time.time(), obs_msg))
+                if isRunning == True:
+                  isRunning = False
+                  self.kill_pub.publish(String(self.param_node_name[1:len(self.param_node_name)]))
             r.sleep()
 
 
