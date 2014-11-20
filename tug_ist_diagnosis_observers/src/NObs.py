@@ -40,8 +40,8 @@ class Node_Observer(object):
         rospy.init_node('NObs', anonymous=True)
         self.caller_id = '/script'
         self.m = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])
-        self.msg = ""
-        self.pub = rospy.Publisher('/observations', Observations, queue_size=5)
+#        self.msg = ""
+#        self.pub = rospy.Publisher('/observations', Observations, queue_size=5)
         self.kill_pub = rospy.Publisher('/nodeKilled', String, queue_size=1)
         self.param_node_name = rospy.get_param('~node', '/NoNode')
 
@@ -63,18 +63,18 @@ class Node_Observer(object):
                             break
             obs_msg = []
             if found == True:
-                self.msg = 'running(' + \
-                    self.param_node_name[1:len(self.param_node_name)] + ')'
-                rospy.logdebug('running(' + self.param_node_name[1:len(self.param_node_name)] + ')')
-                obs_msg.append(self.msg)
-                self.pub.publish(Observations(time.time(), obs_msg))
+#                self.msg = 'running(' + \
+#                    self.param_node_name[1:len(self.param_node_name)] + ')'
+#                rospy.logdebug('running(' + self.param_node_name[1:len(self.param_node_name)] + ')')
+#                obs_msg.append(self.msg)
+#                self.pub.publish(Observations(time.time(), obs_msg))
                 isRunning = True
             else:
-                self.msg = '~running(' + \
-                    self.param_node_name[1:len(self.param_node_name)] + ')'
-                rospy.logdebug('~running(' + self.param_node_name[1:len(self.param_node_name)] + ')')
-                obs_msg.append(self.msg)
-                self.pub.publish(Observations(time.time(), obs_msg))
+#                self.msg = '~running(' + \
+#                    self.param_node_name[1:len(self.param_node_name)] + ')'
+#                rospy.logdebug('~running(' + self.param_node_name[1:len(self.param_node_name)] + ')')
+#                obs_msg.append(self.msg)
+#                self.pub.publish(Observations(time.time(), obs_msg))
                 if isRunning == True:
                   isRunning = False
                   self.kill_pub.publish(String(self.param_node_name[1:len(self.param_node_name)]))
