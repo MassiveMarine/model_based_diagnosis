@@ -1,0 +1,9 @@
+ab: "AB"
+nab: "NAB"
+neg_prefix: "not_"
+ 
+props:
+  - running(laser_node)
+rules:
+  - NAB(laser_node) -> running(laser_node)
+

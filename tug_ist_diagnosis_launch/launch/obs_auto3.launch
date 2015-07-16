@@ -1,0 +1,1045 @@
+<?xml version="1.0"?>
+<launch>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="play_1381327279331005295NObs" >
+	<param name="node" value="play_1381327279331005295" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="play_1381327279331005295CpuPObs" >
+	<param name="node" value="play_1381327279331005295" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="29.3624554057" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="play_1381327279331005295MemPObs" >
+	<param name="node" value="play_1381327279331005295" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="510000.856039" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="rosoutNObs" >
+	<param name="node" value="rosout" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rosoutCpuPObs" >
+	<param name="node" value="rosout" />
+	<param name="property" value="cpu" />
+	<param name="max_val" value="3.5983132365" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="PObs.py" name="rosoutMemPObs" >
+	<param name="node" value="rosout" />
+	<param name="property" value="mem" />
+	<param name="max_val" value="389252.0" />
+	<param name="mismatch_th" value="5" />
+	<param name="ws" value="10" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="map_metadataGObs" >
+	<param name="topic" value="map_metadata" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_raw/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_raw/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/image_raw/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="camera/image_raw/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/image_raw/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="camera/image_raw/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="scanGObs" >
+	<param name="topic" value="scan" />
+	<param name="frq" value="0.0501741093927" />
+	<param name="dev" value="0.0284248225846" />
+	<param name="ws" value="19.930597914" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_color/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_color/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/camera_infoGObs" >
+	<param name="topic" value="sh_kinect/rgb/camera_info" />
+	<param name="frq" value="0.733882548579" />
+	<param name="dev" value="0.0955428230244" />
+	<param name="ws" value="1.3626158599" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_raw/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_raw/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_mono/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_mono/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="arm_odomGObs" >
+	<param name="topic" value="arm_odom" />
+	<param name="frq" value="0.10000641391" />
+	<param name="dev" value="0.033592704509" />
+	<param name="ws" value="9.99935865017" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_raw/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_raw/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_raw/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/ir/image_raw/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect/theoraGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect/theora" />
+	<param name="frq" value="2.66950999896" />
+	<param name="dev" value="0.957044990279" />
+	<param name="ws" value="0.374600582276" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_rect/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/ir/image_rect/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/rectify_ir/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/ir/rectify_ir/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rawGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_raw" />
+	<param name="frq" value="0.734639674784" />
+	<param name="dev" value="0.151392229688" />
+	<param name="ws" value="1.36121153584" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_mono/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_mono/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/image_raw/compressed/parameter_updatesGObs" >
+	<param name="topic" value="camera/image_raw/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sys_stateGObs" >
+	<param name="topic" value="sys_state" />
+	<param name="frq" value="0.0200965871686" />
+	<param name="dev" value="0.0252360522091" />
+	<param name="ws" value="49.759692609" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect_raw/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect_raw/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_rect/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/ir/image_rect/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect_raw/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect_raw/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_raw/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_raw/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_mono/compressedGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_mono/compressed" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="poseupdateGObs" >
+	<param name="topic" value="poseupdate" />
+	<param name="frq" value="0.0504419446115" />
+	<param name="dev" value="0.0465006837607" />
+	<param name="ws" value="19.8247709858" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect_color/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect_color/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_raw/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image_raw/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect_color/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect_color/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect_raw/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect_raw/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect_raw/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect_raw/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="velocityGObs" >
+	<param name="topic" value="velocity" />
+	<param name="frq" value="0.020008117985" />
+	<param name="dev" value="0.0266635930909" />
+	<param name="ws" value="49.9797132719" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/rectify_mono/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/rectify_mono/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_rect/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/ir/image_rect/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect_colorGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect_color" />
+	<param name="frq" value="2.83115523563" />
+	<param name="dev" value="1.24165945523" />
+	<param name="ws" value="0.353212705335" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_raw/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/ir/image_raw/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_raw/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image_raw/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_yaw_controller/stateGObs" >
+	<param name="topic" value="sh_yaw_controller/state" />
+	<param name="frq" value="0.0505610008252" />
+	<param name="dev" value="0.0316686539448" />
+	<param name="ws" value="19.7780895093" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_color/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_color/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/rectify_color/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/rectify_color/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_pitch_controller/commandGObs" >
+	<param name="topic" value="sh_pitch_controller/command" />
+	<param name="frq" value="0.0177404561811" />
+	<param name="dev" value="0.0239671878581" />
+	<param name="ws" value="56.3683362926" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_raw/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/ir/image_raw/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/rectify_depth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/rectify_depth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect/compressedGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect/compressed" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_color/compressedGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_color/compressed" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect_raw/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect_raw/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="joyGObs" >
+	<param name="topic" value="joy" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect_color/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect_color/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_raw/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_raw/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="mission_stateGObs" >
+	<param name="topic" value="mission_state" />
+	<param name="frq" value="0.100057577167" />
+	<param name="dev" value="0.0339242055384" />
+	<param name="ws" value="9.99424559654" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rectGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect" />
+	<param name="frq" value="2.66930408792" />
+	<param name="dev" value="0.858805929676" />
+	<param name="ws" value="0.374629479093" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_monoGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_mono" />
+	<param name="frq" value="2.56029288392" />
+	<param name="dev" value="0.769373393884" />
+	<param name="ws" value="0.390580314572" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="base_joint_stateGObs" >
+	<param name="topic" value="base_joint_state" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect_color/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect_color/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect_color/theoraGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect_color/theora" />
+	<param name="frq" value="2.82336630378" />
+	<param name="dev" value="1.13689312545" />
+	<param name="ws" value="0.354187127141" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_raw/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_raw/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/image_raw/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="camera/image_raw/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_mono/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_mono/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect_raw/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect_raw/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="la_joint_stateGObs" >
+	<param name="topic" value="la_joint_state" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_raw/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/ir/image_raw/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_raw/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_raw/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="la_pitch_controller/commandGObs" >
+	<param name="topic" value="la_pitch_controller/command" />
+	<param name="frq" value="0.0200920690949" />
+	<param name="dev" value="0.0255858604375" />
+	<param name="ws" value="49.770881997" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_mono/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_mono/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="hokuyo_node/parameter_updatesGObs" >
+	<param name="topic" value="hokuyo_node/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="la_roll_controller/stateGObs" >
+	<param name="topic" value="la_roll_controller/state" />
+	<param name="frq" value="0.050151171104" />
+	<param name="dev" value="0.031124675744" />
+	<param name="ws" value="19.9397138289" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_color/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_color/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_raw/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image_raw/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_color/theoraGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_color/theora" />
+	<param name="frq" value="2.54530154391" />
+	<param name="dev" value="0.805785087033" />
+	<param name="ws" value="0.392880758036" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/image_raw/compressedGObs" >
+	<param name="topic" value="camera/image_raw/compressed" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="tfGObs" >
+	<param name="topic" value="tf" />
+	<param name="frq" value="0.0346152028878" />
+	<param name="dev" value="0.0639751088499" />
+	<param name="ws" value="28.8890405537" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/image_raw/theoraGObs" >
+	<param name="topic" value="camera/image_raw/theora" />
+	<param name="frq" value="0.256155163363" />
+	<param name="dev" value="0.394254164816" />
+	<param name="ws" value="3.90388382912" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/rectify_depth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/rectify_depth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_raw/compressedGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_raw/compressed" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect_color/compressedGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect_color/compressed" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="hokuyo_node/parameter_descriptionsGObs" >
+	<param name="topic" value="hokuyo_node/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/driver/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/driver/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/driver/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/driver/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect_raw/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect_raw/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/image_raw/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="camera/image_raw/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="diagnosticsGObs" >
+	<param name="topic" value="diagnostics" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="cmd_velGObs" >
+	<param name="topic" value="cmd_vel" />
+	<param name="frq" value="0.017750285775" />
+	<param name="dev" value="0.0276079693443" />
+	<param name="ws" value="56.3371211415" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_color/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_color/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_color/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_color/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="joint_statesGObs" >
+	<param name="topic" value="joint_states" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="rosoutGObs" >
+	<param name="topic" value="rosout" />
+	<param name="frq" value="0.118554957491" />
+	<param name="dev" value="0.0938691980843" />
+	<param name="ws" value="8.43490665566" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_raw/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_raw/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_raw/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image_raw/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="motor_states/sh_yaw_pitch_portGObs" >
+	<param name="topic" value="motor_states/sh_yaw_pitch_port" />
+	<param name="frq" value="0.0505242510062" />
+	<param name="dev" value="0.0382973531736" />
+	<param name="ws" value="19.7924754961" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_raw/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image_raw/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect_color/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect_color/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/rectify_ir/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/ir/rectify_ir/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="la_roll_controller/commandGObs" >
+	<param name="topic" value="la_roll_controller/command" />
+	<param name="frq" value="0.0200952588773" />
+	<param name="dev" value="0.0270968906307" />
+	<param name="ws" value="49.7629817115" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_rect/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/ir/image_rect/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect_raw/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect_raw/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_mono/theoraGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_mono/theora" />
+	<param name="frq" value="2.554821788" />
+	<param name="dev" value="0.753213192871" />
+	<param name="ws" value="0.391416733918" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/rectify_depth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/rectify_depth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_yaw_controller/commandGObs" >
+	<param name="topic" value="sh_yaw_controller/command" />
+	<param name="frq" value="0.0177400502877" />
+	<param name="dev" value="0.0244576137146" />
+	<param name="ws" value="56.3696260035" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="motor_states/la_roll_pitch_portGObs" >
+	<param name="topic" value="motor_states/la_roll_pitch_port" />
+	<param name="frq" value="0.0501169364641" />
+	<param name="dev" value="0.0375923199369" />
+	<param name="ws" value="19.9533345522" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="qrcode_marker_arrayGObs" >
+	<param name="topic" value="qrcode_marker_array" />
+	<param name="frq" value="4.98586162428" />
+	<param name="dev" value="0.770714863072" />
+	<param name="ws" value="0.200567138713" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="trajectoryGObs" >
+	<param name="topic" value="trajectory" />
+	<param name="frq" value="4.05110721119" />
+	<param name="dev" value="0.73884320533" />
+	<param name="ws" value="0.246846096109" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_raw/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_raw/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="rosout_aggGObs" >
+	<param name="topic" value="rosout_agg" />
+	<param name="frq" value="0.0592608416345" />
+	<param name="dev" value="0.0787490185006" />
+	<param name="ws" value="16.874549406" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="odomGObs" >
+	<param name="topic" value="odom" />
+	<param name="frq" value="0.099990252117" />
+	<param name="dev" value="0.0320406671364" />
+	<param name="ws" value="10.0009748833" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_raw/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_raw/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_color/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_color/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="imu_dataGObs" >
+	<param name="topic" value="imu_data" />
+	<param name="frq" value="0.020031836732" />
+	<param name="dev" value="0.029071640643" />
+	<param name="ws" value="49.9205346658" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect_color/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect_color/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_raw/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_raw/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_pitch_controller/stateGObs" >
+	<param name="topic" value="sh_pitch_controller/state" />
+	<param name="frq" value="0.050561230431" />
+	<param name="dev" value="0.0325711568068" />
+	<param name="ws" value="19.7779996941" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_colorGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_color" />
+	<param name="frq" value="2.55694020302" />
+	<param name="dev" value="0.795741165728" />
+	<param name="ws" value="0.391092446675" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="slam_cloudGObs" >
+	<param name="topic" value="slam_cloud" />
+	<param name="frq" value="1.69025838846" />
+	<param name="dev" value="0.781715271621" />
+	<param name="ws" value="0.59162552118" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/image_rawGObs" >
+	<param name="topic" value="camera/image_raw" />
+	<param name="frq" value="0.279125993037" />
+	<param name="dev" value="0.363435265777" />
+	<param name="ws" value="3.5826115265" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect_raw/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect_raw/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_raw/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/ir/image_raw/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_joint_stateGObs" >
+	<param name="topic" value="sh_joint_state" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="mapGObs" >
+	<param name="topic" value="map" />
+	<param name="frq" value="1.99750638008" />
+	<param name="dev" value="0.117002527016" />
+	<param name="ws" value="0.500624183218" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/camera_infoGObs" >
+	<param name="topic" value="camera/camera_info" />
+	<param name="frq" value="0.256684549287" />
+	<param name="dev" value="0.396140172968" />
+	<param name="ws" value="3.89583246353" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_raw/theoraGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_raw/theora" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_raw/compressedDepth/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_raw/compressedDepth/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/rectify_depth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/rectify_depth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="victim_marker_arrayGObs" >
+	<param name="topic" value="victim_marker_array" />
+	<param name="frq" value="4.96665708224" />
+	<param name="dev" value="0.830906873271" />
+	<param name="ws" value="0.20134267042" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_raw/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/ir/image_raw/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect_raw/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect_raw/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect_raw/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect_raw/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="slam_out_poseGObs" >
+	<param name="topic" value="slam_out_pose" />
+	<param name="frq" value="0.0504464508223" />
+	<param name="dev" value="0.0454385165728" />
+	<param name="ws" value="19.823000106" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/rectify_mono/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/rectify_mono/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/debayer/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/debayer/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_rect/compressed/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/ir/image_rect/compressed/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="camera/image_raw/theora/parameter_updatesGObs" >
+	<param name="topic" value="camera/image_raw/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="la_pitch_controller/stateGObs" >
+	<param name="topic" value="la_pitch_controller/state" />
+	<param name="frq" value="0.0501303539978" />
+	<param name="dev" value="0.0312391546681" />
+	<param name="ws" value="19.9479939847" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/rectify_color/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/rectify_color/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_mono/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_mono/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_mono/theora/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_mono/theora/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_raw/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/depth/image_raw/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="clockGObs" >
+	<param name="topic" value="clock" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth_registered/image_rect_raw/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth_registered/image_rect_raw/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/ir/image_rect/compressed/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/ir/image_rect/compressed/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/depth/image_rect/theora/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/depth/image_rect/theora/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/image_rect/compressedDepth/parameter_descriptionsGObs" >
+	<param name="topic" value="sh_kinect/rgb/image_rect/compressedDepth/parameter_descriptions" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="GObs.py" name="sh_kinect/rgb/debayer/parameter_updatesGObs" >
+	<param name="topic" value="sh_kinect/rgb/debayer/parameter_updates" />
+	<param name="frq" value="0" />
+	<param name="dev" value="0" />
+	<param name="ws" value="0" />
+</node>
+</launch>

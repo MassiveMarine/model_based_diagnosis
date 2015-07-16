@@ -25,7 +25,10 @@ import rospy
 import sys
 import xmlrpclib
 import os
+from std_msgs.msg import String
+from tug_ist_diagnosis_msgs.msg import Observations
 import time
+from array import array
 import thread
 import re
 import traceback
@@ -45,6 +48,7 @@ class General_Observer(object):
         self.obs_msg = []
         self.topic_type = ""
         self.topic_name = ""
+				self.lock=thread.allocate_lock()
         self.msg = ""
         self.prev_t = time.time()
         self.pub = rospy.Publisher('/observations', Observations, queue_size=5)

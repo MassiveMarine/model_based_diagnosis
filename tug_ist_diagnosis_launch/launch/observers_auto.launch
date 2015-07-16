@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="ariaNObs" >
+<param name="node" value="aria" />
+</node>
+<node pkg="tug_ist_diagnosis_observers" type="NObs.py" name="laserNObs" >
+<param name="node" value="laser" />
+</node>
+</launch>

@@ -8,6 +8,7 @@ Diagnosis Model System needs diagnois model of the correct behavior of the syste
   <license>GPLv3</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/tug_ist_diagnosis_generator</url>
+  <depend package="tf"/>
 
 </package>
 

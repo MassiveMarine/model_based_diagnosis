@@ -42,8 +42,7 @@ class ModelActionServer(object):
     rospy.init_node('diag_model_server_node', anonymous=True)
     self.param_file = rospy.get_param('~model', 'diagnosis_model.yaml')
     self._as = actionlib.SimpleActionServer('diagnosis_model_server', tug_ist_diagnosis_msgs.msg.SystemModelAction, execute_cb=self.execute_cb, auto_start = False)
-    self.pub = rospy.Publisher('diagnosis_model', tug_ist_diagnosis_msgs.msg.SystemModelResult)
-    print 'Diagnosis Model Server is up......'
+    print 'Diagnosis Model Server is up ......'
     self._as.start()
     
   def execute_cb(self, goal):
@@ -52,10 +51,8 @@ class ModelActionServer(object):
     except IOError:
         self.report_error()
     self.sys_modl = yaml.load(file_ptr)
-    r = rospy.Rate(1)
     success = True
     rospy.loginfo('Request for System Model received:')
-    time.sleep(2)
     if success:
       self._result.ab = self.sys_modl["ab"]
       self._result.nab = self.sys_modl["nab"]
@@ -70,7 +67,6 @@ class ModelActionServer(object):
       print "Propositions:\n",p
       no_of_props = len(p)
       print "Nos of Props:",no_of_props
-      self.pub.publish(self._result)
       self._as.set_succeeded(self._result)
       rospy.loginfo('System Model sent successfully.')
       

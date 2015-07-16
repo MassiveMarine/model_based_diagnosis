@@ -58,7 +58,8 @@ class node_data_structure(object):
 		self.cpu_list.append(cpu)
 	def get_cpu(self):
 		n = len(self.cpu_list)
-		print 'cpu list len'+str(n)
+		if n == 0:
+			return 0
 		print self.cpu_list
 		if n== 0:
 			mean = 0
@@ -73,77 +74,57 @@ class node_data_structure(object):
 		self.mem_list.append(mem)
 	def get_mem(self):
 		n = len(self.mem_list)
+		if n == 0:
+			return 0
 		mean = sum(self.mem_list)/n
 		dev = [x - mean for x in self.mem_list]
 		dev2 = [x*x for x in dev]
 		sd = sqrt( sum(dev2) / n)
-		return mean+2*sd
+		print self.mem_list
+		return (mean+2*sd)*1000
 	def set_node_pid(self,pid):
 		self.node_pid = pid
 	def get_node_pid(self):
 		return self.node_pid
 
-
 class topic_data_structure(object):
 	def __init__(self,topic_name,ws):
 		self.topic_name = topic_name
-		self.ws = ws
-		self.circular_queu = [0 for i in xrange(self.ws)]
-		#self.frq_list = [0 for i in xrange(self.ws)]
-		self.frq_list = []
-		self.occur_list = []
-		self.calculated_frq = 0
-		self.calculated_frq_dev = 0
-		self.prev_t = time.time()
+		self.current_time_list = []
+		self.delta_time_list = []
+		self.mean_occ_time = 0
+		self.frq = 0
 	def get_topic_name(self):
 		return self.topic_name
-	def set_prev_t(self,prev_t):
-		self.prev_t = prev_t
-	def get_prev_t(self):
-		return self.prev_t
-	def set_occur(self,val):
-		self.occur_list.append(val)
-	def calc_frq(self,delta_t):
-		self.circular_queu.pop(0)
-		self.circular_queu.append(delta_t)
-		sm = numpy.sum(self.circular_queu)
-		#sm = 0
-		#for dt in self.circular_queu:
-		#	sm = sm + dt
-		frq = 1/(float(sm)/self.ws)
-		self.frq_list.append(frq)
-		#print 'size===',len(self.frq_list)
-	def calculate_frq_dev(self):
-		frq_list = self.frq_list[self.ws:]
-		n = len(frq_list)
-		if n!=0:
-			#mean = self.calculate_mean(frq_list)
-			mean = numpy.mean(frq_list)
-			#self.calculated_frq_dev = self.calculate_standard_deviation(frq_list)
-			self.calculated_frq_dev = numpy.std(frq_list)
-			self.calculated_frq = mean
-		else:
-			mean = 0
-			self.calculated_frq_dev = 0
-			self.calculated_frq = 0
-	def calculate_mean(self,par_list):
-		n = len(par_list)
-		s = sum(par_list)
-		return 	float(s)/n
-	def calculate_standard_deviation(self,par_list):
-		n = len(par_list)
-		mean = self.calculate_mean(par_list)
-		return float(sqrt(sum((x-mean)**2 for x in par_list))/n)
-	def get_calculated_frq(self):
-		return self.calculated_frq
-	def get_calculated_frq_dev(self):
-		return self.calculated_frq_dev
-	def get_signal_nature(self):
-		#signal_mean = self.calculate_mean(self.occur_list)
-		signal_mean = numpy.mean(self.occur_list)
-		#signal_dev =  self.calculate_standard_deviation(self.occur_list)
-		signal_dev =  numpy.std(self.occur_list)
-		print self.topic_name, signal_mean, signal_dev
+	def save_current_time(self,t):
+		self.current_time_list.append(t)
+	def get_mean_occ_time(self):
+		return self.mean_occ_time
+	def get_deviation(self):
+		print self.delta_time_list
+		n = len(self.delta_time_list)
+		if n == 0:
+			return 0
+		self.mean_occ_time = float(sum(self.delta_time_list))/n
+		dev = sqrt(sum((x-self.mean_occ_time)**2 for x in self.delta_time_list)/n)
+		return dev
+	def get_frequency(self):
+		if len(self.current_time_list) == 0:
+			return 0
+		#pt = self.current_time_list[0]
+		for x in range(1, len(self.current_time_list)):
+			pt = self.current_time_list[x-1]		
+			t = self.current_time_list[x]		
+			self.delta_time_list.append(t-pt)
+		#for t in self.current_time_list:
+		#	#d = t-pt
+		#	self.delta_time_list.append(t-pt)
+		#	#s = s + d
+		#	pt = t
+		#if s==0:
+		#	return 0
+		#self.frq = 1/(float(s)/len(self.current_time_list))
+		#return self.frq
 	def print_frq_list(self):
 		print 'FILE: for'+self.topic_name
 		fl = open(self.topic_name[1:len(self.topic_name)]+".txt", "w")
@@ -151,7 +132,6 @@ class topic_data_structure(object):
 			fl.write(str(f)+"\n")
 			print f
 		fl.close()
-		
 
 class Generator(object):
 	def __init__(self):
@@ -177,6 +157,7 @@ class Generator(object):
 		self.param_dev = 0
 		self.maxCpu = 0
 		self.maxMem = 0
+		self.prev_t = time.time()
 
 
 	def start(self):
@@ -257,6 +238,13 @@ class Generator(object):
 	def callback(self,data,topic):
 		curr_t = time.time()
 		for tpc_ds in self.topic_data_structure:
+			if topic == tpc_ds.get_topic_name():
+				tpc_ds.save_current_time(curr_t)
+		self.prev_t = curr_t
+
+	def callbackB(self,data,topic):
+		curr_t = time.time()
+		for tpc_ds in self.topic_data_structure:
 			occurance = 0
 			if topic == tpc_ds.get_topic_name():
 				delta_t = curr_t - tpc_ds.get_prev_t()
@@ -276,13 +264,12 @@ class Generator(object):
 				self.out = p.communicate()[0]
 				self.out1 = shlex.split(self.out)
 				cpu = self.out1[8]
-				mem = self.out1[9]
-				#if cpu > self.maxCpu:
-				#	self.maxCpu = cpu
-				#if mem > self.maxMem:
-				#	self.maxMem = mem
 				node_ds.set_cpu(float(cpu))
-				node_ds.set_mem(float(mem))
+				p = subprocess.Popen("pmap -x %s" %node_pid, shell=True,stdout=subprocess.PIPE)
+				out = p.communicate()[0]
+				out1 = shlex.split(out)
+				mem = float(int(out1[len(out1)-3]))/1000
+				node_ds.set_mem(mem)
 				#print 'node_name=',node_name,' node_pid=',node_pid, ' Max_cpu=',self.maxCpu,' Max_Mem=',self.maxMem
 			time.sleep(0.25)
 
@@ -416,13 +403,12 @@ class Generator(object):
 		for t in self.topics_list:
 			for tpc_ds in self.topic_data_structure:
 				if t == tpc_ds.get_topic_name():
-					tpc_ds.calculate_frq_dev()
-					#y = 'imu'
-					#if y in t:
-					#	tpc_ds.print_frq_list()
-					self.param_frq = tpc_ds.get_calculated_frq()
-					self.param_dev = tpc_ds.get_calculated_frq_dev()
+					tpc_ds.get_frequency()
+					self.param_dev = tpc_ds.get_deviation()
+					self.param_frq = tpc_ds.get_mean_occ_time()
+					self.param_g_ws = 10 * self.param_frq
 					break
+			print t, self.param_frq
 			if self.param_frq == 0:
 				self.zero_frq_topic_list.append(t)
 				continue
