@@ -72,18 +72,22 @@ def run(frequency=1.0):
         process_info = get_cpu_and_mem_usage(nodes_info.keys())
 
         for pid, node in nodes_info.iteritems():
-            nodes_info_array.data.append(NodeInfo(name=node, pid=pid, cpu=process_info[pid][0], memory=process_info[pid][1]))
+            try:
+                nodes_info_array.data.append(NodeInfo(name=node, pid=pid, cpu=process_info[pid][0], memory=process_info[pid][1]))
+            except KeyError:
+                rospy.logerr("error with PID of node", node)
 
         node_infos_pub.publish(nodes_info_array)
 
         rate.sleep()
 
 if __name__ == "__main__":
-    rospy.init_node('tug_resource_monitor', anonymous=False)
+    rospy.init_node('tug_resource_monitor', anonymous=True)
 
     node_infos_pub = rospy.Publisher('diag/node_infos', NodeInfoArray, queue_size=10)
 
     try:
+        rospy.logerr(rospy.get_name())
         run(1)
     except KeyboardInterrupt:
         pass
