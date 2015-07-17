@@ -50,10 +50,11 @@ def get_node_names_and_pids():
         if not node_api:
             print("cannot find [%s]: unknown node" % node)
             continue
-
-        code, msg, pid = rosnode.ServerProxy(node_api).getPid(rosnode.ID)
-        if code != 1:
-            raise rosnode.ROSNodeException("remote call failed: %s" % msg)
+        try:
+            code, msg, pid = rosnode.ServerProxy(node_api).getPid(rosnode.ID)
+            if code != 1:
+                raise rosnode.ROSNodeException("remote call failed: %s" % msg)
+        except:
             continue
 
         process_info[pid] = node
