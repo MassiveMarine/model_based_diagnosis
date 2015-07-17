@@ -25,17 +25,6 @@ def get_cpu_and_mem_usage(pids=[]):
         except psutil.NoSuchProcess, KeyError:
             pass
 
-    # for proc in psutil.process_iter():
-    #     try:
-    #         if proc.pid in pids or not pids:
-    #             memory_info = proc.get_memory_info()[0]
-    #             cpu_percent = proc.get_cpu_percent(interval=0)
-    #             pid = proc.pid
-    #             process_info[pid] = [cpu_percent, memory_info]
-    #
-    #     except psutil.NoSuchProcess:
-    #         pass
-
     return process_info
 
 
@@ -47,6 +36,8 @@ def get_node_names_and_pids():
 
     for node in node_names:
         node_api = rosnode.get_api_uri(master, node)
+        hostname = rosnode.urlparse.urlparse(node_api).hostname
+
         if not node_api:
             print("cannot find [%s]: unknown node" % node)
             continue
@@ -57,7 +48,7 @@ def get_node_names_and_pids():
         except:
             continue
 
-        process_info[pid] = node
+        process_info[pid] = [node, hostname]
     return process_info
 
 
@@ -71,14 +62,14 @@ def run(frequency=1.0):
         nodes_info = get_node_names_and_pids()
         process_info = get_cpu_and_mem_usage(nodes_info.keys())
 
-        for pid, node in nodes_info.iteritems():
+        for pid, [node, hostname] in nodes_info.iteritems():
             try:
-                nodes_info_array.data.append(NodeInfo(name=node, pid=pid, cpu=process_info[pid][0], memory=process_info[pid][1]))
+                nodes_info_array.data.append(NodeInfo(name=node, pid=pid, hostname=hostname,
+                                                      cpu=process_info[pid][0], memory=process_info[pid][1]))
             except KeyError:
-                rospy.logerr("error with PID of node", node)
+                rospy.logerr("error with PID of node '" + node + "' on machine '" + hostname + "'")
 
         node_infos_pub.publish(nodes_info_array)
-
         rate.sleep()
 
 if __name__ == "__main__":
@@ -87,9 +78,11 @@ if __name__ == "__main__":
     node_infos_pub = rospy.Publisher('diag/node_infos', NodeInfoArray, queue_size=10)
 
     try:
-        rospy.logerr(rospy.get_name())
+        rospy.loginfo("starting " + rospy.get_name())
         run(1)
     except KeyboardInterrupt:
         pass
+    except rosnode.ROSNodeIOException as e:
+        print e
     except rospy.ROSInterruptException:
         pass
