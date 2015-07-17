@@ -6,6 +6,7 @@ import rospy
 import rosnode
 from tug_resource_monitor.msg import NodeInfo, NodeInfoArray
 import psutil
+import os
 
 
 class TUGResourceMonitor:
@@ -43,12 +44,13 @@ class TUGResourceMonitor:
         for node in node_names:
             try:
                 node_api = rosnode.get_api_uri(master, node)
-                hostname = rosnode.urlparse.urlparse(node_api).hostname
 
                 # check if node can be found
                 if not node_api:
                     rospy.logwarn("cannot find '" + node + "': unknown node")
                     continue
+
+                hostname = rosnode.urlparse.urlparse(node_api).hostname
 
                 # only take nodes, which are running on this machine
                 if hostname != self.own_hostname:
@@ -89,7 +91,7 @@ class TUGResourceMonitor:
             rate.sleep()
 
 if __name__ == "__main__":
-    rospy.init_node('tug_resource_monitor', anonymous=False)
+    rospy.init_node('tug_resource_monitor_' + str(os.getpid()), anonymous=False)
 
     try:
         rospy.loginfo("starting " + rospy.get_name())
