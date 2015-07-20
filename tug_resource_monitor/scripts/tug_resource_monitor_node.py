@@ -7,6 +7,7 @@ import rosnode
 from tug_resource_monitor.msg import NodeInfo, NodeInfoArray
 import psutil
 import os
+from std_msgs.msg import Header
 
 
 class TUGResourceMonitor:
@@ -73,19 +74,24 @@ class TUGResourceMonitor:
     def run(self, frequency=1.0):
 
         rate = rospy.Rate(frequency)
+        nodes_info = self.get_node_names_and_pids()
         while not rospy.is_shutdown():
 
             nodes_info_array = NodeInfoArray()
+            nodes_info_array.header = Header(stamp=rospy.Time.now())
 
-            nodes_info = self.get_node_names_and_pids()
             process_info = self.get_cpu_and_mem_usage(nodes_info.keys())
 
             for pid, [node, hostname] in nodes_info.iteritems():
                 try:
                     nodes_info_array.data.append(NodeInfo(name=node, pid=pid, hostname=hostname,
-                                                          cpu=process_info[pid][0], memory=process_info[pid][1]))
+                                                          cpu=process_info[pid][0], memory=process_info[pid][1],
+                                                          error=NodeInfo.NO_ERROR))
                 except KeyError:
                     rospy.logerr("error with PID of node '" + node + "'")
+                    nodes_info_array.data.append(NodeInfo(name=node, pid=0, hostname='0.0.0.0',
+                                                          cpu=0.0, memory=0,
+                                                          error=NodeInfo.ERROR_PID_NOT_FOUND))
 
             self.node_infos_pub.publish(nodes_info_array)
             rate.sleep()
