@@ -16,7 +16,8 @@ class NodeData:
     OFFLINE = 0
     NEED_INIT = 2
 
-    def __init__(self, pid=0, process=None, hostname='', state=NEED_INIT):
+    def __init__(self, name, pid=0, process=None, hostname='', state=NEED_INIT):
+        self.name = name
         self.pid = pid
         self.process = process
         self.hostname = hostname
@@ -26,7 +27,7 @@ class NodeData:
         self.state = state
 
     def __str__(self):
-        return "\nNode '" + str(self.name) + "' has PID '" + str(self.pid) + "' and runs on machine '" + str(self.hostname) + "'"
+        return "PID: " + str(self.pid) + " machine: '" + str(self.hostname) + "' state: " + str(self.state)
 
     def __repr__(self):
         return str(self)
@@ -34,41 +35,122 @@ class NodeData:
 
 class TUGResourceMonitor:
     def __init__(self):
-        self.own_hostname = get_hostname()
-
+        self.own_hostname, node_api = get_hostname()
         self.nodes = dict()
-
         self.node_infos_pub = rospy.Publisher('diag/node_infos', NodeInfoArray, queue_size=10)
 
     def run(self, frequency=1.0):
-        rate = rospy.Rate(10.0)
+        rate = rospy.Rate(frequency)
+
+        self.waiting_for_nodes_list()
+        self.waiting_for_all_nodes_coming_online()
+
+        rospy.loginfo("entering loop with '" + str(frequency) + " Hz'")
+        while not rospy.is_shutdown():
+
+            nodes_info_array = NodeInfoArray()
+            for node in self.nodes.itervalues():
+                self.get_pid_of_node(node)
+                self.get_cpu_and_mem_usage_of_node(node)
+                nodes_info_array.data.append(NodeInfo(name=node.name, pid=node.pid, hostname=node.hostname,
+                                                      cpu=node.cpu_usage, memory=node.mem_usage,
+                                                      error=node.error))
+
+            nodes_info_array.header = Header(stamp=rospy.Time.now())
+            self.node_infos_pub.publish(nodes_info_array)
+            rate.sleep()
+
+        rospy.logerr('done')
+
+    def waiting_for_nodes_list(self):
         rospy.loginfo("waiting for nodes list")
+        rate = rospy.Rate(10.0)
         while not self.nodes and not rospy.is_shutdown():
             rate.sleep()
 
+    def waiting_for_all_nodes_coming_online(self):
         rospy.loginfo("waiting for all nodes coming online")
+        rate = rospy.Rate(10.0)
         while next((x for x in self.nodes.values() if x.state == 2), False) and not rospy.is_shutdown():
             node_names_currently_running = rosnode.get_node_names()
+            # print node_names_currently_running
 
             if not set(self.nodes.keys()) - set(node_names_currently_running):
                 for node_name in list(set(self.nodes.keys()) & set(node_names_currently_running)):
                     self.nodes[node_name].state = NodeData.ONLINE
             rate.sleep()
 
-        rospy.logerr('done')
+    def get_pid_of_node(self, node, master=rosnode.rosgraph.Master(rosnode.ID)):
+        try:
+            # check if pid is already known
+            if node.pid:
+                return
+
+            hostname, node_api = get_hostname_of_nodes(node_name=node.name, master=master)
+
+            # only take nodes, which are running on this machine
+            if hostname != self.own_hostname:
+                return
+
+            # read out pid of node
+            code, msg, pid = rosnode.ServerProxy(node_api).getPid(rosnode.ID)
+            if code != 1:
+                raise rosnode.ROSNodeException("remote call failed: '" + node.name + "'")
+
+            node.hostname = hostname
+            node.pid = pid
+            node.error = NodeInfo.NO_ERROR
+
+        except rosnode.ROSNodeException as error:
+            rospy.logwarn(str(error))
+        except rosnode.ROSNodeIOException as error:
+            rospy.logerr(str(error))
+        except IOError as error:
+            if node.state == NodeData.OFFLINE:
+                rospy.logwarn("Connection refused '" + str(node.name) + "'; maybe its not running any more")
+            else:
+                rospy.logerr(str(error))
+
+    @staticmethod
+    def get_cpu_and_mem_usage_of_node(node):
+        try:
+            if not node.process:
+                if not node.pid:
+                    return
+                node.process = psutil.Process(node.pid)
+
+            node.mem_usage = node.process.get_memory_info()[0]
+            node.cpu_usage = node.process.get_cpu_percent(interval=0)
+        except psutil.NoSuchProcess:
+            rospy.logwarn("pid of node '" + node.name + "' not found")
+            node.pid = 0
+            node.process = None
+            node.cpu_usage = 0.0
+            node.mem_usage = 0
+            node.error = NodeInfo.ERROR_PID_NOT_FOUND
+            node.state = NodeData.OFFLINE
 
 
 def handle_new_nodes_list(req):
     rospy.logwarn("new nodes list" + str(req.node_names))
+    monitor.nodes.clear()
     for name in req.node_names:
-        monitor.nodes[name] = NodeData()
+        monitor.nodes[name] = NodeData(name=name)
     return NodesInfoResponse()
 
 
 def get_hostname(master=rosnode.rosgraph.Master(rosnode.ID)):
-    master = rosnode.rosgraph.Master(rosnode.ID)
-    node_api = rosnode.get_api_uri(master, rospy.get_name())
-    return rosnode.urlparse.urlparse(node_api).hostname
+    return get_hostname_of_nodes(rospy.get_name(), master)
+
+
+def get_hostname_of_nodes(node_name, master=rosnode.rosgraph.Master(rosnode.ID)):
+    # check if master is available
+    node_api = rosnode.get_api_uri(master, node_name, skip_cache=True)
+    # check if node can be found
+    if not node_api:
+        raise rosnode.ROSNodeException("cannot find node '" + str(node_name) + "'; maybe its not running any more")
+
+    return rosnode.urlparse.urlparse(node_api).hostname, node_api
 
 
 if __name__ == "__main__":
