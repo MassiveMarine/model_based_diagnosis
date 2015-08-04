@@ -20,4 +20,16 @@ namespace tug_observers_cpp
       spinner_.start();
     }
 
+    void ObserverPluginBase::reportError(std::string resource, std::string error_msg, std::string verbose_error_msg)
+    {
+        ROS_ERROR_STREAM("report error for resource: '" << resource << "' with msg: '" << error_msg << "' which means in detail '" << verbose_error_msg << "'");
+    }
+
+    void ObserverPluginBase::reportStates(std::string resource, std::vector<std::string> states)
+    {
+      std::string estimated_states = "";
+      for(std::vector<std::string>::iterator it = states.begin(); it != states.end(); ++it)
+        estimated_states += " '" + *it + "'";
+      ROS_INFO_STREAM("report resource: '" << resource << " is one of the following states:" << estimated_states);
+    }
 }

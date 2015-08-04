@@ -6,6 +6,7 @@ project(tug_observer_plugins_cpp)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  pluginlib
   tug_observers_cpp
   tug_resource_monitor
 )
@@ -80,9 +81,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES tug_observer_plugins_cpp
-#  CATKIN_DEPENDS roscpp tug_observers_cpp tug_resource_monitor
+  INCLUDE_DIRS include
+  LIBRARIES resources_plugin
+#  CATKIN_DEPENDS roscpp tug_observer_plugins_cpp tug_resource_monitor
 #  DEPENDS system_lib
 )
 
@@ -94,13 +95,12 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
-# add_library(tug_observer_plugins_cpp
-#   src/${PROJECT_NAME}/tug_observer_plugins_cpp.cpp
-# )
+add_library(resources_plugin src/ResourcesPlugin.cpp src/NodeResource.cpp src/NodeResourceState.cpp src/ProcessYaml.cpp)
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)
@@ -110,9 +110,9 @@ include_directories(
 # add_dependencies(tug_observer_plugins_cpp_node tug_observer_plugins_cpp_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(tug_observer_plugins_cpp_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(resources_plugin
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

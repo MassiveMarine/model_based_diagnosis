@@ -1,66 +1,17 @@
-  ########## node1 ##########
--
-  type: hz
-  topics: 
-    -
-      name: /topicA
-        -
-          state: 1
-          frequenzy: 10
-          std_deviation: 2
-          filter: mean
-            window_size: 10
-        - state: 2
-          frequenzy: 10
-          std_deviation: 2
-          filter: median
-            window_size: 10
-        - state: 3
-          frequenzy: 10
-          std_deviation: 2
-          filter: kmeans
-            window_size: 10
-            k_size: 10
-        - state: 4
-          frequenzy: 10
-          std_deviation: 2
-          filter: lp
-            # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
-            decay_rate: 1.0
--
-  type: size
-  topics: 
-    -
-      name: /topicA
-        -
-          state: 1
-          bytes: 10
-          std_deviation: 2
--
-  type: timings
-  topics: 
-    -
-      nameA: /topicA
-      nameB: /topicB
-        -
-          state: 1
-          # delay in ms from A to B
-          delay: 10
-          # delay_std_deviation in ms
-          delay_std_deviation: 2
-          # sampling rate from A to B
-          sampling_rate: 1.0
-          sampling_rate_std_deviation: 0.1
--
-  type: resources
-  nodes: 
-    -
-      name: /node
-        -
-          state: 1
-          cpu_usage: 100
-          cpu_usage_std_deviation: 15
-          # mem usage in bytes
-          mem_usage: 1024
-          # mem usage std deviation in bytes
-          mem_usage_std_deviation: 100
+- type: resources
+  nodes:
+  - name: /node
+    states:
+    - state: 1
+      cpu_usage: 100
+      cpu_usage_std_deviation: 15
+      cpu_filter:
+        filter_name: mean
+        window_size: 10
+      # mem usage in bytes
+      mem_usage: 1024
+      # mem usage std deviation in bytes
+      mem_usage_std_deviation: 100
+      mem_filter:
+        filter_name: mean
+        window_size: 10

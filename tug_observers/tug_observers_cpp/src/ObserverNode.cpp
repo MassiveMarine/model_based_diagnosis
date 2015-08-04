@@ -12,7 +12,7 @@ namespace tug_observers_cpp
     void ObserverNode::initPlugins()
     {
       XmlRpc::XmlRpcValue params;
-      nh_.getParam("", params);
+      nh_.getParam("setup", params);
 
       if (!params.valid())
       {

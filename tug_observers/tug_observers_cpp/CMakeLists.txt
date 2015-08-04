@@ -79,8 +79,8 @@ find_package(Boost REQUIRED COMPONENTS thread)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES tug_observers_cpp
+  INCLUDE_DIRS include
+  LIBRARIES tug_observer_plugin_base
 #  CATKIN_DEPENDS roscpp tug_plugin_manager tug_resource_monitor
 #  DEPENDS system_lib
 )
@@ -99,21 +99,27 @@ include_directories(
 )
 
 ## Declare a cpp library
-# add_library(tug_observers_cpp
-#   src/${PROJECT_NAME}/tug_observers_cpp.cpp
-# )
+add_library(tug_observer_plugin_base
+  src/ObserverPluginBase.cpp
+)
 
 ## Declare a cpp executable
-add_executable(tug_observers_node src/ObserverNode.cpp src/ObserverPluginBase.cpp)
+add_executable(tug_observers_node src/ObserverNode.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(tug_observers_cpp_node tug_observers_cpp_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
+target_link_libraries(tug_observer_plugin_base
+  ${catkin_LIBRARIES}
+  ${BOOST_LIBRARIES}
+)
+
 target_link_libraries(tug_observers_node
   ${catkin_LIBRARIES}
   ${BOOST_LIBRARIES}
+  tug_observer_plugin_base
 )
 
 #############

@@ -151,6 +151,10 @@ namespace tug_observers_cpp
       {
         return subscribeConst(topic, queue_size, boost::bind(fp, obj.get(), _1), transport_hints, obj);
       }
+
+      void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg);
+
+      void reportStates(std::string resource, std::vector<std::string> states);
     };
 }
 
