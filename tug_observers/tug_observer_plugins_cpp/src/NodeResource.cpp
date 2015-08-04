@@ -25,11 +25,13 @@ namespace tug_observer_plugins_cpp
 
     void NodeResource::update(double cpu, unsigned long memory)
     {
-
+      //cpu_filter_->update(cpu);
+      //memory_filter_->update(memory);
     }
 
     std::vector<std::string> NodeResource::estimateStates()
     {
+      //double cpu_value =
       return std::vector<std::string>();
     }
 }

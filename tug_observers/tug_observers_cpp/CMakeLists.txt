@@ -6,6 +6,7 @@ project(tug_observers_cpp)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  pluginlib
   tug_plugin_manager
 )
 
