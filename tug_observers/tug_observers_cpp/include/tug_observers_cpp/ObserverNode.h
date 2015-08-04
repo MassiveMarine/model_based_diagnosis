@@ -14,6 +14,7 @@ namespace tug_observers_cpp
 
     typedef tug_plugin_manager::PluginManager<ObserverPluginBase> PluginManager;
     typedef boost::shared_ptr<ObserverPluginBase> ObserverPluginBasePtr;
+    typedef std::vector<tug_plugin_manager::PluginSpec<ObserverPluginBase> > Observers;
 
     class ObserverNode
     {
