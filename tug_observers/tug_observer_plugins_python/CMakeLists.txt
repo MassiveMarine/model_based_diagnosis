@@ -1,16 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tug_observers_cpp)
+project(tug_observer_plugins_python)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  tug_plugin_manager
+  rospy
+  tug_observers_python
+  tug_resource_monitor
 )
 
 ## System dependencies are found with CMake's conventions
-find_package(Boost REQUIRED COMPONENTS thread)
+# find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -80,8 +81,8 @@ find_package(Boost REQUIRED COMPONENTS thread)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES tug_observers_cpp
-#  CATKIN_DEPENDS roscpp tug_plugin_manager tug_resource_monitor
+#  LIBRARIES tug_observer_plugins_python
+#  CATKIN_DEPENDS rospy tug_observers_python tug_resource_monitor
 #  DEPENDS system_lib
 )
 
@@ -93,28 +94,25 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
-  include
   ${catkin_INCLUDE_DIRS}
-  ${BOOST_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
-# add_library(tug_observers_cpp
-#   src/${PROJECT_NAME}/tug_observers_cpp.cpp
+# add_library(tug_observer_plugins_python
+#   src/${PROJECT_NAME}/tug_observer_plugins_python.cpp
 # )
 
 ## Declare a cpp executable
-add_executable(tug_observers_node src/ObserverNode.cpp src/ObserverPluginBase.cpp)
+# add_executable(tug_observer_plugins_python_node src/tug_observer_plugins_python_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(tug_observers_cpp_node tug_observers_cpp_generate_messages_cpp)
+# add_dependencies(tug_observer_plugins_python_node tug_observer_plugins_python_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(tug_observers_node
-  ${catkin_LIBRARIES}
-  ${BOOST_LIBRARIES}
-)
+# target_link_libraries(tug_observer_plugins_python_node
+#   ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
@@ -131,7 +129,7 @@ target_link_libraries(tug_observers_node
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS tug_observers_cpp tug_observers_cpp_node
+# install(TARGETS tug_observer_plugins_python tug_observer_plugins_python_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -156,7 +154,7 @@ target_link_libraries(tug_observers_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_tug_observers_cpp.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_tug_observer_plugins_python.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
