@@ -6,9 +6,14 @@
 #include <ros/ros.h>
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
 #include <pluginlib/class_list_macros.h>
+#include <tug_observers_msgs/resource_error.h>
 
 namespace tug_observer_plugins_cpp
 {
+    ResourcesPlugin::ResourcesPlugin() : ObserverPluginBase("resources"), received_first_msg_(false)
+    {
+
+    }
 
     void ResourcesPlugin::initialize(XmlRpc::XmlRpcValue params)
     {
@@ -33,7 +38,6 @@ namespace tug_observer_plugins_cpp
         node_resources_.insert(std::make_pair(name, new_resource));
       }
       ROS_DEBUG("[ResourcesPlugin::initialize] 3");
-      received_first_msg_ = false;
 
       resource_sub_ = subscribe("/robot_41/diag/node_infos", 1, &ResourcesPlugin::nodeInfoCallback, this);
     }
@@ -76,7 +80,7 @@ namespace tug_observer_plugins_cpp
       {
         ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.1");
         for (std::set<std::string>::iterator it = remaining_nodes.begin(); it != remaining_nodes.end(); ++it)
-          reportError(*it, "not_running_" + *it, "The node with the name '" + *it + "' is not running");
+          reportError(*it, "not_running_" + *it, "The node with the name '" + *it + "' is not running", tug_observers_msgs::resource_error::NO_AVAILABLE);
         ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.2");
         for (std::vector<std::map<std::string, NodeResource>::iterator>::iterator it = found_node_resources.begin();
              it != found_node_resources.end(); ++it)
@@ -88,7 +92,7 @@ namespace tug_observer_plugins_cpp
           ROS_DEBUG_STREAM("ResourcesPlugin::nodeInfoCallback 3.5 " << " with number of states: " << states.size());
           if(states.empty())
           {
-            reportError(name, "no_state_" + name, "For the node with the name '" + name + "' no state could be estimated");
+            reportError(name, "no_state_" + name, "For the node with the name '" + name + "' no state could be estimated", tug_observers_msgs::resource_error::NO_STATE_FITS);
           }
           else
           {
