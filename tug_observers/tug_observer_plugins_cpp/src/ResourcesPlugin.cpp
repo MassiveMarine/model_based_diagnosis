@@ -86,8 +86,15 @@ namespace tug_observer_plugins_cpp
           ROS_DEBUG_STREAM("ResourcesPlugin::nodeInfoCallback 3.4 " << name);
           std::vector<std::string> states = (*it)->second.estimateStates();
           ROS_DEBUG_STREAM("ResourcesPlugin::nodeInfoCallback 3.5 " << " with number of states: " << states.size());
-          reportStates(name, states);
-          ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.5");
+          if(states.empty())
+          {
+            reportError(name, "no_state_" + name, "For the node with the name '" + name + "' no state could be estimated");
+          }
+          else
+          {
+            reportStates(name, states);
+            ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.5");
+          }
         }
       }
       ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 4");
