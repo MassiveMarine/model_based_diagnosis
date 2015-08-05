@@ -24,10 +24,14 @@ namespace tug_observer_plugins_cpp
       /// set to specify all the nodes which should be running
       std::set<std::string> nodes_of_interrest_;
 
+      ros::Subscriber resource_sub_;
+
+      bool received_first_msg_;
+
       void nodeInfoCallback(const tug_resource_monitor::NodeInfoArray::ConstPtr& msg);
 
       public:
-        virtual void initialize(const ros::NodeHandle &nh);
+        virtual void initialize(XmlRpc::XmlRpcValue params);
     };
 }
 

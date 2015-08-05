@@ -6,7 +6,7 @@
 
 namespace tug_observers_cpp
 {
-    ObserverNode::ObserverNode(ros::NodeHandle nh) : nh_(nh)
+    ObserverNode::ObserverNode(ros::NodeHandle nh) : plugin_manager_("tug_observers_cpp", "tug_observers_cpp::ObserverPluginBase"), nh_(nh)
     { }
 
     void ObserverNode::initPlugins()
@@ -20,25 +20,30 @@ namespace tug_observers_cpp
         throw std::runtime_error("No Plugins given");
       }
 
-      for (XmlRpc::XmlRpcValue::iterator it = params.begin(); it != params.end(); ++it)
+      for (int i = 0; i < params.size(); ++i)
       {
-        XmlRpc::XmlRpcValue & param = it->second;
+        XmlRpc::XmlRpcValue & param = params[i];
 
         if (!param.hasMember("type"))
-          throw std::runtime_error("/" + it->first + " has no 'type' parameter");
+          throw std::runtime_error("/" + static_cast<std::string>(params[i]) + " has no 'type' parameter");
 
-        ObserverPluginBasePtr new_plugin = plugin_manager_.loadPlugin(it->first, param["type"]);
-        new_plugin->initialize(ros::NodeHandle(nh_, it->first));
+        std::string type = static_cast<std::string>(param["type"]);
+        ObserverPluginBasePtr new_plugin = plugin_manager_.loadPlugin(type, type);
+        new_plugin->initialize(params[i]);
       }
     }
 
     void ObserverNode::startPlugins()
     {
+      ROS_DEBUG("[ObserverNode::startPlugins] 1");
       Observers observers = plugin_manager_.getPluginList();
+      ROS_DEBUG("[ObserverNode::startPlugins] 2");
       for(Observers::iterator it = observers.begin(); it != observers.end(); ++it)
       {
+        ROS_DEBUG("[ObserverNode::startPlugins] 2.1");
         it->instance->startPlugin();
       }
+      ROS_DEBUG("[ObserverNode::startPlugins] 2.2");
     }
 }
 
@@ -46,11 +51,12 @@ int main(int argc, char** argv)
 {
   try
   {
-    ros::init(argc, argv, "tug_robot_control_node");
-    ros::NodeHandle nh;
+    ros::init(argc, argv, "tug_observers_node");
+    ros::NodeHandle nh("~");
     tug_observers_cpp::ObserverNode node(nh);
     node.initPlugins();
     node.startPlugins();
+    ros::spin();
   }
   catch (std::exception & ex)
   {
