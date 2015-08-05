@@ -23,65 +23,12 @@ namespace tug_observers_cpp
       ros::AsyncSpinner spinner_;
       ros::NodeHandle nh_;
 
-      /// helper functions in order to clean up subscriber functions
-      template<class P>
-      ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size, const boost::function<void(P)> &callback,
-                           const ros::TransportHints &transport_hints
-      )
-      {
-        ros::SubscribeOptions ops;
-        ops.template initByFullCallbackType<P>(topic, queue_size, callback);
-        ops.transport_hints = transport_hints;
-        ops.callback_queue = internal_call_back_queue_;
-        return nh_.subscribe(ops);
-      }
-
-      template<class P>
-      ros::Subscriber subscribeConst(const std::string &topic, uint32_t queue_size, const boost::function<void(P)> &callback,
-                                const ros::TransportHints &transport_hints
-      )
-      {
-        ros::SubscribeOptions ops;
-        ops.template init<P>(topic, queue_size, callback);
-        ops.transport_hints = transport_hints;
-        ops.callback_queue = internal_call_back_queue_;
-        return nh_.subscribe(ops);
-      }
-
-      template<class P, class T>
-      ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size, const boost::function<void(P)> &callback,
-                                const ros::TransportHints &transport_hints,
-                                const boost::shared_ptr<T> &obj
-      )
-      {
-        ros::SubscribeOptions ops;
-        ops.template initByFullCallbackType<P>(topic, queue_size, callback);
-        ops.transport_hints = transport_hints;
-        ops.tracked_object = obj;
-        ops.callback_queue = internal_call_back_queue_;
-        return nh_.subscribe(ops);
-      }
-
-      template<class P, class T>
-      ros::Subscriber subscribeConst(const std::string &topic, uint32_t queue_size, const boost::function<void(P)> &callback,
-                                     const ros::TransportHints &transport_hints,
-                                     const boost::shared_ptr<T> &obj
-      )
-      {
-        ros::SubscribeOptions ops;
-        ops.template init<P>(topic, queue_size, callback);
-        ops.transport_hints = transport_hints;
-        ops.tracked_object = obj;
-        ops.callback_queue = internal_call_back_queue_;
-        return nh_.subscribe(ops);
-      }
-
     public:
       virtual ~ObserverPluginBase();
 
       void startPlugin();
 
-      virtual void initialize(const ros::NodeHandle &nh) = 0;
+      virtual void initialize(XmlRpc::XmlRpcValue params) = 0;
 
     protected:
       ObserverPluginBase();
@@ -92,7 +39,11 @@ namespace tug_observers_cpp
                            const ros::TransportHints &transport_hints = ros::TransportHints()
       )
       {
-        return subscribe(topic, queue_size, boost::bind(fp, obj, _1), transport_hints);
+        ros::SubscribeOptions ops;
+        ops.template initByFullCallbackType<M>(topic, queue_size, boost::bind(fp, obj, _1));
+        ops.transport_hints = transport_hints;
+        ops.callback_queue = &internal_call_back_queue_;
+        return nh_.subscribe(ops);
       }
 
       /// and the const version
@@ -101,7 +52,11 @@ namespace tug_observers_cpp
                            const ros::TransportHints &transport_hints = ros::TransportHints()
       )
       {
-        return subscribe(topic, queue_size, boost::bind(fp, obj, _1), transport_hints);
+        ros::SubscribeOptions ops;
+        ops.template initByFullCallbackType<M>(topic, queue_size, boost::bind(fp, obj, _1));
+        ops.transport_hints = transport_hints;
+        ops.callback_queue = &internal_call_back_queue_;
+        return nh_.subscribe(ops);
       }
 
       template<class M, class T>
@@ -110,7 +65,11 @@ namespace tug_observers_cpp
                            const ros::TransportHints &transport_hints = ros::TransportHints()
       )
       {
-        return subscribeConst(topic, queue_size, boost::bind(fp, obj, _1), transport_hints);
+        ros::SubscribeOptions ops;
+        ops.template init<M>(topic, queue_size, boost::bind(fp, obj, _1));
+        ops.transport_hints = transport_hints;
+        ops.callback_queue = &internal_call_back_queue_;
+        return nh_.subscribe(ops);
       }
 
       template<class M, class T>
@@ -119,21 +78,35 @@ namespace tug_observers_cpp
                            const ros::TransportHints &transport_hints = ros::TransportHints()
       )
       {
-        return subscribeConst(topic, queue_size, boost::bind(fp, obj, _1), transport_hints);
+        ros::SubscribeOptions ops;
+        ops.template init<M>(topic, queue_size, boost::bind(fp, obj, _1));
+        ops.transport_hints = transport_hints;
+        ops.callback_queue = &internal_call_back_queue_;
+        return nh_.subscribe(ops);
       }
 
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size, void(T::*fp)(M),
                            const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
       {
-        return subscribe(topic, queue_size, boost::bind(fp, obj.get(), _1), transport_hints, obj);
+        ros::SubscribeOptions ops;
+        ops.template initByFullCallbackType<M>(topic, queue_size, boost::bind(fp, obj, _1));
+        ops.transport_hints = transport_hints;
+        ops.tracked_object = obj;
+        ops.callback_queue = &internal_call_back_queue_;
+        return nh_.subscribe(ops);
       }
 
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size, void(T::*fp)(M) const,
                            const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
       {
-        return subscribe(topic, queue_size, boost::bind(fp, obj.get(), _1), transport_hints, obj);;
+        ros::SubscribeOptions ops;
+        ops.template initByFullCallbackType<M>(topic, queue_size, boost::bind(fp, obj, _1));
+        ops.transport_hints = transport_hints;
+        ops.tracked_object = obj;
+        ops.callback_queue = &internal_call_back_queue_;
+        return nh_.subscribe(ops);
       }
 
       template<class M, class T>
@@ -141,7 +114,12 @@ namespace tug_observers_cpp
                            void(T::*fp)(const boost::shared_ptr<M const> &),
                            const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
       {
-        return subscribeConst(topic, queue_size, boost::bind(fp, obj.get(), _1), transport_hints, obj);
+        ros::SubscribeOptions ops;
+        ops.template init<M>(topic, queue_size, boost::bind(fp, obj, _1));
+        ops.transport_hints = transport_hints;
+        ops.tracked_object = obj;
+        ops.callback_queue = &internal_call_back_queue_;
+        return nh_.subscribe(ops);
       }
 
       template<class M, class T>
@@ -149,7 +127,12 @@ namespace tug_observers_cpp
                            void(T::*fp)(const boost::shared_ptr<M const> &) const,
                            const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
       {
-        return subscribeConst(topic, queue_size, boost::bind(fp, obj.get(), _1), transport_hints, obj);
+        ros::SubscribeOptions ops;
+        ops.template init<M>(topic, queue_size, boost::bind(fp, obj, _1));
+        ops.transport_hints = transport_hints;
+        ops.tracked_object = obj;
+        ops.callback_queue = &internal_call_back_queue_;
+        return nh_.subscribe(ops);
       }
 
       void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg);
