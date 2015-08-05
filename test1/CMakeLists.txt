@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tug_observers_python)
+project(test1)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   rospy
-  tug_resource_monitor
+  base
 )
 
 ## System dependencies are found with CMake's conventions
@@ -80,8 +80,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES tug_observers_python
-#  CATKIN_DEPENDS rospy tug_plugin_manager tug_resource_monitor
+#  LIBRARIES test1
+#  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
 
@@ -97,19 +97,19 @@ include_directories(
 )
 
 ## Declare a cpp library
-# add_library(tug_observers_python
-#   src/${PROJECT_NAME}/tug_observers_python.cpp
+# add_library(test1
+#   src/${PROJECT_NAME}/test1.cpp
 # )
 
 ## Declare a cpp executable
-# add_executable(tug_observers_python_node src/tug_observers_python_node.cpp)
+# add_executable(test1_node src/test1_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(tug_observers_python_node tug_observers_python_generate_messages_cpp)
+# add_dependencies(test1_node test1_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(tug_observers_python_node
+# target_link_libraries(test1_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -128,7 +128,7 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS tug_observers_python tug_observers_python_node
+# install(TARGETS test1 test1_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -147,15 +147,13 @@ include_directories(
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
-install(PROGRAMS scripts/plugin_base.py
-DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_tug_observers_python.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_test1.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
