@@ -3,64 +3,44 @@ setup:
 - type: hz
   topics:
   - name: /topicA
-    state:
-    - state: 1
-      frequenzy: 10
-      std_deviation: 2
-      filter:
-        filter_name: mean
-        window_size: 10
-    - state: 2
-      frequenzy: 10
-      std_deviation: 2
-      filter:
-        filter: median
-        window_size: 10
-    - state: 3
-      frequenzy: 10
-      std_deviation: 2
-      filter:
-        filter: kmeans
-        window_size: 10
-        k_size: 10
-    - state: 4
-      frequenzy: 10
-      std_deviation: 2
-      filter:
-        filter: lp
-        # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
-        decay_rate: 1.0
+    filter:
+      type: lp
+      # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+      decay_rate: 1.0
+    states:
+    - state: '1'
+      frequenzy:
+        type: gaus
+        mean: 1.0
+        std_deviation: 1.0
+    - state: '2'
+      frequenzy:
+        type: gaus
+        mean: 5.0
+        std_deviation: 1.0
 
 - type: size
   topics:
   - name: /topicA
-    state:
+    states:
     - state: 1
-      bytes: 10
-      std_deviation: 2
+      bytes:
+        type: gaus
+        mean: 10000
+        std_deviation: 100
 
 - type: timings
   topics:
   - nameA: /topicA
     nameB: /topicB
-    state:
+    states:
     - state: 1
-      # delay in ms from A to B
-      delay: 10
-      # delay_std_deviation in ms
-      delay_std_deviation: 2
-      # sampling rate from A to B
-      sampling_rate: 1.0
-      sampling_rate_std_deviation: 0.1
+      delay:
+        type: gaus
+        mean: 10.0           # delay in ms from A to B
+        std_deviation: 1.0   # std_deviation in ms
+      sampling_rate:
+        type: gaus
+        mean: 10.0           # sampling rate from A to B
+        std_deviation: 0.1
 
-- type: resources
-  nodes:
-  - name: /node
-    state:
-    - state: 1
-      cpu_usage: 100
-      cpu_usage_std_deviation: 15
-      # mem usage in bytes
-      mem_usage: 1024
-      # mem usage std deviation in bytes
-      mem_usage_std_deviation: 100
