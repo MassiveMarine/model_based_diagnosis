@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   pluginlib
   tug_plugin_manager
+  tug_observers_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -82,7 +83,7 @@ find_package(Boost REQUIRED COMPONENTS thread)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES tug_observer_plugin_base
-#  CATKIN_DEPENDS roscpp tug_plugin_manager tug_resource_monitor
+  CATKIN_DEPENDS tug_observers_msgs
 #  DEPENDS system_lib
 )
 
@@ -102,7 +103,7 @@ include_directories(
 ## Declare a cpp library
 add_library(tug_observer_plugin_base
   src/ObserverPluginBase.cpp
-)
+src/ObserverInfoSender.cpp include/tug_observers_cpp/ObserverInfoSender.h)
 
 ## Declare a cpp executable
 add_executable(tug_observers_node src/ObserverNode.cpp)

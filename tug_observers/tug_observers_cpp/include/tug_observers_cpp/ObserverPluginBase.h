@@ -22,6 +22,8 @@ namespace tug_observers_cpp
       ros::CallbackQueue internal_call_back_queue_;
       ros::AsyncSpinner spinner_;
       ros::NodeHandle nh_;
+      ros::Publisher error_pub_;
+      std::string type_;
 
     public:
       virtual ~ObserverPluginBase();
@@ -31,7 +33,7 @@ namespace tug_observers_cpp
       virtual void initialize(XmlRpc::XmlRpcValue params) = 0;
 
     protected:
-      ObserverPluginBase();
+      ObserverPluginBase(std::string type);
 
       /// subscriber functions in order to use the callback queue in the right way
       template<class M, class T>
@@ -135,7 +137,7 @@ namespace tug_observers_cpp
         return nh_.subscribe(ops);
       }
 
-      void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg);
+      void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code);
 
       void reportStates(std::string resource, std::vector<std::string> states);
     };

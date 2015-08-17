@@ -33,7 +33,7 @@ setup:
       cpu:
         type: gaus
         mean: 1.0
-        std_deviation: 1.0
+        std_deviation: 4.0
       memory:
         type: gaus
         # mem usage in bytes

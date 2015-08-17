@@ -1,16 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tug_observer_plugins_cpp)
+project(plugin_manager_test)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  pluginlib
-  tug_observers_cpp
-  tug_resource_monitor
-  tug_observers_msgs
-)
+find_package(catkin REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -82,9 +76,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES resources_plugin
-#  CATKIN_DEPENDS roscpp tug_observer_plugins_cpp tug_resource_monitor
+#  INCLUDE_DIRS include
+#  LIBRARIES plugin_manager_test
+#  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
 
@@ -95,31 +89,23 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
 
 ## Declare a cpp library
-add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
-                              src/NodeResourceState.cpp src/ProcessYaml.cpp
-                              src/NominalValue.cpp src/NominalValueFactory.cpp
-                              src/GausNominalValue.cpp src/Filter.cpp
-                              src/FilterFactory.cpp src/MeanFilter.cpp
-                              src/MedianFilter.cpp src/KMeansFilter.cpp
-                              src/LowPassFilter.cpp)
+# add_library(plugin_manager_test
+#   src/${PROJECT_NAME}/plugin_manager_test.cpp
+# )
 
 ## Declare a cpp executable
-# add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)
+# add_executable(plugin_manager_test_node src/plugin_manager_test_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(tug_observer_plugins_cpp_node tug_observer_plugins_cpp_generate_messages_cpp)
+# add_dependencies(plugin_manager_test_node plugin_manager_test_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(resources_plugin
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(plugin_manager_test_node
+#   ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
@@ -136,7 +122,7 @@ target_link_libraries(resources_plugin
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS tug_observer_plugins_cpp tug_observer_plugins_cpp_node
+# install(TARGETS plugin_manager_test plugin_manager_test_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -161,7 +147,7 @@ target_link_libraries(resources_plugin
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_tug_observer_plugins_cpp.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_plugin_manager_test.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

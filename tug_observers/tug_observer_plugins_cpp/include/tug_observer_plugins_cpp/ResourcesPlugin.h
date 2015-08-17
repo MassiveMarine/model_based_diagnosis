@@ -31,6 +31,7 @@ namespace tug_observer_plugins_cpp
       void nodeInfoCallback(const tug_resource_monitor::NodeInfoArray::ConstPtr& msg);
 
       public:
+        ResourcesPlugin();
         virtual void initialize(XmlRpc::XmlRpcValue params);
     };
 }
