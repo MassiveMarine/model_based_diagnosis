@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import rospy
-# import tug_observers_python
-# from plugin_base import PluginBase, PluginThread
 from tug_observers_python import PluginBase, PluginThread
 
 
@@ -57,24 +55,24 @@ class Hz(PluginBase, PluginThread):
             self.subs.append(HzBase(topic))
 
         self.start()
-
-
-if __name__ == "__main__":
-    rospy.init_node('tug_Hz', anonymous=False)
-    try:
-        rospy.loginfo("starting " + rospy.get_name())
-
-        test = Hz()
-
-        rospy.spin()
-
-    except KeyboardInterrupt:
-        pass
-    except rospy.ROSInterruptException:
-        pass
-
-    finally:
-        rospy.logwarn( 'Hz stopped')
-
+#
+#
+# if __name__ == "__main__":
+#     rospy.init_node('tug_Hz', anonymous=False)
+#     try:
+#         rospy.loginfo("starting " + rospy.get_name())
+#
+#         test = Hz()
+#
+#         rospy.spin()
+#
+#     except KeyboardInterrupt:
+#         pass
+#     except rospy.ROSInterruptException:
+#         pass
+#
+#     finally:
+#         rospy.logwarn( 'Hz stopped')
+#
 
 

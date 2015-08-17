@@ -28,7 +28,7 @@ class PluginManager():
 
     @staticmethod
     def unload_plugin(plugin):
-        from plugin_base import PluginThread
+        from tug_observers_python import PluginThread
         if issubclass(plugin.__class__, PluginThread):
             plugin.join(2)
             if plugin.isAlive():
