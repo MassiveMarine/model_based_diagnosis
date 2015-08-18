@@ -5,9 +5,15 @@ from tug_observers_python import PluginBase, PluginThread
 from tug_observers_msgs.msg import resource_info, resource_error
 
 class HzBase():
-    def __init__(self, topic):
-        self.topic = topic
-        self.sub = rospy.Subscriber(topic, rospy.AnyMsg, self.cb, queue_size=1)
+    def __init__(self, config):
+        self.topic = config['name']
+
+        # self.filter = Filter(config['filter'])
+        self.states = []
+        # Filter(config['states'])
+
+        self.sub = rospy.Subscriber(self.topic, rospy.AnyMsg, self.cb, queue_size=1)
+
         self.msg_t0 = -1.
         self.msg_tn = 0
         self.times = []
@@ -47,9 +53,12 @@ class Hz(PluginBase, PluginThread):
         self.topics = None
 
     def run(self):
-        print 'running'
+        if not self.subs:
+            rospy.logwarn('No topics to work with!! Plugin will stop now.')
+            return
 
         rate = rospy.Rate(1)
+
         while not rospy.is_shutdown():
             for [plugin, resource_data] in self.subs:
                 resource_data.header = rospy.Header(stamp=rospy.Time.now())
@@ -58,13 +67,19 @@ class Hz(PluginBase, PluginThread):
             PluginBase.publish_info(self, [x[1] for x in self.subs])
             rate.sleep()
 
-        print 'stopped'
+    def initialize(self, config):
 
-    def initialize(self, topics):
-        for topic in topics:
-            self.subs.append([HzBase(topic), resource_info(type='hz', resource=topic)])
+        for topic_config in config['topics']:
+            self.subs.append([HzBase(topic_config), resource_info(type=config['type'], resource=topic_config['name'])])
+
+        # for topic in config:
+        #     self.subs.append([HzBase(topic), resource_info(type='hz', resource=topic)])
 
         self.start()
+
+
+class hz(Hz):
+    pass
 #
 #
 # if __name__ == "__main__":

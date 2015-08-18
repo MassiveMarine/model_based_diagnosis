@@ -18,17 +18,17 @@ class PluginManager():
         self._plugins = []
 
     @staticmethod
-    def _add_pkg_path_to_sys_path(pkg_name):
+    def add_plugin_paths_to_sys_path():
         """
-        Add path of pkg to syspath, to make the plugin accessible.
-        :param pkg_name: package name
-        :type pkg_name: str
+        Add all packages which depends on the plugin base to sys path to be importable.
         """
         rospack = rospkg.RosPack()
-        new_pkg_path = rospack.get_path(pkg_name) + '/scripts'
-        sys.path = [new_pkg_path] + sys.path
+        pkgs = rospack.get_depends_on('tug_observers_python')
+        for pkg in pkgs:
+            new_pkg_path = rospack.get_path(pkg) + '/scripts'
+            sys.path = [new_pkg_path] + sys.path
 
-    def load_plugin(self, module_name, class_name, pkg_name="tug_observer_plugins_python"):
+    def load_plugin(self, module_name, class_name):
         """
         Find the plugin, import it, create a instance and add it to the plugins
         list of the manager.
@@ -36,13 +36,11 @@ class PluginManager():
         :type module_name: str
         :param class_name: class name
         :type class_name: str
-        :param pkg_name: package name
-        :type pkg_name: str
         :return: instance of plugin or None if not found or possible
         """
         plugin = None
         try:
-            self._add_pkg_path_to_sys_path(pkg_name)
+            # self._add_pkg_path_to_sys_path(pkg_name)
             module = importlib.import_module(module_name)
 
             plugin_ptr = getattr(module, class_name)
@@ -82,9 +80,9 @@ class PluginManager():
                 rospy.logerr(e)
 
     @staticmethod
-    def initialize_plugin(plugin, data):
+    def initialize_plugin(plugin, config):
         try:
-            plugin.initialize(data)
+            plugin.initialize(config)
         except:
             pass
 
@@ -99,14 +97,17 @@ class PluginManager():
 if __name__ == "__main__":
     rospy.init_node('tug_observer', anonymous=False)
 
-    # data = rospy.get_param('/tug_observer_node/setup')
-    # print data
+    configs = rospy.get_param('/tug_observer_node/setup')
+
     try:
         rospy.loginfo("starting " + rospy.get_name())
 
         manager = PluginManager()
-        new_plugin = manager.load_plugin('hz_plugin', 'Hz')
-        manager.initialize_plugin(new_plugin, ['/test', '/test2'])
+        manager.add_plugin_paths_to_sys_path()
+
+        for config in configs:
+            plugin = manager.load_plugin(config['type'], config['type'])
+            manager.initialize_plugin(plugin, config)
 
         rospy.spin()
 

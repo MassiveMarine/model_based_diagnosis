@@ -12,7 +12,7 @@ class PluginBase():
         self._error_pub = rospy.Publisher('/observers/error', observer_error, queue_size=1)
         self._info_pub = rospy.Publisher('/observers/info', observer_info, queue_size=1)
 
-    def initialize(self, parameter):
+    def initialize(self, config):
         return False
 
     def publish_info(self, resource_infos):
