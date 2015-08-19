@@ -10,12 +10,16 @@
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
 #include <numeric>
 #include <algorithm>
+#include <boost/thread/pthread/mutex.hpp>
+#include <boost/thread/mutex.hpp>
+
 
 template<class T>
 class KMeansFilter : public Filter<T>
 {
   boost::circular_buffer<T> buffer_;
   unsigned int k_half_;
+  boost::mutex scope_mutex_;
 
   size_t getLowerIndex()
   {
@@ -46,11 +50,13 @@ public:
 
   virtual void update(const T& new_value)
   {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     buffer_.push_back(new_value);
   }
 
   virtual T getValue()
   {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     if(buffer_.empty())
       return static_cast<T>(0);
 
@@ -64,6 +70,12 @@ public:
     T result = std::accumulate(buffer_.begin() + lower_index, buffer_.begin() + upper_index, static_cast<T>(0));
 
     return result / static_cast<T>(upper_index - lower_index);
+  }
+
+  virtual void reset()
+  {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+    buffer_.clear();
   }
 };
 

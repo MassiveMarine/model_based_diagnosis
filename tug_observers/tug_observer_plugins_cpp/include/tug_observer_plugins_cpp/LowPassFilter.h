@@ -7,6 +7,7 @@
 
 #include <tug_observer_plugins_cpp/Filter.h>
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
+#include <boost/thread/mutex.hpp>
 
 template<class T>
 class LowPassFilter : public Filter<T>
@@ -14,6 +15,7 @@ class LowPassFilter : public Filter<T>
   double decay_rate_;
   T current_value_;
   bool got_initial_value_;
+  boost::mutex scope_mutex_;
 
 public:
   LowPassFilter(XmlRpc::XmlRpcValue params) : got_initial_value_(false)
@@ -23,6 +25,7 @@ public:
 
   virtual void update(const T& new_value)
   {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     if(!got_initial_value_)
     {
       current_value_ = new_value;
@@ -36,10 +39,17 @@ public:
 
   virtual T getValue()
   {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     if(!got_initial_value_)
       return static_cast<T>(0);
 
     return current_value_;
+  }
+
+  virtual void reset()
+  {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+    got_initial_value_ = false;
   }
 };
 

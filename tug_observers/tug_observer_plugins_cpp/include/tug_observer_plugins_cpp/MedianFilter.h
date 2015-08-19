@@ -9,11 +9,13 @@
 #include <boost/circular_buffer.hpp>
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
 #include <algorithm>
+#include <boost/thread/mutex.hpp>
 
 template<class T>
 class MedianFilter : public Filter<T>
 {
   boost::circular_buffer<T> buffer_;
+  boost::mutex scope_mutex_;
 
 public:
   MedianFilter(XmlRpc::XmlRpcValue params)
@@ -24,11 +26,13 @@ public:
 
   virtual void update(const T& new_value)
   {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     buffer_.push_back(new_value);
   }
 
   virtual T getValue()
   {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     if(buffer_.empty())
       return static_cast<T>(0);
 
@@ -37,6 +41,12 @@ public:
 
     std::sort(buffer_.begin(), buffer_.end());
     return (buffer_[upper_median_index] + buffer_[lower_median_index]) / static_cast<T>(2);
+  }
+
+  virtual void reset()
+  {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+    buffer_.clear();
   }
 };
 
