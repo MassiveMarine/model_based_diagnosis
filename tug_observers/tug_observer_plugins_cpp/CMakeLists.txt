@@ -107,7 +107,7 @@ add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/GausNominalValue.cpp src/Filter.cpp
                               src/FilterFactory.cpp src/MeanFilter.cpp
                               src/MedianFilter.cpp src/KMeansFilter.cpp
-                              src/LowPassFilter.cpp)
+                              src/LowPassFilter.cpp src/NoFilterFilter.cpp)
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)

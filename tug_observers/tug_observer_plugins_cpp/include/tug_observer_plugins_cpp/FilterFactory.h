@@ -14,7 +14,7 @@
 #include <tug_observer_plugins_cpp/MedianFilter.h>
 #include <tug_observer_plugins_cpp/KMeansFilter.h>
 #include <tug_observer_plugins_cpp/LowPassFilter.h>
-
+#include <tug_observer_plugins_cpp/NoFilterFilter.h>
 
 template <class T>
 class FilterFactory
@@ -30,6 +30,8 @@ public:
       return boost::make_shared<KMeansFilter<T> >(params);
     else if(type == "lp")
       return boost::make_shared<LowPassFilter<T> >(params);
+    else if(type == "nofilter")
+      return boost::make_shared<NoFilterFilter<T> >();
     else
       throw std::runtime_error("type for nominal value '" + type + "'" + " not known");
   }

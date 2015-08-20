@@ -12,6 +12,8 @@ public:
   virtual void update(const T &new_value) = 0;
 
   virtual T getValue() = 0;
+
+  virtual void reset() = 0;
 };
 
 
