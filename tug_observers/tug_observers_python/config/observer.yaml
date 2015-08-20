@@ -3,21 +3,64 @@ setup:
 - type: hz
   topics:
   - name: /topicA
-    filter:
-      type: lp
-      # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
-      decay_rate: 1.0
-    states:
-    - state: '1'
-      frequenzy:
-        type: gaus
-        mean: 1.0
-        std_deviation: 1.0
-    - state: '2'
-      frequenzy:
-        type: gaus
-        mean: 5.0
-        std_deviation: 1.0
+    callerids:
+    - callerid: /rostopic_10771_1440071731690
+      filter:
+        type: lp
+        window_size: 10
+        # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+        decay_rate: 0.05
+      states:
+      - state: '1'
+        frequenzy:
+          type: gaus
+          mean: 1.0
+          std_deviation: 1.0
+        timeout: 1.0
+      - state: '2'
+        frequenzy:
+          type: gaus
+          mean: 5.0
+          std_deviation: 1.0
+    - callerid: /rostopic_10706_1440071719580
+      filter:
+        type: mean
+        window_size: 10
+        # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+        decay_rate: 0.5
+      states:
+      - state: '1'
+        frequenzy:
+          type: gaus
+          mean: 1.0
+          std_deviation: 1.0
+        timeout: 1.0
+      - state: '2'
+        frequenzy:
+          type: gaus
+          mean: 5.0
+          std_deviation: 1.0
+  - name: /topicB
+    callerids:
+    - callerid: unknown
+      filter:
+        type: lp
+        window_size: 10
+        # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+        decay_rate: 0.05
+      states:
+      - state: '1'
+        frequenzy:
+          type: gaus
+          mean: 1.0
+          std_deviation: 1.0
+        timeout: 1.0
+      - state: '2'
+        frequenzy:
+          type: gaus
+          mean: 5.0
+          std_deviation: 1.0
+          
 
 - type: size
   topics:
