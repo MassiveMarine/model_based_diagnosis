@@ -4,53 +4,74 @@ import rospy
 from tug_observers_python import PluginBase, PluginThread, PluginTimeout
 from tug_observers_msgs.msg import resource_info, resource_error
 from filter import FilterFactory
+from nominal_value import NominalValueFactory
 from threading import Lock
+
+
+class HzState():
+    def __init__(self, config):
+        self.name = config['state']
+        self._frequency = NominalValueFactory.create_nominal_value(config['frequenzy'])
+
+    def is_nominal(self, value):
+        if self._frequency is None:
+            return False
+        return self._frequency.is_nominal(value)
 
 
 class HzBase():
     def __init__(self, topic, config):
-        self.filter = FilterFactory.create_filter(config['filter'])
+        self._filter = FilterFactory.create_filter(config['filter'])
 
-        self.timeout = 1.05 # need to be in each state
-        self.states = []
+        self._states = []
+        for state_config in config['states']:
+            self._states.append(HzState(state_config))
 
         self._resource_info = resource_info(type='hz', resource=str(topic + ' ' + config['callerid']))
 
         self._lock = Lock()
-        self.event = PluginTimeout(self.timeout, self.timeout_cb)
+        self._event = PluginTimeout(config['timeout'], self.timeout_cb)
 
-        self.msg_t0 = -1.
-        self.msg_tn = 0
+        self._msg_t0 = -1.
+        self._msg_tn = 0
 
     def timeout_cb(self):
         rospy.logwarn('timeout of topic')
         self._lock.acquire()
-        self.msg_t0 = -1.
-        self.msg_tn = 0
+        self._msg_t0 = -1.
+        self._msg_tn = 0
+        self._filter.reset()
         self._lock.release()
 
     def cb(self, msg):
         curr_rostime = rospy.get_rostime()
         curr = curr_rostime.to_sec()
-        self.event.set()
+        self._event.set()
 
         self._lock.acquire()
-        if self.msg_t0 < 0 or self.msg_t0 > curr:
-            self.msg_t0 = curr
-            self.msg_tn = curr
-            self.filter.reset()
+        if self._msg_t0 < 0 or self._msg_t0 > curr:
+            self._msg_t0 = curr
+            self._msg_tn = curr
+            self._filter.reset()
         else:
-            self.filter.update(curr - self.msg_tn)
-            self.msg_tn = curr
+            self._filter.update(curr - self._msg_tn)
+            self._msg_tn = curr
 
         self._lock.release()
 
+    def _get_valied_states(self, value):
+        states = []
+        for state in self._states:
+            if state.is_nominal(value):
+                states.append(state.name)
+        return states
+
     def get_resource_info(self):
-        value = self.filter.get_value()
+        value = self._filter.get_value()
         if value is None:
-            self._resource_info.states = [str(None)]
+            self._resource_info.states = []
         else:
-            self._resource_info.states = [str(1. / self.filter.get_value())]
+            self._resource_info.states = self._get_valied_states(1. / self._filter.get_value())  #[str(1. / self._filter.get_value())]
 
         self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
         return self._resource_info
@@ -83,8 +104,6 @@ class HzSubs():
         base = self.bases.get(msg._connection_header['callerid'])
         if base:
             base.cb(msg)
-        from sys import getsizeof
-        print getsizeof(msg._buff)
 
     def get_resource_infos(self):
         return [x.get_resource_info() for x in self.bases.itervalues()]
