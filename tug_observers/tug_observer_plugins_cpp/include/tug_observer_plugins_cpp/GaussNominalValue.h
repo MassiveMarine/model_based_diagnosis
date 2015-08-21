@@ -9,7 +9,7 @@
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
 
 template <class T>
-class GausNominalValue : public NominalValue<T>
+class GaussNominalValue : public NominalValue<T>
 {
 private:
   T mean_;
@@ -32,7 +32,7 @@ private:
   }
 
 public:
-  GausNominalValue(XmlRpc::XmlRpcValue params)
+  GaussNominalValue(XmlRpc::XmlRpcValue params)
   {
     mean_ = ProcessYaml::getValue<T>("mean", params);
     std_deviation_ = ProcessYaml::getValue<T>("std_deviation", params);
@@ -41,7 +41,7 @@ public:
   virtual bool isNominal(const T& value)
   {
     T distance = distanceToMean(value);
-    ROS_ERROR_STREAM("got distance to mean " << distance << " allowed is " << std_deviation_);
+    ROS_DEBUG_STREAM("got distance to mean " << distance << " allowed is " << std_deviation_);
 
     if(distance < std_deviation_)
       return true;
