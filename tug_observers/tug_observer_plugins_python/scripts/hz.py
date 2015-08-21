@@ -2,7 +2,7 @@
 
 import rospy
 from tug_observers_python import PluginBase, PluginThread, PluginTimeout
-from tug_observers_msgs.msg import resource_info, resource_error
+from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
 from filter import FilterFactory
 from nominal_value import NominalValueFactory
 from threading import Lock
@@ -129,7 +129,8 @@ class Hz(PluginBase, PluginThread):
             for sub in self.subs:
                 resource_data += sub.get_resource_infos()
 
-            PluginBase.publish_info(self, resource_data)
+            msg = observer_info(resource_infos=resource_data)
+            self.info_pub.publish(msg)
             rate.sleep()
 
     def initialize(self, config):
