@@ -11,179 +11,21 @@ setup:
         window_size: 10
         # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
         decay_rate: 0.05
+        deviation_type: min_max
       states:
       - state: 'gauss'
         frequenzy:
-          type: gauss
-          mean: 10.0
-          std_deviation: 1.0
-      - state: 'exact'
-        frequenzy:
-          type: exact
-          exact: 5 
-      - state: 'not'
-        frequenzy:
-          type: not
-          exact_not: 5 
-      - state: 'greater_than'
-        frequenzy:
-          type: greather_than
-          greater_than: 5.0 
-      - state: 'less_than'
-        frequenzy:
-          type: less_than
-          less_than: 5.0 
-      - state: 'in_between'
-        frequenzy:
-          type: in_between
-          lower_bound: 5.0
-          upper_bound: 15.0
-  - name: /topicB
-    callerids:
-    - callerid: unknown
-      timeout: 1.0
-      filter:
-        type: nofilter
-        window_size: 10
-        # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
-        decay_rate: 0.05
-      states:
-      - state: 'gaus'
-        frequenzy:
-          type: gaus
-          mean: 10.0
-          std_deviation: 1.0
-      - state: 'exact'
-        frequenzy:
-          type: exact
-          exact: 5 
-      - state: 'not'
-        frequenzy:
-          type: not
-          exact_not: 5 
-      - state: 'greater_than'
-        frequenzy:
-          type: greather_than
-          greater_than: 5.0 
-      - state: 'less_than'
-        frequenzy:
-          type: less_than
-          less_than: 5.0 
-      - state: 'in_between'
-        frequenzy:
-          type: in_between
-          lower_bound: 5.0
-          upper_bound: 15.0 
-  - name: /topicC
-    callerids:
-    - callerid: unknown
-      timeout: 1.0
-      filter:
-        type: nofilter
-        window_size: 10
-        # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
-        decay_rate: 0.05
-      states:
-      - state: 'gaus'
-        frequenzy:
-          type: gaus
-          mean: 10.0
-          std_deviation: 1.0
-      - state: 'exact'
-        frequenzy:
-          type: exact
-          exact: 5 
-      - state: 'not'
-        frequenzy:
-          type: not
-          exact_not: 5 
-      - state: 'greater_than'
-        frequenzy:
-          type: greather_than
-          greater_than: 5.0 
-      - state: 'less_than'
-        frequenzy:
-          type: less_than
-          less_than: 5.0 
-      - state: 'in_between'
-        frequenzy:
-          type: in_between
-          lower_bound: 5.0
-          upper_bound: 15.0 
-  - name: /topicD
-    callerids:
-    - callerid: unknown
-      timeout: 1.0
-      filter:
-        type: nofilter
-        window_size: 10
-        # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
-        decay_rate: 0.05
-      states:
-      - state: 'gaus'
-        frequenzy:
-          type: gaus
-          mean: 10.0
-          std_deviation: 1.0
-      - state: 'exact'
-        frequenzy:
-          type: exact
-          exact: 5 
-      - state: 'not'
-        frequenzy:
-          type: not
-          exact_not: 5 
-      - state: 'greater_than'
-        frequenzy:
-          type: greather_than
-          greater_than: 5.0 
-      - state: 'less_than'
-        frequenzy:
-          type: less_than
-          less_than: 5.0 
-      - state: 'in_between'
-        frequenzy:
-          type: in_between
-          lower_bound: 5.0
-          upper_bound: 15.0 
-  - name: /topicE
-    callerids:
-    - callerid: unknown
-      timeout: 1.0
-      filter:
-        type: nofilter
-        window_size: 10
-        # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
-        decay_rate: 0.05
-      states:
-      - state: 'gaus'
-        frequenzy:
-          type: gaus
-          mean: 10.0
-          std_deviation: 1.0
-      - state: 'exact'
-        frequenzy:
-          type: exact
-          exact: 5 
-      - state: 'not'
-        frequenzy:
-          type: not
-          exact_not: 5 
-      - state: 'greater_than'
-        frequenzy:
-          type: greather_than
-          greater_than: 5.0 
-      - state: 'less_than'
-        frequenzy:
-          type: less_than
-          less_than: 5.0 
-      - state: 'in_between'
-        frequenzy:
-          type: in_between
-          lower_bound: 5.0
-          upper_bound: 15.0 
-
-
+          value:
+            type: gauss
+            mean: 10.0
+            std_deviation: 1.0
+          deviation:
+          - type: in_between
+            lower_bound: 5.0
+            upper_bound: 15.0
+          - type: in_between
+            lower_bound: 5.0
+            upper_bound: 15.0
 
 - type: size
   topics:
