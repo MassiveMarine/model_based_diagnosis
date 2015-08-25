@@ -10,7 +10,7 @@
 #include <boost/thread/mutex.hpp>
 
 template<class T>
-class LowPassFilter : public Filter<T>
+class EWMAFilter : public Filter<T>
 {
   double decay_rate_;
   T current_value_;
@@ -18,7 +18,7 @@ class LowPassFilter : public Filter<T>
   boost::mutex scope_mutex_;
 
 public:
-  LowPassFilter(XmlRpc::XmlRpcValue params) : got_initial_value_(false)
+  EWMAFilter(XmlRpc::XmlRpcValue params) : got_initial_value_(false)
   {
     decay_rate_ = ProcessYaml::getValue<double>("decay_rate", params);
   }

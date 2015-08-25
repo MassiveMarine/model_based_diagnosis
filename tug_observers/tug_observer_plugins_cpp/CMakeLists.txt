@@ -107,7 +107,7 @@ add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/GaussNominalValue.cpp src/Filter.cpp
                               src/FilterFactory.cpp src/MeanFilter.cpp
                               src/MedianFilter.cpp src/KMeansFilter.cpp
-                              src/LowPassFilter.cpp src/NoFilterFilter.cpp
+                              src/EWMAFilter.cpp src/NoFilterFilter.cpp
                               src/ExactNominalValue.cpp src/NotNominalValue.cpp
                               src/GreaterThanNominalValue.cpp src/LessThanNominalValue.cpp
                               src/InBetweenNominalValue.cpp src/NotInBetweenNominalValue.cpp)
