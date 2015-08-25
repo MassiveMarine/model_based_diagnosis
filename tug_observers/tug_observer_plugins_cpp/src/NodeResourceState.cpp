@@ -4,7 +4,7 @@
 
 #include <tug_observer_plugins_cpp/NodeResourceState.h>
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
-#include <tug_observer_plugins_cpp/NominalValueFactory.h>
+#include <tug_observer_plugins_cpp/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValueFactory.h>
 
 namespace tug_observer_plugins_cpp
 {

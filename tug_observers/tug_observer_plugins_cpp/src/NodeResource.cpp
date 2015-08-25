@@ -5,7 +5,7 @@
 #include <tug_observer_plugins_cpp/NodeResource.h>
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
 #include <ros/ros.h>
-#include <tug_observer_plugins_cpp/FilterFactory.h>
+#include <tug_observer_plugins_cpp/filter/value_filter/ValueFilterFactory.h>
 
 namespace tug_observer_plugins_cpp
 {
@@ -31,7 +31,7 @@ namespace tug_observer_plugins_cpp
       ROS_DEBUG("[NodeResource::NodeResource] 4");
       XmlRpc::XmlRpcValue cpu_filter_params = value["cpu_filter"];
       ROS_DEBUG("[NodeResource::NodeResource] 5");
-      cpu_filter_ = FilterFactory<double>::createFilter(ProcessYaml::getValue<std::string>("type", cpu_filter_params), cpu_filter_params);
+      cpu_filter_ = ValueFilterFactory<double>::createFilter(ProcessYaml::getValue<std::string>("type", cpu_filter_params), cpu_filter_params);
       ROS_DEBUG("[NodeResource::NodeResource] 6");
       if (!value.hasMember("mem_filter"))
       {
@@ -41,7 +41,7 @@ namespace tug_observer_plugins_cpp
       ROS_DEBUG("[NodeResource::NodeResource] 7");
       XmlRpc::XmlRpcValue mem_filter_params = value["mem_filter"];
       ROS_DEBUG("[NodeResource::NodeResource] 8");
-      memory_filter_ = FilterFactory<unsigned long>::createFilter(ProcessYaml::getValue<std::string>("type", mem_filter_params), mem_filter_params);
+      memory_filter_ = ValueFilterFactory<unsigned long>::createFilter(ProcessYaml::getValue<std::string>("type", mem_filter_params), mem_filter_params);
       ROS_DEBUG("[NodeResource::NodeResource] 9");
     }
 

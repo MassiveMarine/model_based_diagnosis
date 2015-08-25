@@ -6,7 +6,7 @@
 #define TUG_OBSERVER_PLUGINS_CPP_NODERESOURCESTATE_H
 
 #include <XmlRpcValue.h>
-#include <tug_observer_plugins_cpp/NominalValue.h>
+#include <tug_observer_plugins_cpp/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.h>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 namespace tug_observer_plugins_cpp

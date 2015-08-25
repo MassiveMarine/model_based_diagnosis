@@ -9,7 +9,7 @@
 #include <tug_observer_plugins_cpp/NodeResourceState.h>
 #include <vector>
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <tug_observer_plugins_cpp/Filter.h>
+#include <tug_observer_plugins_cpp/filter/value_filter/ValueFilter.h>
 
 namespace tug_observer_plugins_cpp
 {
@@ -17,8 +17,8 @@ namespace tug_observer_plugins_cpp
     {
     private:
       std::vector<NodeResourceState> states_;
-      boost::shared_ptr<Filter<double> > cpu_filter_;
-      boost::shared_ptr<Filter<unsigned long> > memory_filter_;
+      boost::shared_ptr<ValueFilter<double> > cpu_filter_;
+      boost::shared_ptr<ValueFilter<unsigned long> > memory_filter_;
 
     public:
       NodeResource(XmlRpc::XmlRpcValue &value);

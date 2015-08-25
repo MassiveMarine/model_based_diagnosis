@@ -103,14 +103,14 @@ include_directories(
 ## Declare a cpp library
 add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/NodeResourceState.cpp src/ProcessYaml.cpp
-                              src/NominalValue.cpp src/NominalValueFactory.cpp
-                              src/GaussNominalValue.cpp src/Filter.cpp
-                              src/FilterFactory.cpp src/MeanFilter.cpp
-                              src/MedianFilter.cpp src/KMeansFilter.cpp
-                              src/EWMAFilter.cpp src/NoFilterFilter.cpp
-                              src/ExactNominalValue.cpp src/NotNominalValue.cpp
-                              src/GreaterThanNominalValue.cpp src/LessThanNominalValue.cpp
-                              src/InBetweenNominalValue.cpp src/NotInBetweenNominalValue.cpp)
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.cpp src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValueFactory.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GaussNominalValue.cpp src/filter/value_filter/ValueFilter.cpp
+                              src/filter/value_filter/ValueFilterFactory.cpp src/filter/value_filter/MeanValueFilter.cpp
+                              src/filter/value_filter/MedianValueFilter.cpp src/filter/value_filter/KMeansValueFilter.cpp
+                              src/filter/value_filter/EWMAValueFilter.cpp src/filter/value_filter/NoValueFilter.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/ExactNominalValue.cpp src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotNominalValue.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GreaterThanNominalValue.cpp src/hypothesis_check/singe_value_hypothesis_check/nominal_value/LessThanNominalValue.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/InBetweenNominalValue.cpp src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotInBetweenNominalValue.cpp)
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)
