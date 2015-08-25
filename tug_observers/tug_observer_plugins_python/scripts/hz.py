@@ -3,7 +3,7 @@
 import rospy
 from tug_observers_python import PluginBase, PluginThread, PluginTimeout
 from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
-from filter import FilterFactory
+from valuefilter import ValueFilterFactory
 from nominal_value import NominalValueFactory
 from threading import Lock
 
@@ -11,17 +11,22 @@ from threading import Lock
 class HzState():
     def __init__(self, config):
         self.name = config['state']
-        self._frequency = NominalValueFactory.create_nominal_value(config['frequenzy'])
+        frequency = config['frequenzy']
+        self._value = NominalValueFactory.create_nominal_value(frequency['value'])
+        self._deviation = []
+        for deviation_config in frequency['deviation']:
+            self._deviation.append(NominalValueFactory.create_nominal_value(deviation_config))
 
-    def is_nominal(self, value):
-        if self._frequency is None:
-            return False
-        return self._frequency.is_nominal(value)
+    def is_nominal(self, value, deviation):
+        value_nominal = self._value.is_nominal(value)
+        deviation_nominal = all(o.is_nominal(deviation[c]) for c, o in enumerate(self._deviation))
+
+        return all([value_nominal, deviation_nominal])
 
 
 class HzBase():
     def __init__(self, topic, config):
-        self._filter = FilterFactory.create_filter(config['filter'])
+        self._filter = ValueFilterFactory.create_value_filter(config['filter'])
 
         self._states = []
         for state_config in config['states']:
@@ -59,19 +64,21 @@ class HzBase():
 
         self._lock.release()
 
-    def _get_valied_states(self, value):
+    def _get_valied_states(self, value, deviation=[]):
         states = []
         for state in self._states:
-            if state.is_nominal(value):
+            if state.is_nominal(value, deviation):
                 states.append(state.name)
         return states
 
     def get_resource_info(self):
-        value = self._filter.get_value()
-        if value is None:
+        mean, deviation = self._filter.get_value()
+        if mean is None:
             self._resource_info.states = []
         else:
-            self._resource_info.states = self._get_valied_states(1. / self._filter.get_value())  #[str(1. / self._filter.get_value())]
+            mean = 1. / mean
+            deviation = [1. / x for x in reversed(deviation)]
+            self._resource_info.states = self._get_valied_states(mean, deviation)  #[str(1. / self._filter.get_value())]
 
         self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
         return self._resource_info
@@ -85,7 +92,6 @@ class HzSubs():
 
         for callerid_config in config['callerids']:
             callerid = callerid_config['callerid']
-            print callerid
 
             callerid_unknown = True if callerid == 'unknown' else False
 

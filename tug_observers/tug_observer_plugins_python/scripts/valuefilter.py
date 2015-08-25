@@ -2,13 +2,17 @@
 
 from threading import Lock
 
-class Filter():
+from deviationfilter import DeviationFilterFactory
+
+
+class ValueFilter():
     """
     Base class for filter.
     """
-    def __init__(self):
+    def __init__(self, config):
         self.list_lock = Lock()
-        pass
+        self.deviation = DeviationFilterFactory.create_deviation_filter(config)
+        self.sample_size = 0
 
     def update(self, new_value):
         """
@@ -16,6 +20,7 @@ class Filter():
         Consider the use of resources, because this can be called very often.
         :param new_value: New value for the filter
         """
+        self.deviation.update(new_value)
         pass
 
     def get_value(self):
@@ -23,21 +28,32 @@ class Filter():
         Return the result here. Maybe its necessary to apply the filter first.
         :return: Result of the filter
         """
-        pass
+        return None, self.deviation.get_value()
 
     def reset(self):
         """
         Reset the filter, to remove any history. Necessary for a clean restart.
         """
+        self.deviation.reset()
+        self.sample_size = 0
         pass
 
+    def get_sample_size(self):
+        return self.sample_size
 
-class FilterFactory():
+    def increment_sample_size(self, increment):
+        self.sample_size += increment
+
+    def set_sample_size(self, new_sample_size):
+        self.sample_size = new_sample_size
+
+
+class ValueFilterFactory():
     """
     Factory for getting the right filter instance.
     """
     @staticmethod
-    def create_filter(config):
+    def create_value_filter(config):
         """
         Decode filter type from config and return new instance of corresponding filter.
         :param config: Configuration from yaml file
@@ -45,20 +61,20 @@ class FilterFactory():
         """
         type = config['type']
         if type == "mean":
-            return MeanFilter(config)
+            return MeanValueFilter(config)
         elif type == "median":
-            return MedianFilter(config)
+            return MedianValueFilter(config)
         elif type == "kmeans":
-            return KMeansFilter(config)
+            return KMeansValueFilter(config)
         elif type == "ewma":
-            return ExponentiallyWeightedMovingAverageFilter(config)
+            return ExponentiallyWeightedMovingAverageValueFilter(config)
         elif type == "nofilter":
-            return NoFilter()
+            return NoValueFilter(config)
         else:
             return None
 
 
-class MedianFilter(Filter):
+class MedianValueFilter(ValueFilter):
     """
     Filter for getting the median of a defined number of values
     """
@@ -68,9 +84,10 @@ class MedianFilter(Filter):
         :param config: Configuration from yaml file
         """
         from collections import deque
-        Filter.__init__(self)
+        ValueFilter.__init__(self, config)
         self.window_size = config['window_size']
         self._ring_buffer = deque(maxlen=self.window_size)
+        self.deviation_type = config['min_max']
 
     def update(self, new_value):
         """
@@ -79,6 +96,7 @@ class MedianFilter(Filter):
         """
         self.list_lock.acquire()
         self._ring_buffer.append(new_value)
+        self.deviation.update(new_value)
         self.list_lock.release()
 
     def get_value(self):
@@ -96,9 +114,10 @@ class MedianFilter(Filter):
         else:
             i = n//2
             result = (data[i - 1] + data[i])/2
+        deviation = self.deviation.get_value()
 
         self.list_lock.release()
-        return result
+        return result, deviation
 
     def reset(self):
         """
@@ -106,10 +125,11 @@ class MedianFilter(Filter):
         """
         self.list_lock.acquire()
         self._ring_buffer.clear()
+        self.deviation.reset()
         self.list_lock.release()
 
 
-class MeanFilter(Filter):
+class MeanValueFilter(ValueFilter):
     """
     Filter for getting the mean of a defined number of values
     """
@@ -119,7 +139,7 @@ class MeanFilter(Filter):
         :param config: Configuration from yaml file
         """
         from collections import deque
-        Filter.__init__(self)
+        ValueFilter.__init__(self, config)
         self.window_size = config['window_size']
         self._ring_buffer = deque(maxlen=self.window_size)
 
@@ -130,6 +150,7 @@ class MeanFilter(Filter):
         """
         self.list_lock.acquire()
         self._ring_buffer.append(new_value)
+        self.deviation.update(new_value)
         self.list_lock.release()
 
     def get_value(self):
@@ -141,11 +162,13 @@ class MeanFilter(Filter):
         size = len(self._ring_buffer)
         if not size:
             result = None
+            deviation = []
         else:
             result = sum(self._ring_buffer) / size
+            deviation = self.deviation.get_value()
 
         self.list_lock.release()
-        return result
+        return result, deviation
 
     def reset(self):
         """
@@ -153,10 +176,11 @@ class MeanFilter(Filter):
         """
         self.list_lock.acquire()
         self._ring_buffer.clear()
+        self.deviation.reset()
         self.list_lock.release()
 
 
-class KMeansFilter(Filter):
+class KMeansValueFilter(ValueFilter):
     """
     Filter for getting the k-means of a defined number of values in a defined buffer.
     """
@@ -166,7 +190,7 @@ class KMeansFilter(Filter):
         :param config: Configuration from yaml file
         """
         from collections import deque
-        Filter.__init__(self)
+        ValueFilter.__init__(self, config)
         self.k_half = config['k_size'] / 2
         self.window_size = config['window_size']
         self._ring_buffer = deque(maxlen=self.window_size)
@@ -178,6 +202,7 @@ class KMeansFilter(Filter):
         """
         self.list_lock.acquire()
         self._ring_buffer.append(new_value)
+        self.deviation.update(new_value)
         self.list_lock.release()
 
     def get_value(self):
@@ -190,6 +215,7 @@ class KMeansFilter(Filter):
         size = len(self._ring_buffer)
         if not size:
             result = None
+            deviation = []
         else:
 
             center_index = size // 2
@@ -199,9 +225,10 @@ class KMeansFilter(Filter):
             small_list = list(self._ring_buffer)[lower_index:upper_index + 1]
 
             result = sum(small_list) / len(small_list)
+            deviation = self.deviation.get_value()
 
         self.list_lock.release()
-        return result
+        return result, deviation
 
     def reset(self):
         """
@@ -209,10 +236,11 @@ class KMeansFilter(Filter):
         """
         self.list_lock.acquire()
         self._ring_buffer.clear()
+        self.deviation.reset()
         self.list_lock.release()
 
 
-class ExponentiallyWeightedMovingAverageFilter(Filter):
+class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
     """
     Filter for applying weighted values to history.
     """
@@ -222,7 +250,7 @@ class ExponentiallyWeightedMovingAverageFilter(Filter):
         Applies new values weighted to history.
         :param config: Configuration from yaml file
         """
-        Filter.__init__(self)
+        ValueFilter.__init__(self, config)
         self._decay_rate = config['decay_rate']
         self._current_value = None
 
@@ -236,6 +264,8 @@ class ExponentiallyWeightedMovingAverageFilter(Filter):
             self._current_value = new_value * 1.0
         else:
             self._current_value = self._current_value * (1.0 - self._decay_rate) + new_value * self._decay_rate
+
+        self.deviation.update(new_value)
         self.list_lock.release()
 
     def get_value(self):
@@ -243,7 +273,7 @@ class ExponentiallyWeightedMovingAverageFilter(Filter):
         Filter result is already up-to-date. Just return the value.
         :return: Result of the filter
         """
-        return self._current_value
+        return self._current_value, self.deviation.get_value()
 
     def reset(self):
         """
@@ -251,15 +281,16 @@ class ExponentiallyWeightedMovingAverageFilter(Filter):
         """
         self.list_lock.acquire()
         self._current_value = None
+        self.deviation.reset()
         self.list_lock.release()
 
 
-class NoFilter(Filter):
+class NoValueFilter(ValueFilter):
     """
     This is not a filter. it just stores the current value.
     """
-    def __init__(self):
-        Filter.__init__(self)
+    def __init__(self, config):
+        ValueFilter.__init__(self, config)
         self._current_value = None
 
     def update(self, new_value):
@@ -268,16 +299,18 @@ class NoFilter(Filter):
         :param new_value: New value, which should be stored
         """
         self._current_value = new_value
+        self.deviation.update(new_value)
 
     def get_value(self):
         """
         This is not really a filter. Just return the current value.
         :return: current stored value
         """
-        return self._current_value
+        return self._current_value, self.deviation.get_value()
 
     def reset(self):
         """
         Reset the filter, that cleans the current value.
         """
         self._current_value = None
+        self.deviation.reset()
