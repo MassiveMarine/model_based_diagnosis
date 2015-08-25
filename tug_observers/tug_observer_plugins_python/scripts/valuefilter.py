@@ -1,18 +1,12 @@
 #!/usr/bin/env python
 
-from threading import Lock
-
-from deviationfilter import DeviationFilterFactory
-
 
 class ValueFilter():
     """
     Base class for filter.
     """
     def __init__(self, config):
-        self.list_lock = Lock()
-        self.deviation = DeviationFilterFactory.create_deviation_filter(config)
-        self.sample_size = 0
+        pass
 
     def update(self, new_value):
         """
@@ -20,7 +14,6 @@ class ValueFilter():
         Consider the use of resources, because this can be called very often.
         :param new_value: New value for the filter
         """
-        self.deviation.update(new_value)
         pass
 
     def get_value(self):
@@ -28,24 +21,13 @@ class ValueFilter():
         Return the result here. Maybe its necessary to apply the filter first.
         :return: Result of the filter
         """
-        return None, self.deviation.get_value()
+        return None
 
     def reset(self):
         """
         Reset the filter, to remove any history. Necessary for a clean restart.
         """
-        self.deviation.reset()
-        self.sample_size = 0
         pass
-
-    def get_sample_size(self):
-        return self.sample_size
-
-    def increment_sample_size(self, increment):
-        self.sample_size += increment
-
-    def set_sample_size(self, new_sample_size):
-        self.sample_size = new_sample_size
 
 
 class ValueFilterFactory():
@@ -71,7 +53,7 @@ class ValueFilterFactory():
         elif type == "nofilter":
             return NoValueFilter(config)
         else:
-            return None
+            return ValueFilter(config)
 
 
 class MedianValueFilter(ValueFilter):
@@ -87,24 +69,19 @@ class MedianValueFilter(ValueFilter):
         ValueFilter.__init__(self, config)
         self.window_size = config['window_size']
         self._ring_buffer = deque(maxlen=self.window_size)
-        self.deviation_type = config['min_max']
 
     def update(self, new_value):
         """
         Append new value to ringbuffer.
         :param new_value: New value, which should be added to ring buffer
         """
-        self.list_lock.acquire()
         self._ring_buffer.append(new_value)
-        self.deviation.update(new_value)
-        self.list_lock.release()
 
     def get_value(self):
         """
         Apply the filter and return the resulting value.
         :return: Result of the applied filter
         """
-        self.list_lock.acquire()
         data = sorted(self._ring_buffer)
         n = len(data)
         if n == 0:
@@ -114,19 +91,14 @@ class MedianValueFilter(ValueFilter):
         else:
             i = n//2
             result = (data[i - 1] + data[i])/2
-        deviation = self.deviation.get_value()
 
-        self.list_lock.release()
-        return result, deviation
+        return result
 
     def reset(self):
         """
         Reset the filter, that cleans the buffer.
         """
-        self.list_lock.acquire()
         self._ring_buffer.clear()
-        self.deviation.reset()
-        self.list_lock.release()
 
 
 class MeanValueFilter(ValueFilter):
@@ -148,36 +120,26 @@ class MeanValueFilter(ValueFilter):
         Append new value to ringbuffer.
         :param new_value: New value, which should be added to ring buffer
         """
-        self.list_lock.acquire()
         self._ring_buffer.append(new_value)
-        self.deviation.update(new_value)
-        self.list_lock.release()
 
     def get_value(self):
         """
         Apply the filter and return the resulting value.
         :return: Result of the applied filter
         """
-        self.list_lock.acquire()
         size = len(self._ring_buffer)
         if not size:
             result = None
-            deviation = []
         else:
             result = sum(self._ring_buffer) / size
-            deviation = self.deviation.get_value()
 
-        self.list_lock.release()
-        return result, deviation
+        return result
 
     def reset(self):
         """
         Reset the filter, that cleans the buffer.
         """
-        self.list_lock.acquire()
         self._ring_buffer.clear()
-        self.deviation.reset()
-        self.list_lock.release()
 
 
 class KMeansValueFilter(ValueFilter):
@@ -200,24 +162,17 @@ class KMeansValueFilter(ValueFilter):
         Append new value to ringbuffer.
         :param new_value: New value, which should be added to ring buffer
         """
-        self.list_lock.acquire()
         self._ring_buffer.append(new_value)
-        self.deviation.update(new_value)
-        self.list_lock.release()
 
     def get_value(self):
         """
         Apply the filter and return the resulting value.
         :return: Result of the applied filter
         """
-        self.list_lock.acquire()
-
         size = len(self._ring_buffer)
         if not size:
             result = None
-            deviation = []
         else:
-
             center_index = size // 2
             lower_index = max(center_index - self.k_half, 0)
             upper_index = min(center_index + self.k_half, size)
@@ -225,19 +180,14 @@ class KMeansValueFilter(ValueFilter):
             small_list = list(self._ring_buffer)[lower_index:upper_index + 1]
 
             result = sum(small_list) / len(small_list)
-            deviation = self.deviation.get_value()
 
-        self.list_lock.release()
-        return result, deviation
+        return result
 
     def reset(self):
         """
         Reset the filter, that cleans the buffer.
         """
-        self.list_lock.acquire()
         self._ring_buffer.clear()
-        self.deviation.reset()
-        self.list_lock.release()
 
 
 class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
@@ -252,37 +202,67 @@ class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
         """
         ValueFilter.__init__(self, config)
         self._decay_rate = config['decay_rate']
-        self._current_value = None
+        if config.has_key('window_size'):
+            from collections import deque
+            self.window_size = config['window_size']
+            self._ring_buffer = deque(maxlen=self.window_size)
+            self.update = self.update_buffered
+            self.get_value = self.get_value_buffered
+            self.reset = self.reset_buffered
+        else:
+            self._current_value = None
+            self.update = self.update_unbuffered
+            self.get_value = self.get_value_unbuffered
+            self.reset = self.reset_unbuffered
 
-    def update(self, new_value):
+    def update_unbuffered(self, new_value):
         """
         Add new value to the history with given weight.
         :param new_value: New value, which should be added to history
         """
-        self.list_lock.acquire()
         if self._current_value is None:
             self._current_value = new_value * 1.0
         else:
             self._current_value = self._current_value * (1.0 - self._decay_rate) + new_value * self._decay_rate
 
-        self.deviation.update(new_value)
-        self.list_lock.release()
+    def update_buffered(self, new_value):
+        """
+        Append new value to ringbuffer.
+        :param new_value: New value, which should be added to ring buffer
+        """
+        self._ring_buffer.append(new_value)
 
-    def get_value(self):
+    def get_value_unbuffered(self):
         """
         Filter result is already up-to-date. Just return the value.
         :return: Result of the filter
         """
-        return self._current_value, self.deviation.get_value()
+        return self._current_value
 
-    def reset(self):
+    def get_value_buffered(self):
+        """
+        Apply the filter and return the resulting value.
+        :return: Result of the applied filter
+        """
+        if not len(self._ring_buffer):
+            print 'no value in buffer'
+            return None
+        value = self._ring_buffer[0]
+        for index in range(1,len(self._ring_buffer)):
+            value = value * (1-self._decay_rate) + self._ring_buffer[index] * self._decay_rate
+        return value
+
+    def reset_unbuffered(self):
         """
         Reset the filter, that cleans the history.
         """
-        self.list_lock.acquire()
         self._current_value = None
-        self.deviation.reset()
-        self.list_lock.release()
+
+    def reset_buffered(self):
+        """
+        Reset the filter, that cleans the history.
+        """
+        self._ring_buffer.clear()
 
 
 class NoValueFilter(ValueFilter):
@@ -299,18 +279,16 @@ class NoValueFilter(ValueFilter):
         :param new_value: New value, which should be stored
         """
         self._current_value = new_value
-        self.deviation.update(new_value)
 
     def get_value(self):
         """
         This is not really a filter. Just return the current value.
         :return: current stored value
         """
-        return self._current_value, self.deviation.get_value()
+        return self._current_value
 
     def reset(self):
         """
         Reset the filter, that cleans the current value.
         """
         self._current_value = None
-        self.deviation.reset()

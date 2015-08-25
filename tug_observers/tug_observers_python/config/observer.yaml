@@ -8,7 +8,7 @@ setup:
       timeout: 1.0
       filter:
         type: ewma #exponentially weighted moving average
-        window_size: 10
+        #window_size: 10
         # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
         decay_rate: 0.05
         deviation_type: min_max # std_deviation, min_max

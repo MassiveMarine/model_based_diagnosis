@@ -3,7 +3,7 @@
 import rospy
 from tug_observers_python import PluginBase, PluginThread, PluginTimeout
 from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
-from valuefilter import ValueFilterFactory
+from filter import Filter
 from nominal_value import NominalValueFactory
 from threading import Lock
 
@@ -13,20 +13,24 @@ class HzState():
         self.name = config['state']
         frequency = config['frequenzy']
         self._value = NominalValueFactory.create_nominal_value(frequency['value'])
-        self._deviation = []
+        self._deviation_nominal_values = []
         for deviation_config in frequency['deviation']:
-            self._deviation.append(NominalValueFactory.create_nominal_value(deviation_config))
+            self._deviation_nominal_values.append(NominalValueFactory.create_nominal_value(deviation_config))
 
     def is_nominal(self, value, deviation):
         value_nominal = self._value.is_nominal(value)
-        deviation_nominal = all(o.is_nominal(deviation[c]) for c, o in enumerate(self._deviation))
+        if len(deviation) is not len (self._deviation_nominal_values):
+            rospy.logwarn("Number of deviations do not match with config!")
+            return value_nominal
 
-        return all([value_nominal, deviation_nominal])
+        deviation_nominal = all(o.is_nominal(deviation[c]) for c, o in enumerate(self._deviation_nominal_values))
+
+        return value_nominal and deviation_nominal
 
 
 class HzBase():
     def __init__(self, topic, config):
-        self._filter = ValueFilterFactory.create_value_filter(config['filter'])
+        self._filter = Filter(config['filter'])
 
         self._states = []
         for state_config in config['states']:
@@ -77,6 +81,7 @@ class HzBase():
             self._resource_info.states = []
         else:
             mean = 1. / mean
+            print deviation
             deviation = [1. / x for x in reversed(deviation)]
             self._resource_info.states = self._get_valied_states(mean, deviation)  #[str(1. / self._filter.get_value())]
 

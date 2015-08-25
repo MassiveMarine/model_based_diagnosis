@@ -18,7 +18,7 @@ class DeviationFilter():
         """
         pass
 
-    def get_value(self):
+    def get_deviation(self):
         """
         Return the result here.
         :return: Result of the deviation
@@ -45,25 +45,65 @@ class DeviationFilterFactory():
         """
         type = config['deviation_type']
         if type == "min_max":
-            return MinMaxDeviationFilter()
+            return MinMaxDeviationFilter(config)
+        elif type == "std_deviation":
+            return StdDeviationDeviationFilter(config)
         else:
-            return DeviationFilterFactory()
+            return DeviationFilter()
+
+
+class StdDeviationDeviationFilter(DeviationFilter):
+    def __init__(self, config):
+        DeviationFilter.__init__(self)
+
+    def update(self, new_value):
+        pass
+
+    def get_deviation(self):
+        return []
+
+    def reset(self):
+        pass
 
 
 class MinMaxDeviationFilter(DeviationFilter):
-    def __init__(self):
+    def __init__(self, config):
         DeviationFilter.__init__(self)
-        self._min = float("inf")
-        self._max = float("-inf")
 
-    def update(self, new_value):
-        self._min = min(self._min, new_value)
-        self._max = max(self._max, new_value)
+        if config.has_key('window_size'):
+            from collections import deque
+            self.window_size = config['window_size']
+            self._ring_buffer = deque(maxlen=self.window_size)
+            self.update = self.update_buffered
+            self.get_deviation = self.get_deviation_buffered
+            self.reset = self.reset_buffered
+        else:
+            self._min = float("nan")
+            self._max = float("nan")
+            self.update = self.update_unbuffered
+            self.get_deviation = self.get_deviation_unbuffered
+            self.reset = self.reset_unbuffered
 
-    def get_value(self):
+    def update_unbuffered(self, new_value):
+        print 'use unbuffered'
+        self._min = min(new_value, self._min)
+        self._max = max(new_value, self._max)
+
+    def update_buffered(self, new_value):
+        print 'use buffered'
+        self._ring_buffer.append(new_value)
+
+    def get_deviation_unbuffered(self):
         return [self._min, self._max]
 
-    def reset(self):
-        self._min = float("inf")
-        self._max = float("-inf")
+    def get_deviation_buffered(self):
+        ring_list = list(self._ring_buffer) + [float("nan")]
+        return [min(ring_list), max(ring_list)]
+
+    def reset_unbuffered(self):
+        self._min = float("nan")
+        self._max = float("nan")
+
+    def reset_buffered(self):
+        self._ring_buffer.clear()
 
