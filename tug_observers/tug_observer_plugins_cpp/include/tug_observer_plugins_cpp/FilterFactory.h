@@ -13,7 +13,7 @@
 #include <tug_observer_plugins_cpp/MeanFilter.h>
 #include <tug_observer_plugins_cpp/MedianFilter.h>
 #include <tug_observer_plugins_cpp/KMeansFilter.h>
-#include <tug_observer_plugins_cpp/LowPassFilter.h>
+#include <tug_observer_plugins_cpp/EWMAFilter.h>
 #include <tug_observer_plugins_cpp/NoFilterFilter.h>
 
 template <class T>
@@ -28,8 +28,8 @@ public:
       return boost::make_shared<MedianFilter<T> >(params);
     else if(type == "kmeans")
       return boost::make_shared<KMeansFilter<T> >(params);
-    else if(type == "lp")
-      return boost::make_shared<LowPassFilter<T> >(params);
+    else if(type == "ewma")
+      return boost::make_shared<EWMAFilter<T> >(params);
     else if(type == "nofilter")
       return boost::make_shared<NoFilterFilter<T> >();
     else

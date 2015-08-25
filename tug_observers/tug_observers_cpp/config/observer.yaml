@@ -26,7 +26,7 @@ setup:
       window_size: 5
       k_size: 3
     mem_filter:
-      type: lp
+      type: ewma
       decay_rate: 0.8
     states:
     - state: '1'
