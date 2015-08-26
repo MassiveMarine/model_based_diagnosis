@@ -122,6 +122,8 @@ add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/filter/deviation_filter/StandartDeviationFilter.cpp
                               src/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithBuffer.cpp
                               src/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithoutBuffer.cpp
+                              src/filter/value_filter/MeanValueFilter/MeanValueFilterWithBuffer.cpp
+                              src/filter/value_filter/MeanValueFilter/MeanValueFilterWithoutBuffer.cpp
                               )
 
 ## Declare a cpp executable

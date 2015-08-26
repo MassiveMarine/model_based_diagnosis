@@ -6,8 +6,6 @@
 #define TUG_OBSERVER_PLUGINS_CPP_LOWPASSFILTER_H
 
 #include <tug_observer_plugins_cpp/filter/value_filter/ValueFilter.h>
-#include <tug_observer_plugins_cpp/ProcessYaml.h>
-#include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <tug_observer_plugins_cpp/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithBuffer.h>

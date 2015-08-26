@@ -6,51 +6,44 @@
 #define TUG_OBSERVER_PLUGINS_CPP_MEANFILTER_H
 
 #include <tug_observer_plugins_cpp/filter/value_filter/ValueFilter.h>
-#include <boost/circular_buffer.hpp>
-#include <tug_observer_plugins_cpp/ProcessYaml.h>
-#include <numeric>
-#include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+#include <tug_observer_plugins_cpp/filter/value_filter/MeanValueFilter/MeanValueFilterWithBuffer.h>
+#include <tug_observer_plugins_cpp/filter/value_filter/MeanValueFilter/MeanValueFilterWithoutBuffer.h>
 
 
 template<class T>
 class MeanValueFilter : public ValueFilter<T>
 {
-  boost::circular_buffer<T> buffer_;
-  boost::mutex scope_mutex_;
+  boost::shared_ptr<ValueFilter<T> > mean_internal_value_filter_;
 
 public:
   MeanValueFilter(XmlRpc::XmlRpcValue params)
   {
-    unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
-    buffer_ = boost::circular_buffer<T>(window_size);
+    if(ProcessYaml::hasValue("window_size", params))
+      mean_internal_value_filter_ = boost::make_shared<MeanValueFilterWithBuffer<T> >(params);
+    else
+      mean_internal_value_filter_ = boost::make_shared<MeanValueFilterWithoutBuffer<T> >(params);
   }
 
   virtual void update(const T& new_value)
   {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    buffer_.push_back(new_value);
+    mean_internal_value_filter_->update(new_value);
   }
 
   virtual T getValue()
   {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    if(buffer_.empty())
-      return static_cast<T>(0);
-
-    T result = std::accumulate(buffer_.begin(), buffer_.end(), static_cast<T>(0));
-    return result / static_cast<T>(buffer_.size());
+    return mean_internal_value_filter_->getValue();
   }
 
   virtual void reset()
   {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    buffer_.clear();
+    mean_internal_value_filter_->reset();
   }
 
   virtual size_t getSampleSize()
   {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    return buffer_.size();
+    return mean_internal_value_filter_->getSampleSize();
   }
 };
 
