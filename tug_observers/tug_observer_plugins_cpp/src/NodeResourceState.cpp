@@ -33,7 +33,7 @@ namespace tug_observer_plugins_cpp
 
     bool NodeResourceState::conformsState(double cpu, unsigned long memory)
     {
-      ROS_ERROR_STREAM("conforms state " << name_ << " with cpu: " << cpu << " mem: " << memory);
+      ROS_DEBUG_STREAM("conforms state " << name_ << " with cpu: " << cpu << " mem: " << memory);
       return cpu_->isNominal(cpu) && memory_->isNominal(memory);
     }
 
