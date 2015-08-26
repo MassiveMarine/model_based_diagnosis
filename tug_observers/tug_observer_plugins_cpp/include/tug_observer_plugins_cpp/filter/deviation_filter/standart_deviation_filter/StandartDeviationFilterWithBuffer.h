@@ -81,6 +81,11 @@ public:
     boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     return buffer_.size();
   }
+
+  virtual size_t getExpectedDeviationResultSize()
+  {
+    return 1;
+  }
 };
 
 

@@ -54,6 +54,11 @@ public:
   {
     return sample_size_;
   }
+
+  virtual size_t getExpectedDeviationResultSize()
+  {
+    return 2;
+  }
 };
 
 

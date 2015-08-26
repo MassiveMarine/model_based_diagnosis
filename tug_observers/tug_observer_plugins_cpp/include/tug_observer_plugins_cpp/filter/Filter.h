@@ -35,7 +35,8 @@ public:
 
   void update(const T &new_value)
   {
-    deviation_filter_->update(new_value);
+    if(deviation_filter_)
+      deviation_filter_->update(new_value);
     value_filter_->update(new_value);
   }
 
@@ -53,14 +54,29 @@ public:
       filter_state.has_deviation = false;
 
     filter_state.sample_size = value_filter_->getSampleSize();
+
+    return filter_state;
   }
 
   void reset()
   {
-    deviation_filter_->reset();
+    if(deviation_filter_)
+      deviation_filter_->reset();
     value_filter_->reset();
   }
 
+  size_t getExpectedDeviationResultSize()
+  {
+    if(deviation_filter_)
+      return deviation_filter_->getExpectedDeviationResultSize();
+
+    return 0;
+  }
+
+  bool hasDeviationFilter()
+  {
+    return deviation_filter_;
+  }
 };
 
 

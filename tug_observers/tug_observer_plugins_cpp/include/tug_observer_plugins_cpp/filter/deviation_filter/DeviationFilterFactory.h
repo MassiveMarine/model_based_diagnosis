@@ -20,8 +20,8 @@ public:
   static boost::shared_ptr<DeviationFilter<T> > createFilter(std::string type, XmlRpc::XmlRpcValue params)
   {
     if(type == "min_max")
-      return boost::make_shared<MinMaxDeviationFilter<T> >();
-    else if(type = "std")
+      return boost::make_shared<MinMaxDeviationFilter<T> >(params);
+    else if(type == "std")
       return boost::make_shared<StandartDeviationFilter<T> >(params);
     else
       throw std::runtime_error("type for deviation filter value '" + type + "'" + " not known");

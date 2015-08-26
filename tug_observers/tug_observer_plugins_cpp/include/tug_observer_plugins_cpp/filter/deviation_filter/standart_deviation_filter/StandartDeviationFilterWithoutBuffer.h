@@ -78,6 +78,11 @@ public:
     boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     return history_.size();
   }
+
+  virtual size_t getExpectedDeviationResultSize()
+  {
+    return 1;
+  }
 };
 
 #endif //TUG_OBSERVER_PLUGINS_CPP_STANDARTDEVIATIONFILTERWITHOUTBUFFER_H

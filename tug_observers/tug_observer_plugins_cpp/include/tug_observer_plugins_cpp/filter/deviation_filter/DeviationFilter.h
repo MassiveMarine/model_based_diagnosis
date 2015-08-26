@@ -19,6 +19,8 @@ public:
   virtual void reset() = 0;
 
   virtual size_t getSampleSize() = 0;
+
+  virtual size_t getExpectedDeviationResultSize() = 0;
 };
 
 

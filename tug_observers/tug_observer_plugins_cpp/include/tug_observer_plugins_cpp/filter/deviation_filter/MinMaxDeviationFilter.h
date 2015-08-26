@@ -45,6 +45,11 @@ public:
   {
     return min_max_internal_value_filter_->getSampleSize();
   }
+
+  virtual size_t getExpectedDeviationResultSize()
+  {
+    return min_max_internal_value_filter_->getExpectedDeviationResultSize();
+  }
 };
 
 #endif //TUG_OBSERVER_PLUGINS_CPP_MINMAXDEVIATIONFILTER_H

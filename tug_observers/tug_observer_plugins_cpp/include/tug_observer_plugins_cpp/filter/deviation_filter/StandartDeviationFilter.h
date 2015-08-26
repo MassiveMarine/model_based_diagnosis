@@ -45,6 +45,11 @@ public:
   {
     return std_internal_value_filter_->getSampleSize();
   }
+
+  virtual size_t getExpectedDeviationResultSize()
+  {
+    return std_internal_value_filter_->getExpectedDeviationResultSize();
+  }
 };
 
 
