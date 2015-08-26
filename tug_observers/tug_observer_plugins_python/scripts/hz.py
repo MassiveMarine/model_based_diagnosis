@@ -7,14 +7,16 @@ from filter import Filter
 from nominal_value import NominalValueFactory
 from threading import Lock
 
+from tug_python_utils import YamlHelper as Config
+
 
 class HzState():
     def __init__(self, config):
-        self.name = config['state']
-        frequency = config['frequenzy']
-        self._value = NominalValueFactory.create_nominal_value(frequency['value'])
+        self.name = Config.get_param(config, 'state')
+        frequency = Config.get_param(config, 'frequenzy')
+        self._value = NominalValueFactory.create_nominal_value(Config.get_param(frequency, 'value'))
         self._deviation_nominal_values = []
-        for deviation_config in frequency['deviation']:
+        for deviation_config in Config.get_param(frequency, 'deviation'):
             self._deviation_nominal_values.append(NominalValueFactory.create_nominal_value(deviation_config))
 
     def is_nominal(self, value, deviation):
@@ -30,16 +32,21 @@ class HzState():
 
 class HzBase():
     def __init__(self, topic, config):
-        self._filter = Filter(config['filter'])
+        self._filter = Filter(Config.get_param(config, 'filter'))
 
         self._states = []
-        for state_config in config['states']:
-            self._states.append(HzState(state_config))
+        for state_config in Config.get_param(config, 'states'):
+            try:
+                self._states.append(HzState(state_config))
+            except KeyError as e:
+                rospy.logerr(e)
 
-        self._resource_info = resource_info(type='hz', resource=str(topic + ' ' + config['callerid']))
+        callerid = Config.get_param(config, 'callerid')
+        self._resource_info = resource_info(type='hz', resource=str(topic + ' ' + callerid))
 
         self._lock = Lock()
-        self._event = PluginTimeout(config['timeout'], self.timeout_cb)
+        timeout = Config.get_param(config, 'timeout')
+        self._event = PluginTimeout(timeout, self.timeout_cb)
 
         self._msg_t0 = -1.
         self._msg_tn = 0
@@ -91,17 +98,22 @@ class HzBase():
 
 class HzSubs():
     def __init__(self, config):
-        self.topic = config['name']
+        self.topic = Config.get_param(config, 'name')
 
         self.bases = dict()
 
-        for callerid_config in config['callerids']:
-            callerid = callerid_config['callerid']
+        callerids = Config.get_param(config, 'callerids')
 
-            callerid_unknown = True if callerid == 'unknown' else False
+        for callerid_config in callerids:
+            try:
+                callerid = Config.get_param(callerid_config, 'callerid')
+                callerid_unknown = True if callerid == 'unknown' else False
+                self.bases[callerid] = HzBase(self.topic, callerid_config)
+            except KeyError as e:
+                rospy.logerr(e)
 
-            self.bases[callerid] = HzBase(self.topic, callerid_config)
-
+        if not len(self.bases):
+            raise StandardError("No Subscriber possible for topic '" + self.topic + "' maybe because of errors in config!")
         if callerid_unknown:
             self.sub = rospy.Subscriber(self.topic, rospy.AnyMsg, self.pre_cb, queue_size=1)
         else:
@@ -147,7 +159,10 @@ class Hz(PluginBase, PluginThread):
     def initialize(self, config):
 
         for topic_config in config['topics']:
-            self.subs.append(HzSubs(topic_config))
+            try:
+                self.subs.append(HzSubs(topic_config))
+            except (KeyError, StandardError) as e:
+                rospy.logerr(e)
 
         self.start()
 

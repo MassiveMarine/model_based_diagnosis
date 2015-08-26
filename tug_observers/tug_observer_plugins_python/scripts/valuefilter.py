@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
+from tug_python_utils import YamlHelper as Config
+
 
 class ValueFilter():
     """
     Base class for filter.
     """
-    def __init__(self, config):
+    def __init__(self):
         pass
 
     def update(self, new_value):
@@ -41,7 +43,7 @@ class ValueFilterFactory():
         :param config: Configuration from yaml file
         :return: New instance of a corresponding filter
         """
-        type = config['type']
+        type = Config.get_param(config, 'type')
         if type == "mean":
             return MeanValueFilter(config)
         elif type == "median":
@@ -53,7 +55,8 @@ class ValueFilterFactory():
         elif type == "nofilter":
             return NoValueFilter(config)
         else:
-            return ValueFilter(config)
+            return ValueFilter()
+            # raise NameError("'" + str(type) + "' from config not found in value-filter!")
 
 
 class MedianValueFilter(ValueFilter):
@@ -66,8 +69,8 @@ class MedianValueFilter(ValueFilter):
         :param config: Configuration from yaml file
         """
         from collections import deque
-        ValueFilter.__init__(self, config)
-        self.window_size = config['window_size']
+        ValueFilter.__init__(self)
+        self.window_size = Config.get_param(config, 'window_size')
         self._ring_buffer = deque(maxlen=self.window_size)
 
     def update(self, new_value):
@@ -111,8 +114,8 @@ class MeanValueFilter(ValueFilter):
         :param config: Configuration from yaml file
         """
         from collections import deque
-        ValueFilter.__init__(self, config)
-        self.window_size = config['window_size']
+        ValueFilter.__init__(self)
+        self.window_size = Config.get_param(config, 'window_size')
         self._ring_buffer = deque(maxlen=self.window_size)
 
     def update(self, new_value):
@@ -152,9 +155,9 @@ class KMeansValueFilter(ValueFilter):
         :param config: Configuration from yaml file
         """
         from collections import deque
-        ValueFilter.__init__(self, config)
-        self.k_half = config['k_size'] / 2
-        self.window_size = config['window_size']
+        ValueFilter.__init__(self)
+        self.k_half = Config.get_param(config, 'k_size') / 2
+        self.window_size = Config.get_param(config, 'window_size')
         self._ring_buffer = deque(maxlen=self.window_size)
 
     def update(self, new_value):
@@ -200,11 +203,11 @@ class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
         Applies new values weighted to history.
         :param config: Configuration from yaml file
         """
-        ValueFilter.__init__(self, config)
-        self._decay_rate = config['decay_rate']
-        if config.has_key('window_size'):
+        ValueFilter.__init__(self)
+        self._decay_rate = Config.get_param(config, 'decay_rate')
+        if Config.has_key(config, 'window_size'):
             from collections import deque
-            self.window_size = config['window_size']
+            self.window_size = Config.get_param(config, 'window_size')
             self._ring_buffer = deque(maxlen=self.window_size)
             self.update = self.update_buffered
             self.get_value = self.get_value_buffered
@@ -245,7 +248,6 @@ class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
         :return: Result of the applied filter
         """
         if not len(self._ring_buffer):
-            print 'no value in buffer'
             return None
         value = self._ring_buffer[0]
         for index in range(1,len(self._ring_buffer)):
@@ -270,7 +272,7 @@ class NoValueFilter(ValueFilter):
     This is not a filter. it just stores the current value.
     """
     def __init__(self, config):
-        ValueFilter.__init__(self, config)
+        ValueFilter.__init__(self)
         self._current_value = None
 
     def update(self, new_value):

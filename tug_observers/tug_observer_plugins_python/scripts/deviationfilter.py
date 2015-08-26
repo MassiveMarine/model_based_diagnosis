@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from threading import Lock
+from tug_python_utils import YamlHelper as Config
 
 
 class DeviationFilter():
@@ -43,13 +43,14 @@ class DeviationFilterFactory():
         :param config: Configuration from yaml file
         :return: New instance of a corresponding deviation
         """
-        type = config['deviation_type']
+        type = Config.get_param(config, 'deviation_type')
         if type == "min_max":
             return MinMaxDeviationFilter(config)
         elif type == "std_deviation":
             return StdDeviationDeviationFilter(config)
         else:
             return DeviationFilter()
+            raise NameError("'" + str(type) + "' from config not found in deviation-filter!")
 
 
 class StdDeviationDeviationFilter(DeviationFilter):
@@ -70,9 +71,9 @@ class MinMaxDeviationFilter(DeviationFilter):
     def __init__(self, config):
         DeviationFilter.__init__(self)
 
-        if config.has_key('window_size'):
+        if Config.has_key(config, 'window_size'):
             from collections import deque
-            self.window_size = config['window_size']
+            self.window_size = Config.get_param(config, 'window_size')
             self._ring_buffer = deque(maxlen=self.window_size)
             self.update = self.update_buffered
             self.get_deviation = self.get_deviation_buffered
@@ -85,12 +86,12 @@ class MinMaxDeviationFilter(DeviationFilter):
             self.reset = self.reset_unbuffered
 
     def update_unbuffered(self, new_value):
-        print 'use unbuffered'
+        # print 'use unbuffered'
         self._min = min(new_value, self._min)
         self._max = max(new_value, self._max)
 
     def update_buffered(self, new_value):
-        print 'use buffered'
+        # print 'use buffered'
         self._ring_buffer.append(new_value)
 
     def get_deviation_unbuffered(self):

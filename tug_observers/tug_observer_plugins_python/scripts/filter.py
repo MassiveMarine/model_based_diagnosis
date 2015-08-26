@@ -12,7 +12,6 @@ class Filter():
     """
     def __init__(self, config):
         self.list_lock = Lock()
-        print config
         self.value_filter = ValueFilterFactory.create_value_filter(config)
         self.deviation_filter = DeviationFilterFactory.create_deviation_filter(config)
         self.sample_size = 0
