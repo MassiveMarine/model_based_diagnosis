@@ -32,7 +32,7 @@ struct ObserverInfo
 
 class ObserverInfoSender
 {
-  std::map<ObserverInfo, std::vector<std::string> > current_observer_infos_;
+  std::map<ObserverInfo, std::pair<std::vector<std::string>, ros::Time> > current_observer_infos_;
   ros::NodeHandle nh_;
   ros::Publisher info_pub_;
   ros::Timer timer_;
@@ -40,12 +40,12 @@ class ObserverInfoSender
   ObserverInfoSender();
 
   void timerCallback(const ros::TimerEvent& timer_evnt);
-  void updateInfo(ObserverInfo info, std::vector<std::string> states);
+  void updateInfo(ObserverInfo info, std::vector<std::string> states, ros::Time time_of_occurence);
   void removeInfo(ObserverInfo info);
 
   public:
     static ObserverInfoSender& getInstance();
-    static void sendInfo(std::string type, std::string resource, std::vector<std::string> states);
+    static void sendInfo(std::string type, std::string resource, std::vector<std::string> states, ros::Time time_of_occurence);
     static void removeInfo(std::string type, std::string resource);
 };
 

@@ -24,7 +24,7 @@ namespace tug_observers_cpp
       spinner_.start();
     }
 
-    void ObserverPluginBase::reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code)
+    void ObserverPluginBase::reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code, ros::Time time_of_occurence)
     {
       ObserverInfoSender::removeInfo(type_, resource);
       tug_observers_msgs::observer_error msg;
@@ -33,11 +33,12 @@ namespace tug_observers_cpp
       msg.error_msg.error_msg = error_msg;
       msg.error_msg.verbose_error_msg = verbose_error_msg;
       msg.error_msg.error = error_code;
+      msg.error_msg.header.stamp = time_of_occurence;
       error_pub_.publish(msg);
     }
 
-    void ObserverPluginBase::reportStates(std::string resource, std::vector<std::string> states)
+    void ObserverPluginBase::reportStates(std::string resource, std::vector<std::string> states, ros::Time time_of_occurence)
     {
-      ObserverInfoSender::sendInfo(type_, resource, states);
+      ObserverInfoSender::sendInfo(type_, resource, states, time_of_occurence);
     }
 }
