@@ -124,7 +124,8 @@ add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithoutBuffer.cpp
                               src/filter/value_filter/MeanValueFilter/MeanValueFilterWithBuffer.cpp
                               src/filter/value_filter/MeanValueFilter/MeanValueFilterWithoutBuffer.cpp
-                              )
+                              src/filter/deviation_filter/StandartDeviationFilter/StandartDeviationFilterWithBuffer.cpp
+                              src/filter/deviation_filter/StandartDeviationFilter/StandartDeviationFilterWithoutBuffer.cpp)
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)
