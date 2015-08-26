@@ -9,6 +9,15 @@ from threading import Lock
 
 from tug_python_utils import YamlHelper as Config
 
+error_pub = None
+
+resource_error_timeout = resource_error(error_msg='Timeout',
+                                        verbose_error_msg='Timeout of Topic',
+                                        error=resource_error.NO_AVAILABLE)
+resource_error_no_state_fits = resource_error(error_msg='No State fits',
+                                              verbose_error_msg='No state can be found for the measured results',
+                                              error=resource_error.NO_STATE_FITS)
+
 
 class HzState():
     def __init__(self, config):
@@ -21,6 +30,9 @@ class HzState():
 
     def is_nominal(self, value, deviation):
         value_nominal = self._value.is_nominal(value)
+        if not len(deviation):
+            return False
+
         if len(deviation) is not len (self._deviation_nominal_values):
             rospy.logwarn("Number of deviations do not match with config!")
             return value_nominal
@@ -41,8 +53,11 @@ class HzBase():
             except KeyError as e:
                 rospy.logerr(e)
 
-        callerid = Config.get_param(config, 'callerid')
-        self._resource_info = resource_info(type='hz', resource=str(topic + ' ' + callerid))
+
+        self.topic = topic
+        self.callerid = Config.get_param(config, 'callerid')
+        self._resource_info = resource_info(type='hz', resource=str(self.topic + ' ' + self.callerid))
+        self._observer_error = observer_error(type='hz', resource=str(self.topic + ' ' + self.callerid))
 
         self._lock = Lock()
         timeout = Config.get_param(config, 'timeout')
@@ -52,7 +67,11 @@ class HzBase():
         self._msg_tn = 0
 
     def timeout_cb(self):
-        rospy.logwarn('timeout of topic')
+        # rospy.logwarn('timeout of topic')
+        if error_pub:
+            self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
+            self._observer_error.error_msg = resource_error_timeout
+            error_pub.publish(self._observer_error)
         self._lock.acquire()
         self._msg_t0 = -1.
         self._msg_tn = 0
@@ -80,6 +99,14 @@ class HzBase():
         for state in self._states:
             if state.is_nominal(value, deviation):
                 states.append(state.name)
+
+        print states
+        print len(states)
+        if not states:
+            print 'da bin ich'
+            self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
+            self._observer_error.error_msg = resource_error_no_state_fits
+            error_pub.publish(self._observer_error)
         return states
 
     def get_resource_info(self):
@@ -88,8 +115,8 @@ class HzBase():
             self._resource_info.states = []
         else:
             mean = 1. / mean
-            print deviation
             deviation = [1. / x for x in reversed(deviation)]
+            print mean,  deviation
             self._resource_info.states = self._get_valied_states(mean, deviation)  #[str(1. / self._filter.get_value())]
 
         self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
@@ -139,6 +166,8 @@ class Hz(PluginBase, PluginThread):
 
         self.subs = []
         self.topics = None
+        global error_pub
+        error_pub = self.error_pub
 
     def run(self):
         if not self.subs:

@@ -50,21 +50,39 @@ class DeviationFilterFactory():
             return StdDeviationDeviationFilter(config)
         else:
             return DeviationFilter()
-            raise NameError("'" + str(type) + "' from config not found in deviation-filter!")
+            # raise NameError("'" + str(type) + "' from config not found in deviation-filter!")
 
 
 class StdDeviationDeviationFilter(DeviationFilter):
     def __init__(self, config):
         DeviationFilter.__init__(self)
+        from collections import deque
+        from math import sqrt
+        self.sqrt = sqrt
+        self.window_size = Config.get_param(config, 'window_size')
+        self._ring_buffer = deque(maxlen=self.window_size)
 
     def update(self, new_value):
-        pass
+        self._ring_buffer.append(new_value)
 
     def get_deviation(self):
-        return []
+        data = list(self._ring_buffer)
+        n = len(data)
+
+        if n < 2:
+            return []
+
+        c = sum(data)/n
+        ss = sum((x-c)**2 for x in data)
+
+        ss -= sum((x-c) for x in data)**2/len(data)
+
+        variance = ss/(n-1)
+        result = self.sqrt(variance)
+        return [result]
 
     def reset(self):
-        pass
+        self._ring_buffer.clear()
 
 
 class MinMaxDeviationFilter(DeviationFilter):
