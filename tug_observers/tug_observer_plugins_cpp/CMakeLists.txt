@@ -120,14 +120,14 @@ add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/filter/deviation_filter/MinMaxDeviationFilter.cpp
                               src/filter/deviation_filter/DeviationFilterFactory.cpp
                               src/filter/deviation_filter/StandartDeviationFilter.cpp
-                              src/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithBuffer.cpp
-                              src/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithoutBuffer.cpp
-                              src/filter/value_filter/MeanValueFilter/MeanValueFilterWithBuffer.cpp
-                              src/filter/value_filter/MeanValueFilter/MeanValueFilterWithoutBuffer.cpp
-                              src/filter/deviation_filter/StandartDeviationFilter/StandartDeviationFilterWithBuffer.cpp
-                              src/filter/deviation_filter/StandartDeviationFilter/StandartDeviationFilterWithoutBuffer.cpp
-                              src/filter/deviation_filter/MinMaxDeviationFilter/MinMaxDeviationFilterWithBuffer.cpp
-                              src/filter/deviation_filter/MinMaxDeviationFilter/MinMaxDeviationFilterWithoutBuffer.cpp)
+                              src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithBuffer.cpp
+                              src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithoutBuffer.cpp
+                              src/filter/value_filter/mean_value_filter/MeanValueFilterWithBuffer.cpp
+                              src/filter/value_filter/mean_value_filter/MeanValueFilterWithoutBuffer.cpp
+                              src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithBuffer.cpp
+                              src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithoutBuffer.cpp
+                              src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithBuffer.cpp
+                              src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithoutBuffer.cpp)
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)

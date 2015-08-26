@@ -8,8 +8,8 @@
 #include <tug_observer_plugins_cpp/filter/deviation_filter/DeviationFilter.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <tug_observer_plugins_cpp/filter/deviation_filter/StandartDeviationFilter/StandartDeviationFilterWithBuffer.h>
-#include <tug_observer_plugins_cpp/filter/deviation_filter/StandartDeviationFilter/StandartDeviationFilterWithoutBuffer.h>
+#include <tug_observer_plugins_cpp/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithBuffer.h>
+#include <tug_observer_plugins_cpp/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithoutBuffer.h>
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
 
 template<class T>

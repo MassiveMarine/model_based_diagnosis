@@ -8,9 +8,8 @@
 #include <tug_observer_plugins_cpp/filter/value_filter/ValueFilter.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <tug_observer_plugins_cpp/filter/value_filter/MeanValueFilter/MeanValueFilterWithBuffer.h>
-#include <tug_observer_plugins_cpp/filter/value_filter/MeanValueFilter/MeanValueFilterWithoutBuffer.h>
-
+#include <tug_observer_plugins_cpp/filter/value_filter/mean_value_filter/MeanValueFilterWithBuffer.h>
+#include <tug_observer_plugins_cpp/filter/value_filter/mean_value_filter/MeanValueFilterWithoutBuffer.h>
 
 template<class T>
 class MeanValueFilter : public ValueFilter<T>

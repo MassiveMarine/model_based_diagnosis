@@ -5,13 +5,11 @@
 #ifndef TUG_OBSERVER_PLUGINS_CPP_MINMAXDEVIATIONFILTER_H
 #define TUG_OBSERVER_PLUGINS_CPP_MINMAXDEVIATIONFILTER_H
 
-
-
 #include <tug_observer_plugins_cpp/filter/deviation_filter/DeviationFilter.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <tug_observer_plugins_cpp/filter/deviation_filter/MinMaxDeviationFilter/MinMaxDeviationFilterWithBuffer.h>
-#include <tug_observer_plugins_cpp/filter/deviation_filter/MinMaxDeviationFilter/MinMaxDeviationFilterWithoutBuffer.h>
+#include <tug_observer_plugins_cpp/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithBuffer.h>
+#include <tug_observer_plugins_cpp/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithoutBuffer.h>
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
 
 template<class T>

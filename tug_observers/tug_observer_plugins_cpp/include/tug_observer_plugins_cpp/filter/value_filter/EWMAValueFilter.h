@@ -8,8 +8,8 @@
 #include <tug_observer_plugins_cpp/filter/value_filter/ValueFilter.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <tug_observer_plugins_cpp/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithBuffer.h>
-#include <tug_observer_plugins_cpp/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithoutBuffer.h>
+#include <tug_observer_plugins_cpp/filter/value_filter/ewma_value_filter/EWMAValueFilterWithBuffer.h>
+#include <tug_observer_plugins_cpp/filter/value_filter/ewma_value_filter/EWMAValueFilterWithoutBuffer.h>
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
 
 template<class T>
