@@ -119,7 +119,10 @@ add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/filter/deviation_filter/DeviationFilter.cpp src/filter/Filter.cpp src/filter/FilteState.cpp
                               src/filter/deviation_filter/MinMaxDeviationFilter.cpp
                               src/filter/deviation_filter/DeviationFilterFactory.cpp
-                              src/filter/deviation_filter/StandartDeviationFilter.cpp)
+                              src/filter/deviation_filter/StandartDeviationFilter.cpp
+                              src/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithBuffer.cpp
+                              src/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithoutBuffer.cpp
+                              )
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)

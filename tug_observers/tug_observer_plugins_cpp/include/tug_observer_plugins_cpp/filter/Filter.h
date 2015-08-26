@@ -26,7 +26,7 @@ public:
     std::string filter_type = ProcessYaml::getValue<std::string>("type", params);
     value_filter_ = ValueFilterFactory<T>::createFilter(filter_type, params);
 
-    if(ProcessYaml::hasValue("deviation_type"))
+    if(ProcessYaml::hasValue("deviation_type", params))
     {
       std::string deviation_type = ProcessYaml::getValue<std::string>("deviation_type", params);
       deviation_filter_ = DeviationFilterFactory<T>::createFilter(deviation_type, params);

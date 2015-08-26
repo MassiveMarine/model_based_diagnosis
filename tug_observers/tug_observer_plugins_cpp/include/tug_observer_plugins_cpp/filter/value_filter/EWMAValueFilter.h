@@ -8,57 +8,43 @@
 #include <tug_observer_plugins_cpp/filter/value_filter/ValueFilter.h>
 #include <tug_observer_plugins_cpp/ProcessYaml.h>
 #include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+#include <tug_observer_plugins_cpp/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithBuffer.h>
+#include <tug_observer_plugins_cpp/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithoutBuffer.h>
 
 template<class T>
 class EWMAValueFilter : public ValueFilter<T>
 {
-  double decay_rate_;
-  T current_value_;
-  bool got_initial_value_;
-  boost::mutex scope_mutex_;
-  size_t sample_size_;
+  boost::shared_ptr<ValueFilter<T> > ewma_internal_value_filter_;
 
 public:
-  EWMAValueFilter(XmlRpc::XmlRpcValue params) : got_initial_value_(false), sample_size_(0)
+  EWMAValueFilter(XmlRpc::XmlRpcValue params)
   {
-    decay_rate_ = ProcessYaml::getValue<double>("decay_rate", params);
+    if(ProcessYaml::hasValue("window_size", params))
+      ewma_internal_value_filter_ = boost::make_shared<EWMAValueFilterWithBuffer<T> >(params);
+    else
+      ewma_internal_value_filter_ = boost::make_shared<EWMAValueFilterWithoutBuffer<T> >(params);
   }
 
   virtual void update(const T& new_value)
   {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    sample_size_++;
-    if(!got_initial_value_)
-    {
-      current_value_ = new_value;
-      got_initial_value_ = true;
-    }
-    else
-    {
-      current_value_ = current_value_ * (1.0 - decay_rate_) + new_value * decay_rate_;
-    }
+    ewma_internal_value_filter_->update(new_value);
   }
 
   virtual T getValue()
   {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    if(!got_initial_value_)
-      return static_cast<T>(0);
-
-    return current_value_;
+    return ewma_internal_value_filter_->getValue();
   }
 
   virtual void reset()
   {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    got_initial_value_ = false;
-    sample_size_ = 0;
+    ewma_internal_value_filter_->reset();
   }
 
   virtual size_t getSampleSize()
   {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    return sample_size_;
+    return ewma_internal_value_filter_->getSampleSize();
   }
 };
 

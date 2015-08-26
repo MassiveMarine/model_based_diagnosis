@@ -54,7 +54,7 @@ class StandartDeviationFilter : public DeviationFilter<T>
 public:
   StandartDeviationFilter(XmlRpc::XmlRpcValue params)
   {
-    if(ProcessYaml::hasValue("window_size"))
+    if(ProcessYaml::hasValue("window_size", params))
     {
       unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
       buffer_ = boost::circular_buffer<T>(window_size);

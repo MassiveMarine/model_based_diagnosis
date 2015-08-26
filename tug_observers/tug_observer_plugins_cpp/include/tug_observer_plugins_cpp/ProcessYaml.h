@@ -190,7 +190,7 @@ class ProcessYaml
 {
 public:
 
-    bool hasValue(std::string name, XmlRpc::XmlRpcValue xml_value)
+    static bool hasValue(std::string name, XmlRpc::XmlRpcValue xml_value)
     {
       return xml_value.hasMember(name);
     }
