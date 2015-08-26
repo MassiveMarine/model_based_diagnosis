@@ -6,54 +6,47 @@
 #define TUG_OBSERVER_PLUGINS_CPP_MINMAXDEVIATIONFILTER_H
 
 
+
 #include <tug_observer_plugins_cpp/filter/deviation_filter/DeviationFilter.h>
-#include <limits>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+#include <tug_observer_plugins_cpp/filter/deviation_filter/MinMaxDeviationFilter/MinMaxDeviationFilterWithBuffer.h>
+#include <tug_observer_plugins_cpp/filter/deviation_filter/MinMaxDeviationFilter/MinMaxDeviationFilterWithoutBuffer.h>
+#include <tug_observer_plugins_cpp/ProcessYaml.h>
 
 template<class T>
 class MinMaxDeviationFilter : public DeviationFilter<T>
 {
-  T min_;
-  T max_;
-  size_t sample_size_;
+  boost::shared_ptr<DeviationFilter<T> > min_max_internal_value_filter_;
 
 public:
-  MinMaxDeviationFilter()
+  MinMaxDeviationFilter(XmlRpc::XmlRpcValue params)
   {
-    min_ = std::numeric_limits<T>::max();
-    max_ = std::numeric_limits<T>::min();
-    sample_size_ = 0;
+    if(ProcessYaml::hasValue("window_size", params))
+      min_max_internal_value_filter_ = boost::make_shared<MinMaxDeviationFilterWithBuffer<T> >(params);
+    else
+      min_max_internal_value_filter_ = boost::make_shared<MinMaxDeviationFilterWithoutBuffer<T> >(params);
   }
 
-  virtual void update(const T &new_value)
+  virtual void update(const T& new_value)
   {
-    if(new_value < min_)
-      min_ = new_value;
-
-    if(new_value > max_)
-      max_ = new_value;
-
-    sample_size_++;
+    min_max_internal_value_filter_->update(new_value);
   }
 
   virtual std::vector<T> getDeviation()
   {
-    std::vector<T> result;
-    result.push_back(min_);
-    result.push_back(max_);
+    return min_max_internal_value_filter_->getDeviation();
   }
 
   virtual void reset()
   {
-    min_ = std::numeric_limits<T>::max();
-    max_ = std::numeric_limits<T>::min();
-    sample_size_ = 0;
+    min_max_internal_value_filter_->reset();
   }
 
   virtual size_t getSampleSize()
   {
-    return sample_size_;
+    return min_max_internal_value_filter_->getSampleSize();
   }
 };
-
 
 #endif //TUG_OBSERVER_PLUGINS_CPP_MINMAXDEVIATIONFILTER_H

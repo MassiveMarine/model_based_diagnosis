@@ -10,6 +10,7 @@
 #include <boost/make_shared.hpp>
 #include <tug_observer_plugins_cpp/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithBuffer.h>
 #include <tug_observer_plugins_cpp/filter/value_filter/EWMAValueFilter/EWMAValueFilterWithoutBuffer.h>
+#include <tug_observer_plugins_cpp/ProcessYaml.h>
 
 template<class T>
 class EWMAValueFilter : public ValueFilter<T>
