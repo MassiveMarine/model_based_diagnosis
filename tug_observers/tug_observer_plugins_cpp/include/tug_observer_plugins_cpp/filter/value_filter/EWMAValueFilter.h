@@ -16,9 +16,10 @@ class EWMAValueFilter : public ValueFilter<T>
   T current_value_;
   bool got_initial_value_;
   boost::mutex scope_mutex_;
+  size_t sample_size_;
 
 public:
-  EWMAValueFilter(XmlRpc::XmlRpcValue params) : got_initial_value_(false)
+  EWMAValueFilter(XmlRpc::XmlRpcValue params) : got_initial_value_(false), sample_size_(0)
   {
     decay_rate_ = ProcessYaml::getValue<double>("decay_rate", params);
   }
@@ -26,6 +27,7 @@ public:
   virtual void update(const T& new_value)
   {
     boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+    sample_size_++;
     if(!got_initial_value_)
     {
       current_value_ = new_value;
@@ -50,6 +52,13 @@ public:
   {
     boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     got_initial_value_ = false;
+    sample_size_ = 0;
+  }
+
+  virtual size_t getSampleSize()
+  {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+    return sample_size_;
   }
 };
 

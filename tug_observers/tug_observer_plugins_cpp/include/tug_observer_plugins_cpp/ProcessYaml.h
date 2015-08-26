@@ -190,6 +190,11 @@ class ProcessYaml
 {
 public:
 
+    bool hasValue(std::string name, XmlRpc::XmlRpcValue xml_value)
+    {
+      return xml_value.hasMember(name);
+    }
+
     template<typename _T>
     static _T getValue(XmlRpc::XmlRpcValue::Type type, XmlRpc::XmlRpcValue xml_value)
     {

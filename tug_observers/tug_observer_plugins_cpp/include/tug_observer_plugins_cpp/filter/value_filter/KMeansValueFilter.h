@@ -77,6 +77,12 @@ public:
     boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     buffer_.clear();
   }
+
+  virtual size_t getSampleSize()
+  {
+    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+    return buffer_.size();
+  }
 };
 
 

@@ -36,6 +36,11 @@ class NoValueFilter : public ValueFilter<T>
       boost::mutex::scoped_lock scoped_lock(scope_mutex_);
       current_value_ = static_cast<T>(0);
     }
+
+    virtual size_t getSampleSize()
+    {
+      return 1;
+    }
 };
 
 
