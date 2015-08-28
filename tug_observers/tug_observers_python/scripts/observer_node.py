@@ -46,7 +46,7 @@ class PluginManager():
             plugin_ptr = getattr(module, class_name)
             plugin = plugin_ptr()
             self._plugins.append(plugin)
-        except Exception as e:
+        except StandardError as e:
             rospy.logerr(e)
         finally:
             return plugin

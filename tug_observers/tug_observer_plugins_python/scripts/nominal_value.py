@@ -16,6 +16,7 @@ class NominalValue():
         :param value: Input that should be checked
         :return: True if value correspond to limits, otherwise False
         """
+        return False
         pass
 
 
@@ -30,7 +31,6 @@ class NominalValueFactory():
         :param config: Configuration from yaml file
         :return: New instance of a corresponding verification object
         """
-        print config
         type = config['type']
         if type == "gauss":
             return GaussNominalValue(config)
@@ -48,7 +48,8 @@ class NominalValueFactory():
             return NotInBetweenValue(config)
         else:
             rospy.logwarn("nominal value type '" + str(type) + "' not found")
-            return None
+            # return None
+            return NominalValue()
 
 
 class GaussNominalValue(NominalValue):
