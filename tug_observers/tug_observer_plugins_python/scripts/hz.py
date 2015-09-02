@@ -43,7 +43,14 @@ class HzState():
 
 
 class HzBase():
-    def __init__(self, topic, config):
+    def __init__(self, topic, config=None):
+        if not config:
+            self.cb = self.cb_empty
+            self.is_dummy_base = True
+            return
+
+        self.is_dummy_base = False
+
         self._filter = Filter(Config.get_param(config, 'filter'))
 
         self._states = []
@@ -77,6 +84,10 @@ class HzBase():
         self._msg_tn = 0
         self._filter.reset()
         self._lock.release()
+
+    def cb_empty(self, msg):
+        print 'empty cb'
+        pass
 
     def cb(self, msg):
         curr_rostime = rospy.get_rostime()
@@ -124,34 +135,70 @@ class HzSubs():
 
         self.bases = dict()
 
-        callerids = Config.get_param(config, 'callerids')
+        self.callerids_config = Config.get_param(config, 'callerids')
 
-        for callerid_config in callerids:
-            try:
-                callerid = Config.get_param(callerid_config, 'callerid')
-                callerid_unknown = True if callerid == 'unknown' else False
-                self.bases[callerid] = HzBase(self.topic, callerid_config)
-            except KeyError as e:
-                rospy.logerr(e)
+        # for callerid_config in callerids:
+        #     try:
+        #         callerid = Config.get_param(callerid_config, 'callerid')
+        #         callerid_unknown = True if callerid == 'unknown' else False
+        #         self.bases[callerid] = HzBase(self.topic, callerid_config)
+        #     except KeyError as e:
+        #         rospy.logerr(e)
 
-        if not len(self.bases):
-            raise StandardError("No Subscriber possible for topic '" + self.topic + "' maybe because of errors in config!")
-        if callerid_unknown:
-            self.sub = rospy.Subscriber(self.topic, rospy.AnyMsg, self.pre_cb, queue_size=1)
-        else:
-            self.sub = rospy.Subscriber(self.topic, rospy.AnyMsg, self.cb, queue_size=1)
+        # if not len(self.bases):
+        #     raise StandardError("No Subscriber possible for topic '" + self.topic + "' maybe because of errors in config!")
+        # if callerid_unknown:
+        #     self.sub = rospy.Subscriber(self.topic, rospy.AnyMsg, self.pre_cb, queue_size=1)
+        # else:
+        #     self.sub = rospy.Subscriber(self.topic, rospy.AnyMsg, self.cb, queue_size=1)
+        self.sub = rospy.Subscriber(self.topic, rospy.AnyMsg, self.cb, queue_size=1)
 
-    def pre_cb(self, msg):
-        self.bases['unknown'].cb(msg)
-        self.cb(msg)
+    def add_callerid(self, callerid):
+        print 'new callerid schould be added'
+
+        callerid_unknown = False
+
+        for callerid_config in self.callerids_config:
+            callerid_config_name = callerid_config['callerid']
+            print callerid_config_name, callerid
+            # if callerid_config_name == 'unknown':
+            #     callerid_unknown = True
+
+            if callerid_config_name == callerid:
+                print "config for callerid found"
+                new_base = HzBase(self.topic, callerid_config)
+                self.bases[callerid] = new_base
+                return new_base
+
+        # if callerid_unknown:
+        #     print "a 'unknown' is in list"
+        #     return None
+
+        print 'nothing found'
+        new_base = HzBase(self.topic, None)
+        self.bases[callerid] = new_base
+        return new_base
+
+    # def pre_cb(self, msg):
+    #     self.bases['unknown'].cb(msg)
+    #     self.cb(msg)
 
     def cb(self, msg):
+        current_callerid = msg._connection_header['callerid']
+        print 'current callerid: ' + str(current_callerid)
+
         base = self.bases.get(msg._connection_header['callerid'])
+
         if base:
+            print 'callerid is in list'
             base.cb(msg)
+        else:
+            print 'callerid is NOT in list'
+            new_base = self.add_callerid(current_callerid)
+            new_base.cb(msg)
 
     def get_resource_infos(self):
-        return [x.get_resource_info() for x in self.bases.itervalues()]
+        return [x.get_resource_info() for x in self.bases.itervalues() if not x.is_dummy_base]
 
 
 class Hz(PluginBase, PluginThread):
