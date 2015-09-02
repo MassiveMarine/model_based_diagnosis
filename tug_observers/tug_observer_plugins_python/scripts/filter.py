@@ -14,7 +14,6 @@ class Filter():
         self.list_lock = Lock()
         self.value_filter = ValueFilterFactory.create_value_filter(config)
         self.deviation_filter = DeviationFilterFactory.create_deviation_filter(config)
-        self.sample_size = 0
 
     def update(self, new_value):
         """
@@ -45,14 +44,4 @@ class Filter():
         self.list_lock.acquire()
         self.value_filter.reset()
         self.deviation_filter.reset()
-        self.sample_size = 0
         self.list_lock.release()
-
-    def get_sample_size(self):
-        return self.sample_size
-
-    def increment_sample_size(self, increment):
-        self.sample_size += increment
-
-    def set_sample_size(self, new_sample_size):
-        self.sample_size = new_sample_size

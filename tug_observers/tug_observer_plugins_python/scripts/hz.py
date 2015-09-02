@@ -100,24 +100,19 @@ class HzBase():
             if state.is_nominal(value, deviation):
                 states.append(state.name)
 
-        print states
-        print len(states)
         if not states:
-            # print 'da bin ich'
             self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
             self._observer_error.error_msg = resource_error_no_state_fits
             error_pub.publish(self._observer_error)
         return states
 
     def get_resource_info(self):
-        mean, deviation = self._filter.get_value()
-        if mean is None:
+        mean, deviation, sample_size = self._filter.get_value()
+        if mean is None or sample_size < 2:
             self._resource_info.states = []
         else:
-            mean = 1. / mean
-            deviation = [1. / x for x in reversed(deviation)]
-            print mean,  deviation
-            self._resource_info.states = self._get_valied_states(mean, deviation)  #[str(1. / self._filter.get_value())]
+            print mean,  deviation, sample_size
+            self._resource_info.states = self._get_valied_states(mean, deviation)
 
         self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
         return self._resource_info

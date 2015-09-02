@@ -24,7 +24,7 @@ class ValueFilter():
         Return the result here. Maybe its necessary to apply the filter first.
         :return: Result of the filter
         """
-        return None
+        return None, None
 
     def reset(self):
         """
@@ -255,10 +255,12 @@ class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
         :return: Result of the applied filter
         """
         if not len(self._ring_buffer):
-            return None
+            return None, self.sample_size
         value = self._ring_buffer[0]
         for index in range(1,len(self._ring_buffer)):
             value = value * (1-self._decay_rate) + self._ring_buffer[index] * self._decay_rate
+
+
         return value, self.sample_size
 
     def reset_unbuffered(self):
