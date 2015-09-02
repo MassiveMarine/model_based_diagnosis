@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+#find_package(Boost REQUIRED COMPONENTS thread math)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -103,14 +103,31 @@ include_directories(
 ## Declare a cpp library
 add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/NodeResourceState.cpp src/ProcessYaml.cpp
-                              src/NominalValue.cpp src/NominalValueFactory.cpp
-                              src/GaussNominalValue.cpp src/Filter.cpp
-                              src/FilterFactory.cpp src/MeanFilter.cpp
-                              src/MedianFilter.cpp src/KMeansFilter.cpp
-                              src/EWMAFilter.cpp src/NoFilterFilter.cpp
-                              src/ExactNominalValue.cpp src/NotNominalValue.cpp
-                              src/GreaterThanNominalValue.cpp src/LessThanNominalValue.cpp
-                              src/InBetweenNominalValue.cpp src/NotInBetweenNominalValue.cpp)
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValueFactory.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GaussNominalValue.cpp
+                              src/filter/value_filter/ValueFilter.cpp
+                              src/filter/value_filter/ValueFilterFactory.cpp src/filter/value_filter/MeanValueFilter.cpp
+                              src/filter/value_filter/MedianValueFilter.cpp src/filter/value_filter/KMeansValueFilter.cpp
+                              src/filter/value_filter/EWMAValueFilter.cpp src/filter/value_filter/NoValueFilter.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/ExactNominalValue.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotNominalValue.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GreaterThanNominalValue.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/LessThanNominalValue.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/InBetweenNominalValue.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotInBetweenNominalValue.cpp
+                              src/filter/deviation_filter/DeviationFilter.cpp src/filter/Filter.cpp src/filter/FilteState.cpp
+                              src/filter/deviation_filter/MinMaxDeviationFilter.cpp
+                              src/filter/deviation_filter/DeviationFilterFactory.cpp
+                              src/filter/deviation_filter/StandartDeviationFilter.cpp
+                              src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithBuffer.cpp
+                              src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithoutBuffer.cpp
+                              src/filter/value_filter/mean_value_filter/MeanValueFilterWithBuffer.cpp
+                              src/filter/value_filter/mean_value_filter/MeanValueFilterWithoutBuffer.cpp
+                              src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithBuffer.cpp
+                              src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithoutBuffer.cpp
+                              src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithBuffer.cpp
+                              src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithoutBuffer.cpp)
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)

@@ -9,7 +9,7 @@
 #include <tug_observer_plugins_cpp/NodeResourceState.h>
 #include <vector>
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <tug_observer_plugins_cpp/Filter.h>
+#include <tug_observer_plugins_cpp/filter/Filter.h>
 
 namespace tug_observer_plugins_cpp
 {

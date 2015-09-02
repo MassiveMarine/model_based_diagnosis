@@ -11,7 +11,7 @@
 #include <ros/subscriber.h>
 #include <ros/subscribe_options.h>
 #include <ros/transport_hints.h>
-#include <ros/node_handle.h>
+#include <ros/ros.h>
 
 namespace tug_observers_cpp
 {
@@ -137,9 +137,9 @@ namespace tug_observers_cpp
         return nh_.subscribe(ops);
       }
 
-      void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code);
+      void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code, ros::Time time_of_occurence);
 
-      void reportStates(std::string resource, std::vector<std::string> states);
+      void reportStates(std::string resource, std::vector<std::string> states, ros::Time time_of_occurence);
     };
 }
 

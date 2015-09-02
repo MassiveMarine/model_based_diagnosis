@@ -11,11 +11,11 @@ setup:
     states:
     - state: '1'
       cpu:
-        type: gaus
+        type: gauss
         mean: 2.0
         std_deviation: 1.0
       memory:
-        type: gaus
+        type: gauss
         # mem usage in bytes
         mean: 6512640
         # mem usage std deviation in bytes
@@ -31,11 +31,11 @@ setup:
     states:
     - state: '1'
       cpu:
-        type: gaus
+        type: gauss
         mean: 1.0
         std_deviation: 4.0
       memory:
-        type: gaus
+        type: gauss
         # mem usage in bytes
         mean: 6250496
         # mem usage std deviation in bytes

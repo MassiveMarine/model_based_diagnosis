@@ -80,7 +80,7 @@ namespace tug_observer_plugins_cpp
       {
         ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.1");
         for (std::set<std::string>::iterator it = remaining_nodes.begin(); it != remaining_nodes.end(); ++it)
-          reportError(*it, "not_running_" + *it, "The node with the name '" + *it + "' is not running", tug_observers_msgs::resource_error::NO_AVAILABLE);
+          reportError(*it, "not_running_" + *it, "The node with the name '" + *it + "' is not running", tug_observers_msgs::resource_error::NO_AVAILABLE, msg->header.stamp);
         ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.2");
         for (std::vector<std::map<std::string, NodeResource>::iterator>::iterator it = found_node_resources.begin();
              it != found_node_resources.end(); ++it)
@@ -92,11 +92,11 @@ namespace tug_observer_plugins_cpp
           ROS_DEBUG_STREAM("ResourcesPlugin::nodeInfoCallback 3.5 " << " with number of states: " << states.size());
           if(states.empty())
           {
-            reportError(name, "no_state_" + name, "For the node with the name '" + name + "' no state could be estimated", tug_observers_msgs::resource_error::NO_STATE_FITS);
+            reportError(name, "no_state_" + name, "For the node with the name '" + name + "' no state could be estimated", tug_observers_msgs::resource_error::NO_STATE_FITS, msg->header.stamp);
           }
           else
           {
-            reportStates(name, states);
+            reportStates(name, states, msg->header.stamp);
             ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.5");
           }
         }
