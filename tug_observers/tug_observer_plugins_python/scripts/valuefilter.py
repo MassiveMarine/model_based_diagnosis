@@ -8,6 +8,7 @@ class ValueFilter():
     Base class for filter.
     """
     def __init__(self):
+        self.sample_size = 0
         pass
 
     def update(self, new_value):
@@ -79,6 +80,7 @@ class MedianValueFilter(ValueFilter):
         :param new_value: New value, which should be added to ring buffer
         """
         self._ring_buffer.append(new_value)
+        self.sample_size = len(self._ring_buffer)
 
     def get_value(self):
         """
@@ -95,7 +97,7 @@ class MedianValueFilter(ValueFilter):
             i = n//2
             result = (data[i - 1] + data[i])/2
 
-        return result
+        return result, self.sample_size
 
     def reset(self):
         """
@@ -124,6 +126,7 @@ class MeanValueFilter(ValueFilter):
         :param new_value: New value, which should be added to ring buffer
         """
         self._ring_buffer.append(new_value)
+        self.sample_size = len(self._ring_buffer)
 
     def get_value(self):
         """
@@ -136,7 +139,7 @@ class MeanValueFilter(ValueFilter):
         else:
             result = sum(self._ring_buffer) / size
 
-        return result
+        return result, self.sample_size
 
     def reset(self):
         """
@@ -166,6 +169,7 @@ class KMeansValueFilter(ValueFilter):
         :param new_value: New value, which should be added to ring buffer
         """
         self._ring_buffer.append(new_value)
+        self.sample_size = len(self._ring_buffer)
 
     def get_value(self):
         """
@@ -184,7 +188,7 @@ class KMeansValueFilter(ValueFilter):
 
             result = sum(small_list) / len(small_list)
 
-        return result
+        return result, self.sample_size
 
     def reset(self):
         """
@@ -228,19 +232,22 @@ class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
         else:
             self._current_value = self._current_value * (1.0 - self._decay_rate) + new_value * self._decay_rate
 
+        self.sample_size += 1
+
     def update_buffered(self, new_value):
         """
         Append new value to ringbuffer.
         :param new_value: New value, which should be added to ring buffer
         """
         self._ring_buffer.append(new_value)
+        self.sample_size = len(self._ring_buffer)
 
     def get_value_unbuffered(self):
         """
         Filter result is already up-to-date. Just return the value.
         :return: Result of the filter
         """
-        return self._current_value
+        return self._current_value, self.sample_size
 
     def get_value_buffered(self):
         """
@@ -252,7 +259,7 @@ class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
         value = self._ring_buffer[0]
         for index in range(1,len(self._ring_buffer)):
             value = value * (1-self._decay_rate) + self._ring_buffer[index] * self._decay_rate
-        return value
+        return value, self.sample_size
 
     def reset_unbuffered(self):
         """
@@ -281,16 +288,18 @@ class NoValueFilter(ValueFilter):
         :param new_value: New value, which should be stored
         """
         self._current_value = new_value
+        self.sample_size = 1
 
     def get_value(self):
         """
         This is not really a filter. Just return the current value.
         :return: current stored value
         """
-        return self._current_value
+        return self._current_value, self.sample_size
 
     def reset(self):
         """
         Reset the filter, that cleans the current value.
         """
         self._current_value = None
+        self.sample_size = 0

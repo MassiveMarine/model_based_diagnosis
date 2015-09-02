@@ -33,10 +33,10 @@ class Filter():
         :return: Result of the filter
         """
         self.list_lock.acquire()
-        value = self.value_filter.get_value()
+        value, sample_size = self.value_filter.get_value()
         deviation = self.deviation_filter.get_deviation()
         self.list_lock.release()
-        return value, deviation
+        return value, deviation, sample_size
 
     def reset(self):
         """
