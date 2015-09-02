@@ -33,7 +33,7 @@ class HzState():
         if not len(deviation):
             return False
 
-        if len(deviation) is not len (self._deviation_nominal_values):
+        if len(deviation) is not len(self._deviation_nominal_values):
             rospy.logwarn("Number of deviations do not match with config!")
             return value_nominal
 
@@ -103,7 +103,7 @@ class HzBase():
         print states
         print len(states)
         if not states:
-            print 'da bin ich'
+            # print 'da bin ich'
             self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
             self._observer_error.error_msg = resource_error_no_state_fits
             error_pub.publish(self._observer_error)
