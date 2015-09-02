@@ -56,17 +56,23 @@ class DeviationFilterFactory():
 class StdDeviationDeviationFilter(DeviationFilter):
     def __init__(self, config):
         DeviationFilter.__init__(self)
-        from collections import deque
         from math import sqrt
         self.sqrt = sqrt
-        self.window_size = Config.get_param(config, 'window_size')
-        self._ring_buffer = deque(maxlen=self.window_size)
+
+        if Config.has_key(config, 'window_size'):
+            from collections import deque
+            self.window_size = Config.get_param(config, 'window_size')
+            self._buffer = deque(maxlen=self.window_size)
+            self.reset = self.reset_buffered
+        else:
+            self._buffer = []
+            self.reset = self.reset_unbuffered
 
     def update(self, new_value):
-        self._ring_buffer.append(new_value)
+        self._buffer.append(new_value)
 
     def get_deviation(self):
-        data = list(self._ring_buffer)
+        data = list(self._buffer)
         n = len(data)
 
         if n < 2:
@@ -81,8 +87,11 @@ class StdDeviationDeviationFilter(DeviationFilter):
         result = self.sqrt(variance)
         return [result]
 
-    def reset(self):
-        self._ring_buffer.clear()
+    def reset_unbuffered(self):
+        self._buffer = []
+
+    def reset_buffered(self):
+        self._buffer.clear()
 
 
 class MinMaxDeviationFilter(DeviationFilter):
