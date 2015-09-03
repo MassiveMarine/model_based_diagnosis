@@ -56,13 +56,16 @@ class PluginTimeout(Thread):
         # from threading import Event
         self._event = Event()
         self._event.clear()
+
+        self._stop_request = False
+
         self.start()
 
     def run(self):
         """
         Thread runs in here, till shutdown.
         """
-        while not rospy.is_shutdown():
+        while not rospy.is_shutdown() and not self._stop_request:
             if self._event.wait(self._timeout):
                 self._event.clear()
             else:
@@ -82,4 +85,10 @@ class PluginTimeout(Thread):
         Start new timeout.
         """
         self._event.clear()
+
+    def stop(self):
+        """
+        Kill this thread.
+        """
+        self._stop_request = True
 
