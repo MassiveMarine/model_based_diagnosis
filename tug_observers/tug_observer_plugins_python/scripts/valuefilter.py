@@ -104,6 +104,7 @@ class MedianValueFilter(ValueFilter):
         Reset the filter, that cleans the buffer.
         """
         self._ring_buffer.clear()
+        self.sample_size = 0
 
 
 class MeanValueFilter(ValueFilter):
@@ -146,6 +147,7 @@ class MeanValueFilter(ValueFilter):
         Reset the filter, that cleans the buffer.
         """
         self._ring_buffer.clear()
+        self.sample_size = 0
 
 
 class KMeansValueFilter(ValueFilter):
@@ -195,6 +197,7 @@ class KMeansValueFilter(ValueFilter):
         Reset the filter, that cleans the buffer.
         """
         self._ring_buffer.clear()
+        self.sample_size = 0
 
 
 class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
@@ -268,12 +271,14 @@ class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
         Reset the filter, that cleans the history.
         """
         self._current_value = None
+        self.sample_size = 0
 
     def reset_buffered(self):
         """
         Reset the filter, that cleans the history.
         """
         self._ring_buffer.clear()
+        self.sample_size = 0
 
 
 class NoValueFilter(ValueFilter):
