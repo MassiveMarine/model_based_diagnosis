@@ -63,7 +63,7 @@ class PluginTimeout(Thread):
 
     def run(self):
         """
-        Thread runs in here, till shutdown.
+        Thread runs in here, till shutdown or stop request.
         """
         while not rospy.is_shutdown() and not self._stop_request:
             if self._event.wait(self._timeout):
