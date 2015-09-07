@@ -6,20 +6,20 @@
 #define TUG_OBSERVER_PLUGINS_CPP_NODERESOURCESTATE_H
 
 #include <XmlRpcValue.h>
-#include <tug_observer_plugins_cpp/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.h>
 #include <boost/smart_ptr/shared_ptr.hpp>
+#include <tug_observer_plugins_cpp/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheck.h>
 
 namespace tug_observer_plugins_cpp
 {
     class NodeResourceState
     {
-      boost::shared_ptr<NominalValue<double> > cpu_;
-      boost::shared_ptr<NominalValue<unsigned long> > memory_;
+      boost::shared_ptr<SingleValueHypothesisCheck<double> > cpu_;
+      boost::shared_ptr<SingleValueHypothesisCheck<unsigned long> > memory_;
       std::string name_;
 
     public:
         NodeResourceState(XmlRpc::XmlRpcValue value);
-        bool conformsState(double cpu, unsigned long memory);
+        bool conformsState(FilteState<double> cpu_state, FilteState<unsigned long> memory_state);
         std::string getName();
     };
 }

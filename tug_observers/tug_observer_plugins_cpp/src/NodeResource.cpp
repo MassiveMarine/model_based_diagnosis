@@ -57,9 +57,9 @@ namespace tug_observer_plugins_cpp
     std::vector<std::string> NodeResource::estimateStates()
     {
       ROS_DEBUG("NodeResource::estimateStates 1");
-      double cpu = cpu_filter_->getFilteState().value;
+      FilteState<double> cpu = cpu_filter_->getFilteState();
       ROS_DEBUG("NodeResource::estimateStates 2");
-      unsigned long memory = memory_filter_->getFilteState().value;
+      FilteState<unsigned long> memory = memory_filter_->getFilteState();
       ROS_DEBUG("NodeResource::estimateStates 3");
       std::vector<std::string> result;
       for(std::vector<NodeResourceState>::iterator it = states_.begin(); it != states_.end(); ++it)
