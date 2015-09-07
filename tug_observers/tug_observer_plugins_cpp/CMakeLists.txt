@@ -127,7 +127,12 @@ add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithBuffer.cpp
                               src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithoutBuffer.cpp
                               src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithBuffer.cpp
-                              src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithoutBuffer.cpp)
+                              src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithoutBuffer.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheck.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/NominalValueHypothesis.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheckFactory.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/StudentsTSingleHypothesis.cpp
+                              )
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)

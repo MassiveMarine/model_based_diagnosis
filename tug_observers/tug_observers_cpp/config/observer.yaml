@@ -11,15 +11,19 @@ setup:
     states:
     - state: '1'
       cpu:
-        type: gauss
-        mean: 2.0
-        std_deviation: 1.0
+        type: nominal_value
+        value:
+          type: gauss
+          mean: 2.0
+          std_deviation: 1.0
       memory:
-        type: gauss
-        # mem usage in bytes
-        mean: 6512640
-        # mem usage std deviation in bytes
-        std_deviation: 1024
+        type: nominal_value
+        value:
+          type: gauss
+          # mem usage in bytes
+          mean: 6512640
+          # mem usage std deviation in bytes
+          std_deviation: 1024
   - name: /robot_41/triangle_extraction
     cpu_filter:
       type: kmeans
@@ -31,12 +35,16 @@ setup:
     states:
     - state: '1'
       cpu:
-        type: gauss
-        mean: 1.0
-        std_deviation: 4.0
+        type: nominal_value
+        value:
+          type: gauss
+          mean: 1.0
+          std_deviation: 4.0
       memory:
-        type: gauss
-        # mem usage in bytes
-        mean: 6250496
-        # mem usage std deviation in bytes
-        std_deviation: 1024
+        type: nominal_value
+        value:
+          type: gauss
+          # mem usage in bytes
+          mean: 6250496
+          # mem usage std deviation in bytes
+          std_deviation: 1024
