@@ -6,6 +6,8 @@ project(tug_observer_plugin_utils)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
+  tug_observers
 )
 
 ## System dependencies are found with CMake's conventions

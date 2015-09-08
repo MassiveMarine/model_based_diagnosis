@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-import rospy
 import rospkg
 import sys
 import importlib
+
+import rospy
 
 
 class PluginManager():
@@ -23,7 +24,7 @@ class PluginManager():
         Add all packages which depends on the plugin base to sys path to be importable.
         """
         rospack = rospkg.RosPack()
-        pkgs = rospack.get_depends_on('tug_observers_python')
+        pkgs = rospack.get_depends_on('tug_observers')
         for pkg in pkgs:
             new_pkg_path = rospack.get_path(pkg) + '/scripts'
             sys.path = [new_pkg_path] + sys.path
@@ -61,7 +62,7 @@ class PluginManager():
         :type timeout: float
         :raise RuntimeError: if plugin do not respond on ros shutdown
         """
-        from tug_observers_python import PluginThread
+        from tug_observers import PluginThread
         if issubclass(plugin.__class__, PluginThread):
             plugin.join(timeout)
             if plugin.isAlive():

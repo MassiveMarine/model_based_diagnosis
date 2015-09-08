@@ -4,10 +4,9 @@ from threading import Lock
 
 import rospy
 
-from tug_observers_python import PluginBase, PluginThread, PluginTimeout
+from tug_observers import PluginBase, PluginThread, PluginTimeout
 from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
 from filter.filter import Filter
-from hypothesis_check.single_value_hypothesis_check.nominal_value import NominalValueFactory
 from hypothesis_check.single_value_hypothesis_check.single_value_hypothesis_check import SingleValueHypothesisCheckFactory
 from tug_python_utils import YamlHelper as Config
 

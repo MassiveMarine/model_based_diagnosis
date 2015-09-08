@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import rospy
-from nominal_value import NominalValueFactory
+
+from hypothesis_check.single_value_hypothesis_check.nominal_value import NominalValueFactory
 from student_t_test import StudentTTest
 from tug_python_utils import YamlHelper as Config
 
