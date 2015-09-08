@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
-import rospy
-from tug_observers_python import PluginBase, PluginThread, PluginTimeout
-from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
-from filter import Filter
-from nominal_value import NominalValueFactory
 from threading import Lock
 
+import rospy
+
+from tug_observers_python import PluginBase, PluginThread, PluginTimeout
+from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
+from filter.filter import Filter
+from hypothesis_check.single_value_hypothesis_check.nominal_value import NominalValueFactory
+from hypothesis_check.single_value_hypothesis_check.single_value_hypothesis_check import SingleValueHypothesisCheckFactory
 from tug_python_utils import YamlHelper as Config
+
 
 error_pub = None
 
@@ -21,28 +24,28 @@ resource_error_no_state_fits = resource_error(error_msg='No State fits',
 
 
 class HzState():
+    """
+    This class is used for hypothesis checks for a state. Each state
+    has one or more hypotheses. These are managed in here.
+    """
     def __init__(self, config):
-
+        """
+        Constructor of a new state. It reads the config used for this state and create a new hypothesis check instance.
+        :param config: Configuration from yaml file
+        """
         self.name = Config.get_param(config, 'state')
-
         frequency = Config.get_param(config, 'frequenzy')
-        self._value = NominalValueFactory.create_nominal_value(Config.get_param(frequency, 'value'))
-        self._deviation_nominal_values = []
-        for deviation_config in Config.get_param(frequency, 'deviation'):
-            self._deviation_nominal_values.append(NominalValueFactory.create_nominal_value(deviation_config))
+        self.hypothesis_check = SingleValueHypothesisCheckFactory.create_single_value_hypothesis_check(frequency)
 
-    def is_nominal(self, value, deviation):
-        value_nominal = self._value.is_nominal(value)
-        if not len(deviation):
-            return False
-
-        if len(deviation) is not len(self._deviation_nominal_values):
-            rospy.logwarn("Number of deviations do not match with config!")
-            return value_nominal
-
-        deviation_nominal = all(o.is_nominal(deviation[c]) for c, o in enumerate(self._deviation_nominal_values))
-
-        return value_nominal and deviation_nominal
+    def check_hypothesis(self, value, deviation, sample_size):
+        """
+        Forward the information for hypothesis check.
+        :param value: mean value which should be checked
+        :param deviation: deviation values which should be checked
+        :param sample_size: number of samples that are used for mean and deviation
+        :return: result of the hypothesis check
+        """
+        return self.hypothesis_check.check_hypothesis(value, deviation, sample_size)
 
 
 class HzBase():
@@ -54,6 +57,9 @@ class HzBase():
         """
         Constructor of the HzBase class. It manages the filter, creates and starts the timeout-thread
         and initialize stuff for the delay calculation.
+        :param topic: name of topic that is subscribed
+        :param callerid: name of the node that publish on the topic
+        :param config: Configuration from yaml file
         """
         # create a filter and lock
         self._filter_lock = Lock()
@@ -148,6 +154,7 @@ class HzMergedBase():
         """
         Constructor that defines which callerids should be merged. Also all states for this combination
         of callerids are defined depending on the config.
+        :param topic: name of topic that is subscribed
         :param config: Configuration from yaml file
         """
         # public variables
@@ -183,7 +190,7 @@ class HzMergedBase():
             """
             Iterate over all callerids and combine them.
             :param callerids_to_merge: objects of all callerids that should be combined
-            :return:
+            :return: merged mean, deviation and number of samples
             """
             # prepare for combining callerids
             is_first = True
@@ -214,16 +221,20 @@ class HzMergedBase():
 
             return mean, deviation, sample_size
 
-        def get_valid_states(value, deviation=[], sample_size=0):
+        def get_valid_states(value, deviation, sample_size):
             """
-            :param value:
-            :param deviation:
-            :param sample_size:
+            Check hypotheses of all states.
+            :param value: mean value which should be checked
+            :param deviation: deviation values which should be checked
+            :param sample_size: number of samples that are used for mean and deviation
             """
             states = []
             for state in self._states:
-                if state.is_nominal(value, deviation):
-                    states.append(state.name)
+                try:
+                    if state.check_hypothesis(value, deviation, sample_size):
+                        states.append(state.name)
+                except AttributeError as e:
+                    rospy.logerr(e)
 
             if not states:
                 self._observer_error.header = rospy.Header(stamp=rospy.Time.now())

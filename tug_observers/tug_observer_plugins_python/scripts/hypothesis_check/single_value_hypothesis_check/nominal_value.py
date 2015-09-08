@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-
+from tug_python_utils import YamlHelper as Config
 
 class NominalValue():
     """
@@ -10,7 +10,7 @@ class NominalValue():
     def __init__(self):
         pass
 
-    def is_nominal(self, value):
+    def check_hypothesis(self, value):
         """
         Should contain the verification of the value based on the defined limits.
         :param value: Input that should be checked
@@ -31,7 +31,7 @@ class NominalValueFactory():
         :param config: Configuration from yaml file
         :return: New instance of a corresponding verification object
         """
-        type = config['type']
+        type = Config.get_param(config, 'type')
         if type == "gauss":
             return GaussNominalValue(config)
         elif type == "exact":
@@ -62,8 +62,8 @@ class GaussNominalValue(NominalValue):
         :param config: Configuration from yaml file
         """
         NominalValue.__init__(self)
-        self._mean = config['mean']
-        self._std_deviation = config['std_deviation']
+        self._mean = Config.get_param(config, 'mean')
+        self._std_deviation = Config.get_param(config, 'std_deviation')
 
     def _distance_to_mean(self, value):
         """
@@ -75,7 +75,7 @@ class GaussNominalValue(NominalValue):
             return abs(self._mean - value)
         return abs(value - self._mean)
 
-    def is_nominal(self, value):
+    def check_hypothesis(self, value):
         """
         Check if the given value confirms with the defined Gauss.
         :param value: Value that should be checked
@@ -95,9 +95,9 @@ class ExactValue(NominalValue):
         :param config: Configuration from yaml file
         """
         NominalValue.__init__(self)
-        self._exact = config['exact']
+        self._exact = Config.get_param(config, 'exact')
 
-    def is_nominal(self, value):
+    def check_hypothesis(self, value):
         """
         Check if given value is exactly the same as defined.
         :param value: Value that should be checked
@@ -116,9 +116,9 @@ class NotValue(NominalValue):
         :param config: Configuration from yaml file
         """
         NominalValue.__init__(self)
-        self._exact_not = config['exact_not']
+        self._exact_not = Config.get_param(config, 'exact_not')
 
-    def is_nominal(self, value):
+    def check_hypothesis(self, value):
         """
         Check if given value is exactly not the same as defined.
         :param value: Value that should be checked
@@ -137,9 +137,9 @@ class GreaterThanValue(NominalValue):
         :param config: Configuration from yaml file
         """
         NominalValue.__init__(self)
-        self._greater_than = config['greater_than']
+        self._greater_than = Config.get_param(config, 'greater_than')
 
-    def is_nominal(self, value):
+    def check_hypothesis(self, value):
         """
         Check if given value is greater than defined.
         :param value: Value that should be checked
@@ -158,9 +158,9 @@ class LessThanValue(NominalValue):
         :param config: Configuration from yaml file
         """
         NominalValue.__init__(self)
-        self._less_than = config['less_than']
+        self._less_than = Config.get_param(config, 'less_than')
 
-    def is_nominal(self, value):
+    def check_hypothesis(self, value):
         """
         Check if given value is less than defined.
         :param value: Value that should be checked
@@ -179,12 +179,12 @@ class InBetweenValue(NominalValue):
         :param config: Configuration from yaml file
         """
         NominalValue.__init__(self)
-        self._lower_bound = config['lower_bound']
-        self._upper_bound = config['upper_bound']
+        self._lower_bound = Config.get_param(config, 'lower_bound')
+        self._upper_bound = Config.get_param(config, 'upper_bound')
         if self._lower_bound > self._lower_bound:
             rospy.logwarn("lower bound is bigger than upper bound. 'InBetweenValue' will not work correctly!")
 
-    def is_nominal(self, value):
+    def check_hypothesis(self, value):
         """
         Check if given value is greater than a lower bound and smaller than a upper bound.
         :param value: Value that should be checked
@@ -203,12 +203,12 @@ class NotInBetweenValue(NominalValue):
         :param config: Configuration from yaml file
         """
         NominalValue.__init__(self)
-        self._lower_bound = config['lower_bound']
-        self._upper_bound = config['upper_bound']
+        self._lower_bound = Config.get_param(config, 'lower_bound')
+        self._upper_bound = Config.get_param(config, 'upper_bound')
         if self._lower_bound > self._lower_bound:
             rospy.logwarn("lower bound is bigger than upper bound. 'NotInBetweenValue' will not work correctly!")
 
-    def is_nominal(self, value):
+    def check_hypothesis(self, value):
         """
         Check if given value is smaller than a lower bound and greater than a upper bound.
         :param value: Value that should be checked

@@ -37,6 +37,10 @@ class ValueFilterFactory():
     """
     Factory for getting the right filter instance.
     """
+
+    def __init__(self):
+        pass
+
     @staticmethod
     def create_value_filter(config):
         """
@@ -44,20 +48,20 @@ class ValueFilterFactory():
         :param config: Configuration from yaml file
         :return: New instance of a corresponding filter
         """
-        type = Config.get_param(config, 'type')
-        if type == "mean":
+        value_filter_type = Config.get_param(config, 'type')
+        if value_filter_type == "mean":
             return MeanValueFilter(config)
-        elif type == "median":
+        elif value_filter_type == "median":
             return MedianValueFilter(config)
-        elif type == "kmeans":
+        elif value_filter_type == "kmeans":
             return KMeansValueFilter(config)
-        elif type == "ewma":
+        elif value_filter_type == "ewma":
             return ExponentiallyWeightedMovingAverageValueFilter(config)
-        elif type == "nofilter":
+        elif value_filter_type == "nofilter":
             return NoValueFilter(config)
         else:
             return ValueFilter()
-            # raise NameError("'" + str(type) + "' from config not found in value-filter!")
+            # raise NameError("'" + str(value_filter_type) + "' from config not found in value-filter!")
 
 
 class MedianValueFilter(ValueFilter):
@@ -91,7 +95,7 @@ class MedianValueFilter(ValueFilter):
         n = len(data)
         if n == 0:
             result = None
-        elif n%2 == 1:
+        elif n % 2 == 1:
             result = data[n//2]
         else:
             i = n//2
@@ -260,9 +264,8 @@ class ExponentiallyWeightedMovingAverageValueFilter(ValueFilter):
         if not len(self._ring_buffer):
             return None, self.sample_size
         value = self._ring_buffer[0]
-        for index in range(1,len(self._ring_buffer)):
+        for index in range(1, len(self._ring_buffer)):
             value = value * (1-self._decay_rate) + self._ring_buffer[index] * self._decay_rate
-
 
         return value, self.sample_size
 

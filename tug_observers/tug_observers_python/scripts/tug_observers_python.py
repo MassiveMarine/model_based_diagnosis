@@ -7,14 +7,14 @@ from tug_observers_msgs.msg import observer_error, observer_info
 
 class PluginBase():
     """
-    Base calss for plugins. It lists all required defines.
+    Base class for plugins. It lists all required defines.
     """
-    def __init__(self, type):
+    def __init__(self, plugin_type):
         """
         Constructor for base plugin.
-        :param type: Name of the type
+        :param plugin_type: Name of the type
         """
-        self.type = type
+        self.type = plugin_type
 
         self.error_pub = rospy.Publisher('/observers/error', observer_error, queue_size=1)
         self.info_pub = rospy.Publisher('/observers/info', observer_info, queue_size=1)
