@@ -9,7 +9,7 @@
 #include <tug_observers/ObserverPluginBase.h>
 #include <ros/ros.h>
 
-namespace tug_observers_cpp
+namespace tug_observers
 {
 
     typedef tug_plugin_manager::PluginManager<ObserverPluginBase> PluginManager;

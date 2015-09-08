@@ -6,7 +6,7 @@
 #include <tug_observers_msgs/observer_error.h>
 #include <tug_observers/ObserverInfoSender.h>
 
-namespace tug_observers_cpp
+namespace tug_observers
 {
 
     ObserverPluginBase::ObserverPluginBase(std::string type) : spinner_(1, &internal_call_back_queue_), type_(type)

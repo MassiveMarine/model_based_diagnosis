@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tug_observers)
+project(tug_resource_observer)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -7,13 +7,14 @@ project(tug_observers)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   pluginlib
-  tug_plugin_manager
+  tug_observers
+  tug_resource_monitor
   tug_observers_msgs
+  tug_observer_plugin_utils
 )
 
 ## System dependencies are found with CMake's conventions
-find_package(Boost REQUIRED COMPONENTS thread)
-
+#find_package(Boost REQUIRED COMPONENTS thread math)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -82,8 +83,8 @@ find_package(Boost REQUIRED COMPONENTS thread)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES tug_observer_plugin_base
-  CATKIN_DEPENDS tug_observers_msgs
+  LIBRARIES resources_plugin
+#  CATKIN_DEPENDS roscpp tug_observer_plugins_cpp tug_resource_monitor
 #  DEPENDS system_lib
 )
 
@@ -97,31 +98,23 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${BOOST_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
-add_library(tug_observer_plugin_base
-  src/ObserverPluginBase.cpp
-src/ObserverInfoSender.cpp include/tug_observers/ObserverInfoSender.h)
+add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
+                              src/NodeResourceState.cpp
+                              )
 
 ## Declare a cpp executable
-add_executable(tug_observers_node src/ObserverNode.cpp)
+# add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(tug_observers_cpp_node tug_observers_cpp_generate_messages_cpp)
+# add_dependencies(tug_observer_plugins_cpp_node tug_observer_plugins_cpp_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(tug_observer_plugin_base
+target_link_libraries(resources_plugin
   ${catkin_LIBRARIES}
-  ${BOOST_LIBRARIES}
-)
-
-target_link_libraries(tug_observers_node
-  ${catkin_LIBRARIES}
-  ${BOOST_LIBRARIES}
-  tug_observer_plugin_base
 )
 
 #############
@@ -139,7 +132,7 @@ target_link_libraries(tug_observers_node
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS tug_observers_cpp tug_observers_cpp_node
+# install(TARGETS tug_observer_plugins_cpp tug_observer_plugins_cpp_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -164,7 +157,7 @@ target_link_libraries(tug_observers_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_tug_observers_cpp.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_tug_observer_plugins_cpp.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

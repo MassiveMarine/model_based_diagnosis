@@ -13,7 +13,7 @@
 #include <ros/transport_hints.h>
 #include <ros/ros.h>
 
-namespace tug_observers_cpp
+namespace tug_observers
 {
 
     class ObserverPluginBase

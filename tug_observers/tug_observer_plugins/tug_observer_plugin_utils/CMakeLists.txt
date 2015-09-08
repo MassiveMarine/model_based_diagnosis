@@ -1,19 +1,15 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tug_observers)
+project(tug_observer_plugin_utils)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  pluginlib
-  tug_plugin_manager
-  tug_observers_msgs
 )
 
 ## System dependencies are found with CMake's conventions
-find_package(Boost REQUIRED COMPONENTS thread)
-
+#find_package(Boost REQUIRED COMPONENTS thread math)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -82,8 +78,8 @@ find_package(Boost REQUIRED COMPONENTS thread)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES tug_observer_plugin_base
-  CATKIN_DEPENDS tug_observers_msgs
+  LIBRARIES observer_plugin_utils
+#  CATKIN_DEPENDS roscpp tug_observer_plugins_cpp tug_resource_monitor
 #  DEPENDS system_lib
 )
 
@@ -97,31 +93,52 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${BOOST_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
-add_library(tug_observer_plugin_base
-  src/ObserverPluginBase.cpp
-src/ObserverInfoSender.cpp include/tug_observers/ObserverInfoSender.h)
+add_library(observer_plugin_utils   src/ProcessYaml.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValueFactory.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GaussNominalValue.cpp
+                                    src/filter/value_filter/ValueFilter.cpp
+                                    src/filter/value_filter/ValueFilterFactory.cpp src/filter/value_filter/MeanValueFilter.cpp
+                                    src/filter/value_filter/MedianValueFilter.cpp src/filter/value_filter/KMeansValueFilter.cpp
+                                    src/filter/value_filter/EWMAValueFilter.cpp src/filter/value_filter/NoValueFilter.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/ExactNominalValue.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotNominalValue.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GreaterThanNominalValue.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/LessThanNominalValue.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/InBetweenNominalValue.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotInBetweenNominalValue.cpp
+                                    src/filter/deviation_filter/DeviationFilter.cpp src/filter/Filter.cpp src/filter/FilteState.cpp
+                                    src/filter/deviation_filter/MinMaxDeviationFilter.cpp
+                                    src/filter/deviation_filter/DeviationFilterFactory.cpp
+                                    src/filter/deviation_filter/StandartDeviationFilter.cpp
+                                    src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithBuffer.cpp
+                                    src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithoutBuffer.cpp
+                                    src/filter/value_filter/mean_value_filter/MeanValueFilterWithBuffer.cpp
+                                    src/filter/value_filter/mean_value_filter/MeanValueFilterWithoutBuffer.cpp
+                                    src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithBuffer.cpp
+                                    src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithoutBuffer.cpp
+                                    src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithBuffer.cpp
+                                    src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithoutBuffer.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheck.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/NominalValueHypothesis.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheckFactory.cpp
+                                    src/hypothesis_check/singe_value_hypothesis_check/StudentsTSingleHypothesis.cpp
+                                    src/interpolation/Interpolation.cpp src/interpolation/LinearInterpolation.cpp
+                              )
 
 ## Declare a cpp executable
-add_executable(tug_observers_node src/ObserverNode.cpp)
+# add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(tug_observers_cpp_node tug_observers_cpp_generate_messages_cpp)
+# add_dependencies(tug_observer_plugins_cpp_node tug_observer_plugins_cpp_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(tug_observer_plugin_base
+target_link_libraries(observer_plugin_utils
   ${catkin_LIBRARIES}
-  ${BOOST_LIBRARIES}
-)
-
-target_link_libraries(tug_observers_node
-  ${catkin_LIBRARIES}
-  ${BOOST_LIBRARIES}
-  tug_observer_plugin_base
 )
 
 #############
@@ -139,7 +156,7 @@ target_link_libraries(tug_observers_node
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS tug_observers_cpp tug_observers_cpp_node
+# install(TARGETS tug_observer_plugins_cpp tug_observer_plugins_cpp_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -164,7 +181,7 @@ target_link_libraries(tug_observers_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_tug_observers_cpp.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_tug_observer_plugins_cpp.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

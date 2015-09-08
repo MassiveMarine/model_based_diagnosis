@@ -4,9 +4,9 @@
 
 #include <tug_observers/ObserverNode.h>
 
-namespace tug_observers_cpp
+namespace tug_observers
 {
-    ObserverNode::ObserverNode(ros::NodeHandle nh) : plugin_manager_("tug_observers_cpp", "tug_observers_cpp::ObserverPluginBase"), nh_(nh)
+    ObserverNode::ObserverNode(ros::NodeHandle nh) : plugin_manager_("tug_observers", "tug_observers::ObserverPluginBase"), nh_(nh)
     { }
 
     void ObserverNode::initPlugins()
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
   {
     ros::init(argc, argv, "tug_observers_node");
     ros::NodeHandle nh("~");
-    tug_observers_cpp::ObserverNode node(nh);
+    tug_observers::ObserverNode node(nh);
     node.initPlugins();
     node.startPlugins();
     ros::spin();
