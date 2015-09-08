@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>tug_observers_cpp</name>
+  <name>tug_observers</name>
   <version>0.0.0</version>
-  <description>The tug_observers_cpp package</description>
+  <description>The tug_observers package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->

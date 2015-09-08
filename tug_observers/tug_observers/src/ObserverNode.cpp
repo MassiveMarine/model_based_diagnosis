@@ -2,7 +2,7 @@
 // Created by clemens on 03.08.15.
 //
 
-#include <tug_observers_cpp/ObserverNode.h>
+#include <tug_observers/ObserverNode.h>
 
 namespace tug_observers_cpp
 {

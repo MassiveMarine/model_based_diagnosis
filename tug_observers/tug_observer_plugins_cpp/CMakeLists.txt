@@ -7,7 +7,7 @@ project(tug_observer_plugins_cpp)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   pluginlib
-  tug_observers_cpp
+  tug_observers
   tug_resource_monitor
   tug_observers_msgs
   cmake_modules

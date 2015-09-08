@@ -2,9 +2,9 @@
 // Created by clemens on 03.08.15.
 //
 
-#include <tug_observers_cpp/ObserverPluginBase.h>
+#include <tug_observers/ObserverPluginBase.h>
 #include <tug_observers_msgs/observer_error.h>
-#include <tug_observers_cpp/ObserverInfoSender.h>
+#include <tug_observers/ObserverInfoSender.h>
 
 namespace tug_observers_cpp
 {

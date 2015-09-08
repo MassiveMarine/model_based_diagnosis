@@ -2,7 +2,7 @@
 // Created by clemens on 05.08.15.
 //
 
-#include <tug_observers_cpp/ObserverInfoSender.h>
+#include <tug_observers/ObserverInfoSender.h>
 #include <tug_observers_msgs/observer_info.h>
 
 ObserverInfoSender::ObserverInfoSender()

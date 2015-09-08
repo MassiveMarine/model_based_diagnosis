@@ -5,7 +5,7 @@
 #ifndef TUG_OBSERVER_PLUGINS_CPP_RESOURCESPLUGIN_H
 #define TUG_OBSERVER_PLUGINS_CPP_RESOURCESPLUGIN_H
 
-#include <tug_observers_cpp/ObserverPluginBase.h>
+#include <tug_observers/ObserverPluginBase.h>
 #include <tug_observer_plugins_cpp/NodeResource.h>
 #include <map>
 #include <string>

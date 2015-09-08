@@ -6,7 +6,7 @@
 #define TUG_OBSERVERS_CPP_OBSERVERNODE_H
 
 #include <tug_plugin_manager/plugin_manager.h>
-#include <tug_observers_cpp/ObserverPluginBase.h>
+#include <tug_observers/ObserverPluginBase.h>
 #include <ros/ros.h>
 
 namespace tug_observers_cpp
