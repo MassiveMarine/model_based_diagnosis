@@ -10,11 +10,12 @@ find_package(catkin REQUIRED COMPONENTS
   tug_observers_cpp
   tug_resource_monitor
   tug_observers_msgs
+  cmake_modules
 )
 
 ## System dependencies are found with CMake's conventions
 #find_package(Boost REQUIRED COMPONENTS thread math)
-
+find_package(Eigen REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -97,6 +98,7 @@ catkin_package(
 # include_directories(include)
 include_directories(
   include
+  ${Eigen_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -131,7 +133,8 @@ add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
                               src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheck.cpp
                               src/hypothesis_check/singe_value_hypothesis_check/NominalValueHypothesis.cpp
                               src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheckFactory.cpp
-        src/hypothesis_check/singe_value_hypothesis_check/StudentsTSingleHypothesis.cpp
+                              src/hypothesis_check/singe_value_hypothesis_check/StudentsTSingleHypothesis.cpp
+                              src/interpolation/Interpolation.cpp src/interpolation/LinearInterpolation.cpp
                               )
 
 ## Declare a cpp executable
@@ -144,6 +147,7 @@ add_library(resources_plugin  src/ResourcesPlugin.cpp src/NodeResource.cpp
 ## Specify libraries to link a library or executable target against
 target_link_libraries(resources_plugin
   ${catkin_LIBRARIES}
+  ${Eigen_LIBRARIES}
 )
 
 #############

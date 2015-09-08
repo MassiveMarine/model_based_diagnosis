@@ -30,6 +30,11 @@ class StudentsTSingleHypothesis : public SingleValueHypothesisCheck<T>
     }
 
 public:
+    StudentsTSingleHypothesis(T true_mean, XmlRpc::XmlRpcValue params) : true_mean_(true_mean)
+    {
+      significance_level_ = ProcessYaml::getValue<T>("significance_level", params);
+    }
+
     StudentsTSingleHypothesis(XmlRpc::XmlRpcValue params)
     {
       true_mean_ = ProcessYaml::getValue<T>("true_mean", params);
