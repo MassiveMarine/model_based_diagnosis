@@ -87,7 +87,7 @@ class PluginTimeout(Thread):
         """
         Start new timeout.
         """
-        
+
         self._event.clear()
 
     def stop(self):
