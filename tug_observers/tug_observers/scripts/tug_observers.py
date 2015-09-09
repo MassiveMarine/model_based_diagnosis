@@ -65,8 +65,11 @@ class PluginTimeout(Thread):
         """
         Thread runs in here, till shutdown or stop request.
         """
-        while not rospy.is_shutdown() and not self._stop_request:
-            if self._event.wait(self._timeout):
+        while not rospy.is_shutdown():
+            result = self._event.wait(self._timeout)
+            if self._stop_request:
+                break
+            if result:
                 self._event.clear()
             else:
                 try:
@@ -84,6 +87,7 @@ class PluginTimeout(Thread):
         """
         Start new timeout.
         """
+        
         self._event.clear()
 
     def stop(self):
@@ -91,4 +95,5 @@ class PluginTimeout(Thread):
         Kill this thread.
         """
         self._stop_request = True
+        self._event.set()
 

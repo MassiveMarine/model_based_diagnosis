@@ -1,6 +1,8 @@
 ########## node1 ##########
 setup:
 - type: hz
+  main_loop_rate: 1.0
+  max_timeouts_in_a_row: 2
   topics:
   - name: /topicA
     callerids:

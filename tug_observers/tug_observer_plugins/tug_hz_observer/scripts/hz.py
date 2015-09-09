@@ -10,6 +10,7 @@ from tug_observer_plugin_utils import Filter, SingleValueHypothesisCheckFactory
 from tug_python_utils import YamlHelper as Config
 
 
+max_timeouts_in_a_row = 10
 error_pub = None
 
 # predefined resource error msgs that are used if a error is published
@@ -69,7 +70,7 @@ class HzBase():
 
         # requirements to handle timeout
         self._event = PluginTimeout(Config.get_param(config, 'timeout'), self.timeout_cb)
-        self.max_timeouts = 10 if len(Config.get_param(config, 'callerid')) < 1 else None
+        self.max_timeouts = max_timeouts_in_a_row if len(Config.get_param(config, 'callerid')) < 1 else None
         self.remaining_timeouts = self.max_timeouts
 
         # create a predefined error msg
@@ -80,11 +81,6 @@ class HzBase():
         Callback method that is called if a timeout is reached.
         It will reset all information for delay calculation and the filter.
         """
-        # publish error
-        if error_pub:
-            self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
-            self._observer_error.error_msg = resource_error_timeout
-            error_pub.publish(self._observer_error)
 
         self._filter_lock.acquire()
         # reset all necessary things to be ready for restart
@@ -95,8 +91,15 @@ class HzBase():
         # decrement timeout counter
         if self.max_timeouts is not None:
             self.remaining_timeouts -= 1
+            print 'self.remaining_timeouts: ', self.remaining_timeouts
 
         self._filter_lock.release()
+
+        # publish error
+        if error_pub and self.remaining_timeouts >= 0:
+            self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
+            self._observer_error.error_msg = resource_error_timeout
+            error_pub.publish(self._observer_error)
 
     def cb(self, msg):
         """
@@ -389,14 +392,13 @@ class Hz(PluginBase, PluginThread):
         self.topics = None
         global error_pub
         error_pub = self.error_pub
+        self.rate = 1
 
     def run(self):
         """
         Thread runs in here, till shutdown. It will publish observer info with a defined
         rate and also cleanup old/unused callerids of topics.
         """
-        rate = rospy.Rate(1)
-
         while not rospy.is_shutdown():
             resource_data = []
             for sub in self.subs:
@@ -405,7 +407,7 @@ class Hz(PluginBase, PluginThread):
 
             msg = observer_info(resource_infos=resource_data)
             self.info_pub.publish(msg)
-            rate.sleep()
+            self.rate.sleep()
 
     def initialize(self, config):
         """
@@ -413,7 +415,11 @@ class Hz(PluginBase, PluginThread):
         In addition it start the main thread of this plugin.
         :param config: Configuration from yaml file
         """
-        for topic_config in config['topics']:
+        global max_timeouts_in_a_row
+        max_timeouts_in_a_row = Config.get_param(config, 'max_timeouts_in_a_row')
+
+        self.rate = rospy.Rate(Config.get_param(config, 'main_loop_rate'))
+        for topic_config in Config.get_param(config, 'topics'):
             try:
                 self.subs.append(HzSubs(topic_config))
             except (KeyError, StandardError) as e:
