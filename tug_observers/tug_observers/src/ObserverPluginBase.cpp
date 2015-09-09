@@ -33,7 +33,7 @@ namespace tug_observers
       msg.error_msg.error_msg = error_msg;
       msg.error_msg.verbose_error_msg = verbose_error_msg;
       msg.error_msg.error = error_code;
-      msg.error_msg.header.stamp = time_of_occurence;
+      msg.header.stamp = time_of_occurence;
       error_pub_.publish(msg);
     }
 

@@ -1,4 +1,3 @@
-Header header
 string error_msg
 string verbose_error_msg
 uint32 error
