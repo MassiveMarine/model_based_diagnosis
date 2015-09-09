@@ -6,8 +6,7 @@ import rospy
 
 from tug_observers import PluginBase, PluginThread, PluginTimeout
 from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
-from filter.filter import Filter
-from hypothesis_check.single_value_hypothesis_check.single_value_hypothesis_check import SingleValueHypothesisCheckFactory
+from tug_observer_plugin_utils import Filter, SingleValueHypothesisCheckFactory
 from tug_python_utils import YamlHelper as Config
 
 
@@ -423,5 +422,4 @@ class Hz(PluginBase, PluginThread):
         self.start()
 
 
-class hz(Hz):
-    pass
+hz = Hz
