@@ -392,7 +392,7 @@ class Hz(PluginBase, PluginThread):
         self.topics = None
         global error_pub
         error_pub = self.error_pub
-        self.rate = 1
+        self.rate = rospy.Rate(1)
 
     def run(self):
         """
