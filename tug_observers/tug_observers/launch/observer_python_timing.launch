@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node name="tug_observer_node" pkg="tug_observers" type="observer_node.py" output="screen">
+
+    <rosparam command="load" file="$(find tug_observers)/config/observer_timing.yaml" />
+  
+  </node>
+
+</launch>
