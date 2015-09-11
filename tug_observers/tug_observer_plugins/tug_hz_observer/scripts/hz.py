@@ -4,19 +4,16 @@ from threading import Lock
 
 import rospy
 
-from tug_observers import PluginBase, PluginThread, PluginTimeout
+from tug_observers import PluginBase, PluginThread
 from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
 from tug_observer_plugin_utils import Filter, SingleValueHypothesisCheckFactory
 from tug_python_utils import YamlHelper as Config
 
 
-max_timeouts_in_a_row = 10
+# max_timeouts_in_a_row = 10
 error_pub = None
 
 # predefined resource error msgs that are used if a error is published
-resource_error_timeout = resource_error(error_msg='Timeout',
-                                        verbose_error_msg='Timeout of Topic',
-                                        error=resource_error.NO_AVAILABLE)
 resource_error_no_state_fits = resource_error(error_msg='No State fits',
                                               verbose_error_msg='No state can be found for the measured results',
                                               error=resource_error.NO_STATE_FITS)
@@ -49,13 +46,11 @@ class HzState():
 
 class HzBase():
     """
-    This class is used for each callerid. Each instance of this has its own timeout thread.
-    The delay calculation will be done here.
+    This class is used for each callerid. The delay calculation will be done here.
     """
     def __init__(self, topic, callerid, config):
         """
-        Constructor of the HzBase class. It manages the filter, creates and starts the timeout-thread
-        and initialize stuff for the delay calculation.
+        Constructor of the HzBase class. It manages the filter and initialize stuff for the delay calculation.
         :param topic: name of topic that is subscribed
         :param callerid: name of the node that publish on the topic
         :param config: Configuration from yaml file
@@ -68,38 +63,8 @@ class HzBase():
         self._msg_t0 = -1.
         self._msg_tn = 0
 
-        # requirements to handle timeout
-        self._event = PluginTimeout(Config.get_param(config, 'timeout'), self.timeout_cb)
-        self.max_timeouts = max_timeouts_in_a_row if len(Config.get_param(config, 'callerid')) < 1 else None
-        self.remaining_timeouts = self.max_timeouts
-
         # create a predefined error msg
         self._observer_error = observer_error(type='hz', resource=str(topic + ' ' + str(callerid)))
-
-    def timeout_cb(self):
-        """
-        Callback method that is called if a timeout is reached.
-        It will reset all information for delay calculation and the filter.
-        """
-
-        self._filter_lock.acquire()
-        # reset all necessary things to be ready for restart
-        self._msg_t0 = -1.
-        self._msg_tn = 0
-        self._filter.reset()
-
-        # decrement timeout counter
-        if self.max_timeouts is not None:
-            self.remaining_timeouts -= 1
-            print 'self.remaining_timeouts: ', self.remaining_timeouts
-
-        self._filter_lock.release()
-
-        # publish error
-        if error_pub and self.remaining_timeouts >= 0:
-            self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
-            self._observer_error.error_msg = resource_error_timeout
-            error_pub.publish(self._observer_error)
 
     def cb(self, msg):
         """
@@ -109,7 +74,6 @@ class HzBase():
         """
         curr_rostime = rospy.get_rostime()
         curr = curr_rostime.to_sec()
-        self._event.set()
 
         self._filter_lock.acquire()
 
@@ -121,15 +85,7 @@ class HzBase():
             self._filter.update(curr - self._msg_tn)
             self._msg_tn = curr
 
-        self.remaining_timeouts = self.max_timeouts
-
         self._filter_lock.release()
-
-    def stop(self):
-        """
-        Stop the observation of this callerid. This will stop the Timeout thread.
-        """
-        self._event.stop()
 
     def get_values(self):
         """
@@ -137,13 +93,6 @@ class HzBase():
         :return information of the filter of this callerid
         """
         return self._filter.get_value()
-
-    def is_in_timeout(self):
-        """
-        Check if a publish of the callerid is overdue
-        :return True if timeout is reached currently, otherwise False.
-        """
-        return True if self.remaining_timeouts < self.max_timeouts else False
 
 
 class HzMergedBase():
@@ -203,8 +152,6 @@ class HzMergedBase():
                 _mean, _deviation, _sample_size = callerid.get_values()
 
                 # check if the current callerid is valid and contains valid information
-                if callerid.is_in_timeout():
-                    continue
                 if _mean is None or _sample_size < 2:
                     continue
 
@@ -357,23 +304,6 @@ class HzSubs():
 
         return info
 
-    def cleanup_dead_callerids(self):
-        """
-        Remove callerids from list if the number of timeouts reaches a maximum, but
-        only if its not exactly defined in the config.
-        """
-        self._bases_lock.acquire()
-
-        callerids = list(self._bases.iterkeys())
-
-        for callerid in callerids:
-            base = self._bases[callerid]
-            if base and base.remaining_timeouts is not None and base.remaining_timeouts < 1:
-                self._bases[callerid].stop()
-                del self._bases[callerid]
-
-        self._bases_lock.release()
-
 
 class Hz(PluginBase, PluginThread):
     """
@@ -402,7 +332,6 @@ class Hz(PluginBase, PluginThread):
             resource_data = []
             for sub in self.subs:
                 resource_data += sub.get_resource_info()
-                sub.cleanup_dead_callerids()
 
             msg = observer_info(resource_infos=resource_data)
             self.info_pub.publish(msg)
@@ -414,8 +343,6 @@ class Hz(PluginBase, PluginThread):
         In addition it start the main thread of this plugin.
         :param config: Configuration from yaml file
         """
-        global max_timeouts_in_a_row
-        max_timeouts_in_a_row = Config.get_param(config, 'max_timeouts_in_a_row')
 
         self.rate = rospy.Rate(Config.get_param(config, 'main_loop_rate'))
         for topic_config in Config.get_param(config, 'topics'):

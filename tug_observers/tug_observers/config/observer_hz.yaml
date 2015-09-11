@@ -2,12 +2,10 @@
 setup:
 - type: hz
   main_loop_rate: 1.0
-  max_timeouts_in_a_row: 2
   topics:
   - name: /topicA
     callerids:
     - callerid: []
-      timeout: 1.0
       filter:
         type: ewma                      #exponentially weighted moving average
         window_size: 200
