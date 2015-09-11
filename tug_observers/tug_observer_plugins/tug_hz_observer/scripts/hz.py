@@ -103,7 +103,7 @@ class HzBase():
 
     def cb(self, msg):
         """
-        Callback method that is called because of the forwarding if HzSub.
+        Callback method that is called from the forwarding of HzSub.
         Calculates the delay between this and the previous callback call and updates the filter.
         :param msg: message from publisher
         """
@@ -149,7 +149,6 @@ class HzBase():
 class HzMergedBase():
     """
     This class is used to manage the combination of callerids and its possible states.
-    The
     """
     def __init__(self, topic, config):
         """
