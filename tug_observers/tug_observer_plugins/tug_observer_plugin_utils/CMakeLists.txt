@@ -128,7 +128,8 @@ add_library(observer_plugin_utils   src/ProcessYaml.cpp
                                     src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheckFactory.cpp
                                     src/hypothesis_check/singe_value_hypothesis_check/StudentsTSingleHypothesis.cpp
                                     src/interpolation/Interpolation.cpp src/interpolation/LinearInterpolation.cpp
-                              )
+                                    src/differentiation/Differentiation.cpp src/differentiation/SingleSideDifferentiation.cpp
+                                    src/differentiation/TwoSideDifferentiation.cpp)
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)

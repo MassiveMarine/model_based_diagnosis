@@ -1,0 +1,15 @@
+//
+// Created by clemens on 08.09.15.
+//
+
+#ifndef TUG_VELOCITY_OBSERVER_VELOCITYCONVERTERTF_H
+#define TUG_VELOCITY_OBSERVER_VELOCITYCONVERTERTF_H
+
+
+class VelocityConverterTf
+{
+
+};
+
+
+#endif //TUG_VELOCITY_OBSERVER_VELOCITYCONVERTERTF_H

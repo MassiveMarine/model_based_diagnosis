@@ -32,13 +32,10 @@ namespace tug_observers
 
       virtual void initialize(XmlRpc::XmlRpcValue params) = 0;
 
-    protected:
-      ObserverPluginBase(std::string type);
-
       /// subscriber functions in order to use the callback queue in the right way
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size, void(T::*fp)(M), T *obj,
-                           const ros::TransportHints &transport_hints = ros::TransportHints()
+                                const ros::TransportHints &transport_hints = ros::TransportHints()
       )
       {
         ros::SubscribeOptions ops;
@@ -51,7 +48,7 @@ namespace tug_observers
       /// and the const version
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size, void(T::*fp)(M) const, T *obj,
-                           const ros::TransportHints &transport_hints = ros::TransportHints()
+                                const ros::TransportHints &transport_hints = ros::TransportHints()
       )
       {
         ros::SubscribeOptions ops;
@@ -63,8 +60,8 @@ namespace tug_observers
 
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size,
-                           void(T::*fp)(const boost::shared_ptr<M const> &), T *obj,
-                           const ros::TransportHints &transport_hints = ros::TransportHints()
+                                void(T::*fp)(const boost::shared_ptr<M const> &), T *obj,
+                                const ros::TransportHints &transport_hints = ros::TransportHints()
       )
       {
         ros::SubscribeOptions ops;
@@ -76,8 +73,8 @@ namespace tug_observers
 
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size,
-                           void(T::*fp)(const boost::shared_ptr<M const> &) const, T *obj,
-                           const ros::TransportHints &transport_hints = ros::TransportHints()
+                                void(T::*fp)(const boost::shared_ptr<M const> &) const, T *obj,
+                                const ros::TransportHints &transport_hints = ros::TransportHints()
       )
       {
         ros::SubscribeOptions ops;
@@ -89,7 +86,7 @@ namespace tug_observers
 
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size, void(T::*fp)(M),
-                           const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
+                                const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
       {
         ros::SubscribeOptions ops;
         ops.template initByFullCallbackType<M>(topic, queue_size, boost::bind(fp, obj, _1));
@@ -101,7 +98,7 @@ namespace tug_observers
 
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size, void(T::*fp)(M) const,
-                           const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
+                                const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
       {
         ros::SubscribeOptions ops;
         ops.template initByFullCallbackType<M>(topic, queue_size, boost::bind(fp, obj, _1));
@@ -113,8 +110,8 @@ namespace tug_observers
 
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size,
-                           void(T::*fp)(const boost::shared_ptr<M const> &),
-                           const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
+                                void(T::*fp)(const boost::shared_ptr<M const> &),
+                                const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
       {
         ros::SubscribeOptions ops;
         ops.template init<M>(topic, queue_size, boost::bind(fp, obj, _1));
@@ -126,8 +123,8 @@ namespace tug_observers
 
       template<class M, class T>
       ros::Subscriber subscribe(const std::string &topic, uint32_t queue_size,
-                           void(T::*fp)(const boost::shared_ptr<M const> &) const,
-                           const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
+                                void(T::*fp)(const boost::shared_ptr<M const> &) const,
+                                const boost::shared_ptr<T> &obj, const ros::TransportHints &transport_hints = ros::TransportHints())
       {
         ros::SubscribeOptions ops;
         ops.template init<M>(topic, queue_size, boost::bind(fp, obj, _1));
@@ -136,6 +133,8 @@ namespace tug_observers
         ops.callback_queue = &internal_call_back_queue_;
         return nh_.subscribe(ops);
       }
+    protected:
+      ObserverPluginBase(std::string type);
 
       void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code, ros::Time time_of_occurence);
 
