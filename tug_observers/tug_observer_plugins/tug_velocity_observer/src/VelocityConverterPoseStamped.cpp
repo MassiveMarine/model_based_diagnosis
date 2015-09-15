@@ -18,6 +18,9 @@ VelocityConverterPoseStamped::VelocityConverterPoseStamped(XmlRpc::XmlRpcValue p
 
 void VelocityConverterPoseStamped::PoseStampedCB(const geometry_msgs::PoseStamped& msg)
 {
+  ROS_DEBUG_STREAM("got pose stamped callback with position x:" << msg.pose.position.x << " y:" << msg.pose.position.y << " z:" << msg.pose.position.z
+  << " at time sec:" << msg.header.stamp.sec << " nsec:" << msg.header.stamp.nsec);
+
   linear_x_velocity_calc_.addValue(msg.pose.position.x, msg.header.stamp);
   linear_y_velocity_calc_.addValue(msg.pose.position.y, msg.header.stamp);
   linear_z_velocity_calc_.addValue(msg.pose.position.z, msg.header.stamp);

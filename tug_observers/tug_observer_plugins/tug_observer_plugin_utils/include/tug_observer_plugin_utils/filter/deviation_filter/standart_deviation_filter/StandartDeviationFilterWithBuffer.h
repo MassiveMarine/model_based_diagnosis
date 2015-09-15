@@ -45,8 +45,8 @@ class StandartDeviationFilterWithBuffer : public DeviationFilter<T>
   {
     T mean_value = getMeanValue(begin, end, size);
     T sum_differences = summSqaredDifference(begin, end, mean_value);
-
-    return std::sqrt<T>(sum_differences / (static_cast<T>(size) - static_cast<T>(1)));
+    double squared_std = static_cast<double>(sum_differences) / static_cast<double>(static_cast<T>(size) - static_cast<T>(1));
+    return static_cast<T>(std::sqrt(squared_std));
   }
 
 public:
@@ -66,7 +66,7 @@ public:
   {
     boost::mutex::scoped_lock scoped_lock(scope_mutex_);
     std::vector<T> result;
-    result.push_back(summSqaredDifference(buffer_.begin(), buffer_.end(), buffer_.size()));
+    result.push_back(calculateStd(buffer_.begin(), buffer_.end(), buffer_.size()));
     return result;
   }
 

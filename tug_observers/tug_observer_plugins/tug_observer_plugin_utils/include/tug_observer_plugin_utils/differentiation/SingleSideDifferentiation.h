@@ -6,6 +6,7 @@
 #define TUG_OBSERVER_PLUGIN_UTILS_SINGLESIDEDIFFERENTIATION_H
 
 #include <tug_observer_plugin_utils/differentiation/Differentiation.h>
+#include <ros/ros.h>
 
 template <class T>
 class SingleSideDifferentiation : public Differentiation<T>
@@ -27,11 +28,17 @@ public:
       {
         if(value_time <= past_value_time_)
           throw std::invalid_argument("new added value is in the past can't process this data");
-
+        ROS_DEBUG_STREAM("calculate single side differntiation with new value:" << value <<
+                                 " and old value:" << past_value_ << " current time sec:" << value_time.sec <<
+                                " nsec:" << value_time.nsec << " old time sec: " << past_value_time_.sec <<
+                                " nsec:" << past_value_time_.nsec);
         double time_difference = (value_time - past_value_time_).toSec();
+        ROS_DEBUG_STREAM("time difference:" << time_difference);
+        ROS_DEBUG_STREAM("value difference: " << static_cast<double>(past_value_ - value));
         current_differntiation_ = static_cast<T>(static_cast<double>(past_value_ - value) / time_difference);
         current_differntiation_time_ = value_time;
         has_current_differntiation_ = true;
+        ROS_DEBUG_STREAM("calculated difference:" << current_differntiation_ << " at time:" << current_differntiation_time_);
       }
 
       past_value_time_ = value_time;

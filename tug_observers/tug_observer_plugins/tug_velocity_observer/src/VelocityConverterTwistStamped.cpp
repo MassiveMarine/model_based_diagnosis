@@ -16,6 +16,10 @@ VelocityConverterTwistStamped::VelocityConverterTwistStamped(XmlRpc::XmlRpcValue
 
 void VelocityConverterTwistStamped::TwistStampedCB(const geometry_msgs::TwistStamped& msg)
 {
+  ROS_DEBUG_STREAM("got twist stamped callback with velocity linear x:" << msg.twist.linear.x << " y:" << msg.twist.linear.y << " z:" << msg.twist.linear.z
+                   << " angular x:" << msg.twist.angular.x << " y:" << msg.twist.angular.y << " z:" << msg.twist.angular.z
+                   << " at time sec:" << msg.header.stamp.sec << " nsec:" << msg.header.stamp.nsec);
+
   x_acceleration_calc_.addValue(msg.twist.linear.x, msg.header.stamp);
   y_acceleration_calc_.addValue(msg.twist.linear.y, msg.header.stamp);
   z_acceleration_calc_.addValue(msg.twist.linear.z, msg.header.stamp);

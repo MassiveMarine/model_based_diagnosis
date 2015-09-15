@@ -127,7 +127,7 @@ add_library(velocity_plugin
                             src/VelocityConverterTwistStamped.cpp src/VelocityConverterIMU.cpp
                             src/VelocityConverterOdometry.cpp src/VelocityConverterPoseStamped.cpp
                             src/VelocityConverterTf.cpp src/MovementReading.cpp
-        src/VelocityConverterPose.cpp)
+                            src/VelocityConverterPose.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -144,7 +144,6 @@ add_library(velocity_plugin
 ## Specify libraries to link a library or executable target against
 target_link_libraries(velocity_plugin
   ${catkin_LIBRARIES}
-  ${EIGEN_LIBRARIES}
 )
 
 #############

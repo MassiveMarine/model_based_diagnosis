@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <stddef.h>
+#include <iostream>
 
 template<class T>
 struct FilteState
@@ -17,5 +18,14 @@ struct FilteState
   size_t sample_size;
 };
 
+template<class T>
+std::ostream& operator<<(std::ostream& out, const FilteState<T>& state){
+  out << "value: " << state.value << ", sample size: " << state.sample_size ;
+
+  for(size_t i = 0; i < state.deviation.size(); ++i)
+    out << " deviation on position: " << i << " is: " << state.deviation[i];
+
+  return out;
+}
 
 #endif //TUG_OBSERVER_PLUGINS_CPP_FILTESTATE_H
