@@ -17,6 +17,10 @@ class StudentTTest():
         :param config: Configuration from yaml file
         """
         self._true_mean = Config.get_param(config, 'true_mean')
+        if Config.has_key(config, 'std_deviation'):
+            self._std_deviation = Config.get_param(config, 'std_deviation')
+        else:
+            self._std_deviation = None
         self._significance_level = Config.get_param(config, 'significance_level')
 
     def check_hypothesis(self, value, deviation, sample_size):
@@ -31,11 +35,16 @@ class StudentTTest():
             # raise AttributeError('student t test needs one deviation as parameter')
             return False
 
+        if self._std_deviation:
+            deviation = self._std_deviation
+        else:
+            deviation = deviation[0]
+
         mean_difference = value - self._true_mean
 
-        tf = mean_difference * sqrt(float(sample_size)) / deviation[0] # t-statistic for mean
+        tf = mean_difference * sqrt(float(sample_size)) / deviation # t-statistic for mean
 
-        avar = deviation[0]**2
+        avar = deviation**2
         na = sample_size
         adof = na - 1
         dof = (avar/na)**2 / (avar**2/(na**2*adof))
