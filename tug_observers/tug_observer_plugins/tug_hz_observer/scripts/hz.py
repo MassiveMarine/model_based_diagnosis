@@ -267,7 +267,7 @@ class HzSubs():
         """
         Callback method that is called by the subscriber.
         After identifying the callerid the corresponding callback is called.
-        If the callerid does not exists, it will be created as long a suitable config can be found.
+        If the callerid does not exists, it will be created as long as a suitable config can be found.
         If there exists a config with undefined callerids, this will be the default config.
         Otherwise the callerid is added to list, but without calling a callback.
         :param msg: message from publisher

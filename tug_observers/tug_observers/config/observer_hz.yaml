@@ -11,6 +11,7 @@ setup:
         window_size: 200
         # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
         decay_rate: 0.05
+        k_size: 10
         deviation_type: std_deviation   # std_deviation, min_max
       states:
       - state: 'gauss'
@@ -27,7 +28,7 @@ setup:
         #  - type: in_between
         #    lower_bound: 5.0
         #    upper_bound: 15.0
-        
+
           type: student_t
           true_mean: 0.10
           significance_level: 0.05
