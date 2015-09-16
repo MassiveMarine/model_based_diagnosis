@@ -1,0 +1,61 @@
+setup:
+- type: velocity
+  topic_A:
+    type: odometry
+    topic: /robot_41/odom
+  topic_B:
+    type: twist
+    topic: /robot_41/cmd_vel
+  x_filter:
+    type: mean
+    window_size: 50
+    deviation_type: std
+  y_filter:
+    type: mean
+    window_size: 50
+    deviation_type: std
+  use_yaw: true
+  rot_x_filter:
+    type: mean
+    window_size: 50
+    deviation_type: std
+  rot_y_filter:
+    type: mean
+    window_size: 50
+    deviation_type: std
+  rot_z_filter:
+    type: mean
+    window_size: 50
+    deviation_type: std
+  states:
+  - state: '1'
+    x:
+      type: nominal_value
+      value:
+        type: gauss
+        mean: 0.0
+        std_deviation: 0.5
+    y:
+      type: nominal_value
+      value:
+        type: gauss
+        mean: 0.0
+        std_deviation: 0.5
+    rot_x:
+      type: nominal_value
+      value:
+        type: gauss
+        mean: 0.0
+        std_deviation: 0.5
+    rot_y:
+      type: nominal_value
+      value:
+        type: gauss
+        mean: 0.0
+        std_deviation: 0.5
+    rot_z:
+      type: nominal_value
+      value:
+        type: gauss
+        mean: 0.0
+        std_deviation: 0.5

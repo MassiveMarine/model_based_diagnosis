@@ -6,10 +6,10 @@
 #define TUG_VELOCITY_OBSERVER_VELOCITYCONVERTERODOMETRY_H
 
 
-#include <tug_velocity_observer/VelocityConverterPose.h>
+#include <tug_velocity_observer/VelocityConverterPoseStamped.h>
 #include <nav_msgs/Odometry.h>
 
-class VelocityConverterOdometry : public VelocityConverterPose
+class VelocityConverterOdometry : public VelocityConverterPoseStamped
 {
 public:
     VelocityConverterOdometry(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base);

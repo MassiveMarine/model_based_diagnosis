@@ -23,8 +23,8 @@ boost::shared_ptr<VelocityConverter> VelocityConverterFactory::createVelocityCon
     return boost::make_shared<VelocityConverterOdometry>(params, call_back, plugin_base);
   else if(type == "pose_stamped")
     return boost::make_shared<VelocityConverterPoseStamped>(params, call_back, plugin_base);
-/*  else if(type == "tf")
-    return boost::make_shared<VelocityConverterTf>(params, call_back, plugin_base);*/
+  else if(type == "tf")
+    return boost::make_shared<VelocityConverterTf>(params, call_back, plugin_base);
   else
     throw std::runtime_error("type for nominal value '" + type + "'" + " not known");
 }
