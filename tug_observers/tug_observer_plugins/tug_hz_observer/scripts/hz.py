@@ -41,6 +41,7 @@ class HzState():
         :param sample_size: number of samples that are used for mean and deviation
         :return: result of the hypothesis check
         """
+        print value, deviation, sample_size
         return self.hypothesis_check.check_hypothesis(value, deviation, sample_size)
 
 
@@ -335,7 +336,10 @@ class Hz(PluginBase, PluginThread):
 
             msg = observer_info(resource_infos=resource_data)
             self.info_pub.publish(msg)
-            self.rate.sleep()
+            try:
+                self.rate.sleep()
+            except rospy.exceptions.ROSTimeMovedBackwardsException as e:
+                print e
 
     def initialize(self, config):
         """

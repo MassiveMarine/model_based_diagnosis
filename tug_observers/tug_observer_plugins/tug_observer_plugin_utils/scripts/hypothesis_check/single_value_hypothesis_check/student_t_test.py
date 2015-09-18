@@ -5,7 +5,6 @@ from tug_python_utils import YamlHelper as Config
 from scipy.special import stdtr
 from numpy import abs, sqrt
 
-
 class StudentTTest():
     """
     Base class for student t test.
@@ -50,6 +49,6 @@ class StudentTTest():
         dof = (avar/na)**2 / (avar**2/(na**2*adof))
 
         q = stdtr(dof, -abs(tf))*2  # two-sided pvalue = Prob(abs(t)>tt)
-        rospy.loginfo('t-statistic = %6.3f pvalue = %6.10f' % (tf, q))
-
+        # rospy.loginfo('t-statistic = %6.3f pvalue = %6.10f' % (tf, q))
+        print 't-statistic = %6.3f pvalue = %6.10f' % (tf, q)
         return False if q < self._significance_level/2. else True
