@@ -36,7 +36,7 @@ class TimeoutBase():
         # create a predefined error msg
         self._observer_error = observer_error(type='timeout', resource=str(topic + '[' + str(callerid)) + ']')
 
-        print self.max_timeouts, Config.get_param(config, 'timeout')
+        # print self.max_timeouts, Config.get_param(config, 'timeout')
 
     def timeout_cb(self):
         """
@@ -52,7 +52,7 @@ class TimeoutBase():
 
         # publish error
         if self.remaining_timeouts is None or self.remaining_timeouts >= 0:
-            print 'self.remaining_timeouts: ', self.remaining_timeouts
+            # print 'self.remaining_timeouts: ', self.remaining_timeouts
             self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
             self._observer_error.error_msg = resource_error_timeout
             error_pub.publish(self._observer_error)
@@ -129,7 +129,7 @@ class TimeoutSubs():
             except KeyError as e:
                 rospy.logerr(e)
 
-        print best_config
+        # print best_config
 
         if best_config:
             new_base = TimeoutBase(self._topic, callerid, best_config)
@@ -147,7 +147,7 @@ class TimeoutSubs():
         :param msg: message from publisher
         """
         current_callerid = msg._connection_header['callerid']
-        rospy.loginfo(current_callerid)
+        # rospy.loginfo(current_callerid)
 
         self._bases_lock.acquire()
         if current_callerid not in self._bases:

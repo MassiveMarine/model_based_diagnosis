@@ -41,7 +41,6 @@ class HzState():
         :param sample_size: number of samples that are used for mean and deviation
         :return: result of the hypothesis check
         """
-        print value, deviation, sample_size
         return self.hypothesis_check.check_hypothesis(value, deviation, sample_size)
 
 
@@ -123,6 +122,8 @@ class HzMergedBase():
         self._resource_info = resource_info(type='hz', resource=str(topic + ' ' + str(self.callerids)))
         self._observer_error = observer_error(type='hz', resource=str(topic + ' ' + str(self.callerids)))
 
+        self._topic = topic
+
     def get_resource_info(self, callerids):
         """
         Generate a resource information for publishing by readout and combine the given callerids and
@@ -147,6 +148,7 @@ class HzMergedBase():
             mean = 0
             deviation = []
             sample_size = 0
+            informations_valid = False
 
             for callerid in callerids_to_merge.itervalues():
 
@@ -155,6 +157,8 @@ class HzMergedBase():
                 # check if the current callerid is valid and contains valid information
                 if _mean is None or _sample_size < 2:
                     continue
+
+                informations_valid = True
 
                 # sum up all information of all callerids
                 if is_first:
@@ -167,7 +171,7 @@ class HzMergedBase():
                     deviation = [sum(x) for x in zip(deviation, _deviation)]
                     sample_size += _sample_size
 
-            return mean, deviation, sample_size
+            return mean, deviation, sample_size, informations_valid
 
         def get_valid_states(value, deviation, sample_size):
             """
@@ -179,6 +183,7 @@ class HzMergedBase():
             states = []
             for state in self._states:
                 try:
+                    # print self._topic, value, deviation, sample_size
                     if state.check_hypothesis(value, deviation, sample_size):
                         states.append(state.name)
                 except AttributeError as e:
@@ -191,10 +196,13 @@ class HzMergedBase():
             return states
 
         # combine callerids
-        mean_merged, deviation_merged, sample_size_merged = merge_callerids(callerids)
+        mean_merged, deviation_merged, sample_size_merged, informations_valid = merge_callerids(callerids)
 
         # setup predefined resource information
-        self._resource_info.states = get_valid_states(mean_merged, deviation_merged, sample_size_merged)
+        if informations_valid:
+            self._resource_info.states = get_valid_states(mean_merged, deviation_merged, sample_size_merged)
+        else:
+            self._resource_info.states = []
         self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
         return self._resource_info
 

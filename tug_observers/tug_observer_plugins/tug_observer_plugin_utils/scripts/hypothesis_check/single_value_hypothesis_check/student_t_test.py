@@ -50,5 +50,5 @@ class StudentTTest():
 
         q = stdtr(dof, -abs(tf))*2  # two-sided pvalue = Prob(abs(t)>tt)
         # rospy.loginfo('t-statistic = %6.3f pvalue = %6.10f' % (tf, q))
-        print 't-statistic = %6.3f pvalue = %6.10f' % (tf, q)
+        # print 't-statistic = %6.3f pvalue = %6.10f' % (tf, q)
         return False if q < self._significance_level/2. else True
