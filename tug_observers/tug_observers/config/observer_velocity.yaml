@@ -1,9 +1,9 @@
 setup:
 - type: velocity
-  topic_A:
+  source_A:
     type: odometry
     topic: /robot_41/odom
-  topic_B:
+  source_B:
     type: twist
     topic: /robot_41/cmd_vel
   x_filter:

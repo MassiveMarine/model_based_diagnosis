@@ -19,24 +19,24 @@ namespace tug_observer_plugins_cpp
 
     void VelocityPlugin::initialize(XmlRpc::XmlRpcValue params)
     {
-      if (!params.hasMember("topic_A"))
+      if (!params.hasMember("source_A"))
       {
         ROS_ERROR("no topic for input A defined");
         throw std::invalid_argument("no topic for input A defined");
       }
-      XmlRpc::XmlRpcValue topic_a_params = params["topic_A"];
+      XmlRpc::XmlRpcValue source_a_params = params["source_A"];
       a_input_ = VelocityConverterFactory::createVelocityConverter(
-              ProcessYaml::getValue<std::string>("type", topic_a_params), topic_a_params,
+              ProcessYaml::getValue<std::string>("type", source_a_params), source_a_params,
               boost::bind(&VelocityPlugin::addTwistA, this, _1), this);
 
-      if (!params.hasMember("topic_B"))
+      if (!params.hasMember("source_B"))
       {
         ROS_ERROR("no topic for input B defined");
         throw std::invalid_argument("no topic for input B defined");
       }
-      XmlRpc::XmlRpcValue topic_b_params = params["topic_B"];
+      XmlRpc::XmlRpcValue source_b_params = params["source_B"];
       b_input_ = VelocityConverterFactory::createVelocityConverter(
-              ProcessYaml::getValue<std::string>("type", topic_b_params), topic_b_params,
+              ProcessYaml::getValue<std::string>("type", source_b_params), source_b_params,
               boost::bind(&VelocityPlugin::addTwistB, this, _1), this);
 
       if (params.hasMember("x_filter"))
@@ -93,6 +93,9 @@ namespace tug_observer_plugins_cpp
       XmlRpc::XmlRpcValue state_params = params["states"];
       for (int i = 0; i < state_params.size(); ++i)
         states_.push_back(VelocityState(state_params[i]));
+
+      double main_loop_rate = ProcessYaml::getValue<double>("main_loop_rate", params, 1.0);
+      background_rate_ = ros::Rate(main_loop_rate);
 
       background_thread_ = boost::thread(boost::bind(&VelocityPlugin::run, this));
     }
