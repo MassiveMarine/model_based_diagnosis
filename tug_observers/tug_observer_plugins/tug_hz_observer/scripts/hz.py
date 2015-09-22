@@ -213,7 +213,7 @@ class HzSubs():
     which contains objects for each callerid that publish at this topic. To that it also saves all defined
     combinations of callerids that should be merged.
     """
-    def __init__(self, config):
+    def __init__(self, config, use_global_subscriber):
         """
         Constructor to create a object of HzSubs that exists per topic. For each combination a HzMergedBase
         object is created. The last callerid-config that defines no callerid is used as default config for
@@ -222,7 +222,7 @@ class HzSubs():
         :param config: Configuration from yaml file
         """
         # topic that should be subscribed
-        self._topic = Config.get_param(config, 'name')
+        self.topic = Config.get_param(config, 'name')
 
         # store all callerids of this topic separately
         self._bases = dict()
@@ -238,14 +238,15 @@ class HzSubs():
         for callerid_config in self._callerids_config:
             try:
                 callerid_list = Config.get_param(callerid_config, 'callerid')
-                self._merged_bases.append(HzMergedBase(self._topic, callerid_config))
+                self._merged_bases.append(HzMergedBase(self.topic, callerid_config))
                 if not len(callerid_list):
                     self._config_for_unknown = callerid_config
             except KeyError as e:
                 rospy.logerr(e)
 
         # subscribe to given topic
-        self.sub = rospy.Subscriber(self._topic, rospy.AnyMsg, self.cb, queue_size=1)
+        if not use_global_subscriber:
+            self.sub = rospy.Subscriber(self.topic, rospy.AnyMsg, self.cb, queue_size=1)
 
     def add_callerid(self, callerid):
         """
@@ -267,7 +268,7 @@ class HzSubs():
                 rospy.logerr(e)
 
         if best_config:
-            new_base = HzBase(self._topic, callerid, self._config_for_unknown)
+            new_base = HzBase(self.topic, callerid, self._config_for_unknown)
 
         self._bases[callerid] = new_base
         return new_base
@@ -281,16 +282,17 @@ class HzSubs():
         Otherwise the callerid is added to list, but without calling a callback.
         :param msg: message from publisher
         """
-        current_callerid = msg._connection_header['callerid']
-        self._bases_lock.acquire()
-        if current_callerid not in self._bases:
-            base = self.add_callerid(current_callerid)
-        else:
-            base = self._bases.get(current_callerid)
-
-        if base:
-            base.cb(msg)
-        self._bases_lock.release()
+        pass
+        # current_callerid = msg._connection_header['callerid']
+        # self._bases_lock.acquire()
+        # if current_callerid not in self._bases:
+        #     base = self.add_callerid(current_callerid)
+        # else:
+        #     base = self._bases.get(current_callerid)
+        #
+        # if base:
+        #     base.cb(msg)
+        # self._bases_lock.release()
 
     def get_resource_info(self):
         """
@@ -357,13 +359,24 @@ class Hz(PluginBase, PluginThread):
         """
 
         self.rate = rospy.Rate(Config.get_param(config, 'main_loop_rate'))
+        try:
+            use_global_subscriber = Config.get_param(config, 'use_global_subscriber')
+        except KeyError:
+            use_global_subscriber = False
+
         for topic_config in Config.get_param(config, 'topics'):
             try:
-                self.subs.append(HzSubs(topic_config))
+                self.subs.append(HzSubs(topic_config, use_global_subscriber))
             except (KeyError, StandardError) as e:
                 rospy.logerr(e)
 
+        sub_dict = dict()
+        for sub in self.subs:
+            sub_dict[sub.topic] = sub.cb
+
         self.start()
+
+        return sub_dict
 
 
 hz = Hz

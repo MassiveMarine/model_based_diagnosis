@@ -1,6 +1,7 @@
 setup:
 - type: hz
   main_loop_rate: 1.0
+  use_global_subscriber: true
   topics:
 # 1 # /dynament/co2 ###########################################################
   - name: /dynament/co2
@@ -11,7 +12,7 @@ setup:
         window_size:  5                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.5                    # @ student_t
@@ -26,7 +27,7 @@ setup:
         window_size:  5                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.5                    # @ student_t
@@ -41,28 +42,28 @@ setup:
         window_size:  5                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.5                    # @ student_t
           std_deviation: 0.006              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 4 # /elevation_pose #######################################################
+# 4 # /elevation_pose #########################################################
   - name: /elevation_pose
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
+          true_mean: 0.025                  # @ student_t
           std_deviation: 0.006              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 5 # /features #######################################################
+# 5 # /features ###############################################################
   - name: /features
     callerids:
     - callerid: []
@@ -71,73 +72,73 @@ setup:
         window_size:  5                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.03                   # @ student_t
+          std_deviation: 0.03               # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 6 # /imu_data #######################################################
+# 6 # /imu_data ###############################################################
   - name: /imu_data
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 150                    # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.01                   # @ student_t
+          std_deviation: 0.005            # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 7 # /joint_states #######################################################
+# 7 # /joint_states ###########################################################
   - name: /joint_states
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.02                   # @ student_t
+          std_deviation: 0.004              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 8 # /la_pitch_controller/state #######################################################
+# 8 # /la_pitch_controller/state ##############################################
   - name: /la_pitch_controller/state
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.02                   # @ student_t
+          std_deviation: 0.008              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 9 # /la_roll_controller/state #######################################################
+# 9 # /la_roll_controller/state ###############################################
   - name: /la_roll_controller/state
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.02                   # @ student_t
+          std_deviation: 0.008              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 10 # /map #######################################################
+# 10 # /map ###################################################################
   - name: /map
     callerids:
     - callerid: []
@@ -146,43 +147,43 @@ setup:
         window_size:  5                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 2.0                    # @ student_t
+          std_deviation: 0.15               # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 11 # /navigation_context #######################################################
+# 11 # /navigation_context ####################################################
   - name: /navigation_context
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
+          true_mean: 0.025                    # @ student_t
           std_deviation: 0.006              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 12 # /non_filtered_scan #######################################################
+# 12 # /non_filtered_scan #####################################################
   - name: /non_filtered_scan
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.03                   # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 13 # /odom #######################################################
+# 13 # /odom ##################################################################
   - name: /odom
     callerids:
     - callerid: []
@@ -191,234 +192,471 @@ setup:
         window_size:  5                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.1                    # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 14 # /poseupdate #######################################################
+# 14 # /poseupdate ############################################################
   - name: /poseupdate
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 15                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.037                  # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 15 # /robot_pose #######################################################
+# 15 # /robot_pose ############################################################
   - name: /robot_pose
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
+          true_mean: 0.025                  # @ student_t
           std_deviation: 0.006              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 16 # /robot_pose_simple #######################################################
+# 16 # /robot_pose_simple #####################################################
   - name: /robot_pose_simple
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
+          true_mean: 0.025                    # @ student_t
           std_deviation: 0.006              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 17 # /scan #######################################################
+# 17 # /scan ##################################################################
   - name: /scan
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.03                   # @ student_t
+          std_deviation: 0.015              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 18 # /scan_matcher_pose_2d #######################################################
+# 18 # /scan_matcher_pose_2d ##################################################
   - name: /scan_matcher_pose_2d
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.032                  # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 19 # /scan_matcher_pose_stamped_2d #######################################################
+# 19 # /scan_matcher_pose_stamped_2d ##########################################
   - name: /scan_matcher_pose_stamped_2d
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.032                  # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 20 # /sh_joint_state #######################################################
+# 20 # /sh_joint_state ########################################################
   - name: /sh_joint_state
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 15                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.04                   # @ student_t
+          std_deviation: 0.003              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 21 # /sh_kinect/depth/camera_info #######################################################
+# 21 # /sh_kinect/depth/camera_info ###########################################
   - name: /sh_kinect/depth/camera_info
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.034                  # @ student_t
+          std_deviation: 0.035              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 22 # /sh_kinect/depth/image/compressed #######################################################
-  - name: /sh_kinect/depth/image/compressed
-    callerids:
-    - callerid: []
-      filter:
-        type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
-        deviation_type: std_deviation       # std_deviation, min_max
-      states:
-      - state: 'state1'
-        frequenzy:
-          type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
-          significance_level: 0.05          # @ student_t
-# 23 # /sh_kinect/rgb/camera_info #######################################################
+# 22 # /sh_kinect/depth/image/compressed ######################################
+#  - name: /sh_kinect/depth/image/compressed
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        frequenzy:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.034                  # @ student_t
+#          std_deviation: 0.035              # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+# 23 # /sh_kinect/rgb/camera_info #############################################
   - name: /sh_kinect/rgb/camera_info
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 60                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.034                 # @ student_t
+          std_deviation: 0.035              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 24 # /sh_kinect/rgb/image_raw/compressed #######################################################
+# 24 # /sh_kinect/rgb/image_raw/compressed ####################################
   - name: /sh_kinect/rgb/image_raw/compressed
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 60                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.034                 # @ student_t
+          std_deviation: 0.035               # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 25 # /sh_pitch_controller/state #######################################################
+# 25 # /sh_pitch_controller/state #############################################
   - name: /sh_pitch_controller/state
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
+          true_mean: 0.025                  # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 26 # /sh_yaw_controller/state #######################################################
+# 26 # /sh_yaw_controller/state ###############################################
   - name: /sh_yaw_controller/state
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 25                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
+          true_mean: 0.025                    # @ student_t
           std_deviation: 0.006              # @ student_t(optional)
           significance_level: 0.05          # @ student_t
-# 27 # /tf #######################################################
+# 27 # /tf ####################################################################
   - name: /tf
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 200                    # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
-          significance_level: 0.05          # @ student_t
-# 28 # /tim_160_thermal_camera/thermal_image/compressed #######################################################
+          true_mean: 0.01                   # @ student_t
+          std_deviation: 0.03               # @ student_t(optional)
+          significance_level: 0.04          # @ student_t
+# 28 # /tim_160_thermal_camera/thermal_image/compressed #######################
   - name: /tim_160_thermal_camera/thermal_image/compressed
     callerids:
     - callerid: []
       filter:
         type: mean                          # mean, median, kmeans, ewma, nofilter
-        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        window_size: 50                     # @ mean, median, kmeans, ewma(optional)
         deviation_type: std_deviation       # std_deviation, min_max
       states:
-      - state: 'state1'
+      - state: 'ok'
         frequenzy:
           type: student_t                   # student_t, nominal_value
-          true_mean: 0.5                    # @ student_t
-          std_deviation: 0.006              # @ student_t(optional)
-          significance_level: 0.05          # @ student_t
+          true_mean: 0.028                  # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
+          significance_level: 0.04          # @ student_t#setup:
+- type: timeout
+  use_global_subscriber: true
+  topics:
+# 1 # /calculate_observation_pose/goal ########################################
+  - name: /calculate_observation_pose/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 2 # /calculate_observation_pose/result ######################################
+  - name: /calculate_observation_pose/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 3 # /change/goal ############################################################
+  - name: /change/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 4 # /change/result ##########################################################
+  - name: /change/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 5 # /cmd_vel ################################################################
+  - name: /cmd_vel
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 6 # /costmap_add_obstacle/goal ##############################################
+  - name: /costmap_add_obstacle/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 7 # /costmap_add_obstacle/result ############################################
+  - name: /costmap_add_obstacle/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 8 # /costmap_dynamic_obstacles/goal #########################################
+  - name: /costmap_dynamic_obstacles/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 9 # /costmap_dynamic_obstacles/result #######################################
+  - name: /costmap_dynamic_obstacles/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 10 # /dynament/co2 ##########################################################
+  - name: /dynament/co2
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 11 # /dynament/methane ######################################################
+  - name: /dynament/methane
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 12 # /dynament/propane ######################################################
+  - name: /dynament/propane
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 13 # /elevation_pose ########################################################
+  - name: /elevation_pose
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 14 # /exploration_path/goal #################################################
+  - name: /exploration_path/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 15 # /exploration_path/result ###############################################
+  - name: /exploration_path/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 16 # /features ##############################################################
+  - name: /features
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 17 # /imu_data ##############################################################
+  - name: /imu_data
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 18 # /joint_states ##########################################################
+  - name: /joint_states
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 19 # /la_pitch_controller/state #############################################
+  - name: /la_pitch_controller/state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 20 # /la_roll_controller/state ##############################################
+  - name: /la_roll_controller/state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 21 # /map ###################################################################
+  - name: /map
+    callerids:
+    - callerid: []
+      timeout: 3.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 22 # /navigation_context ####################################################
+  - name: /navigation_context
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 23 # /non_filtered_scan #####################################################
+  - name: /non_filtered_scan
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 24 # /odom ##################################################################
+  - name: /odom
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 25 # /poseupdate ############################################################
+  - name: /poseupdate
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 26 # /robot_pose ############################################################
+  - name: /robot_pose
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 27 # /robot_pose_simple #####################################################
+  - name: /robot_pose_simple
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 28 # /scan ##################################################################
+  - name: /scan
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 29 # /scan_matcher_pose_2d ##################################################
+  - name: /scan_matcher_pose_2d
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 30 # /scan_matcher_pose_stamped_2d ##########################################
+  - name: /scan_matcher_pose_stamped_2d
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 31 # /sh_joint_state #######################################################
+  - name: /sh_joint_state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 32 # /sh_kinect/depth/camera_info ###########################################
+  - name: /sh_kinect/depth/camera_info
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 33 # /sh_kinect/depth/image/compressed ######################################
+#  - name: /sh_kinect/depth/image/compressed
+#    callerids:
+#    - callerid: []
+#      timeout: 1.0
+#      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 34 # /sh_kinect/rgb/camera_info #############################################
+  - name: /sh_kinect/rgb/camera_info
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 35 # /sh_kinect/rgb/image_raw/compressed ####################################
+  - name: /sh_kinect/rgb/image_raw/compressed
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 36 # /sh_pitch_controller/state #############################################
+  - name: /sh_pitch_controller/state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 37 # /sh_yaw_controller/state ###############################################
+  - name: /sh_yaw_controller/state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 38 # /tf ####################################################################
+  - name: /tf
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 39 # /tim_160_thermal_camera/thermal_image/compressed #######################
+  - name: /tim_160_thermal_camera/thermal_image/compressed
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined

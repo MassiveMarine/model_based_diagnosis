@@ -82,10 +82,13 @@ class PluginManager():
 
     @staticmethod
     def initialize_plugin(plugin, config):
+        subs = dict()
         try:
-            plugin.initialize(config)
+            subs = plugin.initialize(config)
         except:
             pass
+        finally:
+            return subs
 
     def get_plugin_list(self):
         """
@@ -93,6 +96,16 @@ class PluginManager():
         :return: list of all loaded plugins
         """
         return list(self._plugins)
+
+
+class SubscripberManager():
+    def __init__(self, topic, cb_list):
+        self._cb_list = cb_list
+        self._sub = rospy.Subscriber(t, rospy.AnyMsg, self.cb, queue_size=1)
+
+    def cb(self, msg):
+        # pass
+        [F(msg) for F in self._cb_list]
 
 
 if __name__ == "__main__":
@@ -106,9 +119,16 @@ if __name__ == "__main__":
         manager = PluginManager()
         manager.add_plugin_paths_to_sys_path()
 
+        sub_list = dict()
+
         for config in configs:
             plugin = manager.load_plugin(config['type'], config['type'])
-            manager.initialize_plugin(plugin, config)
+            new_cbs = manager.initialize_plugin(plugin, config)
+            [sub_list.setdefault(key, []).append(value) for key, value in new_cbs.iteritems()]
+
+        print 'here I am', len(sub_list)
+
+        [SubscripberManager(t, cb_list) for t, cb_list in sub_list.iteritems()]
 
         rospy.spin()
 

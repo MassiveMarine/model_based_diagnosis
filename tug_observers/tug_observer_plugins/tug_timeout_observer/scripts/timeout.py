@@ -78,7 +78,7 @@ class TimeoutSubs():
     This class is used to subscribe to a topic, process the information for each callerid. It has a list
     which contains objects for each callerid that publish at this topic.
     """
-    def __init__(self, config):
+    def __init__(self, config, use_global_subscriber):
         """
         Constructor to create a object of TimeoutSubs that exists per topic. The last callerid-config that
         defines no callerid exactly is used as default config for new callerids that are not explicitly
@@ -87,7 +87,7 @@ class TimeoutSubs():
         :param config: Configuration from yaml file
         """
         # topic that should be subscribed
-        self._topic = Config.get_param(config, 'name')
+        self.topic = Config.get_param(config, 'name')
 
         # store all callerids of this topic separately
         self._bases = dict()
@@ -108,7 +108,8 @@ class TimeoutSubs():
                 rospy.logerr(e)
 
         # subscribe to given topic
-        self.sub = rospy.Subscriber(self._topic, rospy.AnyMsg, self.cb, queue_size=1)
+        if not use_global_subscriber:
+            self.sub = rospy.Subscriber(self.topic, rospy.AnyMsg, self.cb, queue_size=1)
 
     def add_callerid(self, callerid):
         """
@@ -132,7 +133,7 @@ class TimeoutSubs():
         # print best_config
 
         if best_config:
-            new_base = TimeoutBase(self._topic, callerid, best_config)
+            new_base = TimeoutBase(self.topic, callerid, best_config)
 
         self._bases[callerid] = new_base
         return new_base
@@ -204,7 +205,10 @@ class Timeout(PluginBase, PluginThread):
             for sub in self.subs:
                 sub.cleanup_dead_callerids()
 
-            rate.sleep()
+            try:
+                rate.sleep()
+            except rospy.exceptions.ROSTimeMovedBackwardsException as e:
+                print e
 
     def initialize(self, config):
         """
@@ -212,13 +216,25 @@ class Timeout(PluginBase, PluginThread):
         In addition it start the main thread of this plugin.
         :param config: Configuration from yaml file
         """
+
+        try:
+            use_global_subscriber = Config.get_param(config, 'use_global_subscriber')
+        except KeyError:
+            use_global_subscriber = False
+
         for topic_config in Config.get_param(config, 'topics'):
             try:
-                self.subs.append(TimeoutSubs(topic_config))
+                self.subs.append(TimeoutSubs(topic_config, use_global_subscriber))
             except (KeyError, StandardError) as e:
                 rospy.logerr(e)
 
+        sub_dict = dict()
+        for sub in self.subs:
+            sub_dict[sub.topic] = sub.cb
+
         self.start()
+
+        return sub_dict
 
 
 timeout = Timeout

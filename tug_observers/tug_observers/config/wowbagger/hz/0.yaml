@@ -1,6 +1,7 @@
 setup:
 - type: hz
   main_loop_rate: 1.0
+  use_global_subscriber: true
   topics:
 # 1 # /dynament/co2 ###########################################################
   - name: /dynament/co2

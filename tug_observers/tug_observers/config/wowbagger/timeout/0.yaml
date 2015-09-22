@@ -1,5 +1,6 @@
 #setup:
 - type: timeout
+  use_global_subscriber: true
   topics:
 # 1 # /calculate_observation_pose/goal ########################################
   - name: /calculate_observation_pose/goal
