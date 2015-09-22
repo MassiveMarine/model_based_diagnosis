@@ -282,17 +282,16 @@ class HzSubs():
         Otherwise the callerid is added to list, but without calling a callback.
         :param msg: message from publisher
         """
-        pass
-        # current_callerid = msg._connection_header['callerid']
-        # self._bases_lock.acquire()
-        # if current_callerid not in self._bases:
-        #     base = self.add_callerid(current_callerid)
-        # else:
-        #     base = self._bases.get(current_callerid)
-        #
-        # if base:
-        #     base.cb(msg)
-        # self._bases_lock.release()
+        current_callerid = msg._connection_header['callerid']
+        self._bases_lock.acquire()
+        if current_callerid not in self._bases:
+            base = self.add_callerid(current_callerid)
+        else:
+            base = self._bases.get(current_callerid)
+
+        if base:
+            base.cb(msg)
+        self._bases_lock.release()
 
     def get_resource_info(self):
         """
