@@ -133,12 +133,12 @@ namespace tug_observers
         ops.callback_queue = &internal_call_back_queue_;
         return nh_.subscribe(ops);
       }
+
+        void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code, ros::Time time_of_occurence);
+
+        void reportStates(std::string resource, std::vector<std::string> states, ros::Time time_of_occurence);
     protected:
       ObserverPluginBase(std::string type);
-
-      void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code, ros::Time time_of_occurence);
-
-      void reportStates(std::string resource, std::vector<std::string> states, ros::Time time_of_occurence);
     };
 }
 
