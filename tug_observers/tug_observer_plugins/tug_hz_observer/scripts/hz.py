@@ -48,11 +48,9 @@ class HzBase():
     """
     This class is used for each callerid. The delay calculation will be done here.
     """
-    def __init__(self, topic, callerid, config):
+    def __init__(self, config):
         """
         Constructor of the HzBase class. It manages the filter and initialize stuff for the delay calculation.
-        :param topic: name of topic that is subscribed
-        :param callerid: name of the node that publish on the topic
         :param config: Configuration from yaml file
         """
         # create a filter and lock
@@ -62,9 +60,6 @@ class HzBase():
         # necessary stuff to calculate time between cb's
         self._msg_t0 = -1.
         self._msg_tn = 0
-
-        # create a predefined error msg
-        self._observer_error = observer_error(type='hz', resource=str(topic + ' ' + str(callerid)))
 
     def cb(self, msg):
         """
@@ -268,7 +263,7 @@ class HzSubs():
                 rospy.logerr(e)
 
         if best_config:
-            new_base = HzBase(self.topic, callerid, self._config_for_unknown)
+            new_base = HzBase(self.best_config)
 
         self._bases[callerid] = new_base
         return new_base
