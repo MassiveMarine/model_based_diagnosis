@@ -1,5 +1,6 @@
 setup:
 - type: resources
+  resource_topic: /node_infos
   nodes:
   - name: /nodeA
     cpu_filter:

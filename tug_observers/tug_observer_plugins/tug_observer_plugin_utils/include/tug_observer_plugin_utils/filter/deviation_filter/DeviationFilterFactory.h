@@ -21,7 +21,7 @@ public:
   {
     if(type == "min_max")
       return boost::make_shared<MinMaxDeviationFilter<T> >(params);
-    else if(type == "std")
+    else if(type == "std" || type == "std_deviation")
       return boost::make_shared<StandartDeviationFilter<T> >(params);
     else
       throw std::runtime_error("type for deviation filter value '" + type + "'" + " not known");

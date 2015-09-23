@@ -39,7 +39,8 @@ namespace tug_observer_plugins_cpp
       }
       ROS_DEBUG("[ResourcesPlugin::initialize] 3");
 
-      resource_sub_ = subscribe("/robot_41/diag/node_infos", 1, &ResourcesPlugin::nodeInfoCallback, this);
+      std::string resource_topic = ProcessYaml::getValue<std::string>("resource_topic", params);
+      resource_sub_ = subscribe(resource_topic, 1, &ResourcesPlugin::nodeInfoCallback, this);
     }
 
     void ResourcesPlugin::nodeInfoCallback(const tug_resource_monitor::NodeInfoArray::ConstPtr &msg)

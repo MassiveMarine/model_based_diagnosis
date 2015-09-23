@@ -263,7 +263,7 @@ class HzSubs():
                 rospy.logerr(e)
 
         if best_config:
-            new_base = HzBase(self.best_config)
+            new_base = HzBase(best_config)
 
         self._bases[callerid] = new_base
         return new_base
