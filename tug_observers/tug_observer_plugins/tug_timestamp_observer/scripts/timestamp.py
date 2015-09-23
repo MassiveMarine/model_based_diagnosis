@@ -62,25 +62,25 @@ class TimestampBase():
 
         # create a predefined error msg
         self._observer_error = observer_error(type='timestemp', resource=str(topic + '[' + str(callerid)) + ']')
+        self._topic = topic
 
-    def cb(self, msg):
+    def cb(self, msg, curr_rostime):
         """
         Callback method that is called from the forwarding of TimeoutSub.
         Calculates the delay between real ros time and the rostime in the header of the msg and updates the filter.
         :param msg: message from publisher
         """
-        curr_rostime = rospy.get_rostime().to_sec()
-
         self._filter_lock.acquire()
-        self._filter.update(curr_rostime - msg.header.stamp.to_sec())
+        self._filter.update(curr_rostime - msg.header.stamp.to_nsec())
         self._filter_lock.release()
+        print curr_rostime, ' - ', msg.header.stamp.to_nsec(), ' = ', curr_rostime - msg.header.stamp.to_nsec()
 
     def get_values(self):
         """
         Get the information of the filter of this callerid
         :return information of the filter of this callerid
         """
-        print self._filter.get_value()
+        print self._topic, self._filter.get_value()
         return self._filter.get_value()
 
 
@@ -192,7 +192,7 @@ class TimestampSubs():
     This class is used to subscribe to a topic, process the information for each callerid. It has a list
     which contains objects for each callerid that publish at this topic.
     """
-    def __init__(self, config):
+    def __init__(self, config, use_global_subscriber):
         """
         Constructor to create a object of TimeoutSubs that exists per topic. The last callerid-config that
         defines no callerid exactly is used as default config for new callerids that are not explicitly
@@ -224,8 +224,9 @@ class TimestampSubs():
                 rospy.logerr(e)
 
         # get topic class and subscribe
-        msg_class, real_topic, msg_eval =  rostopic.get_topic_class(self._topic)
-        self.sub = rospy.Subscriber(self._topic, msg_class, self.cb, queue_size=1)
+        if not use_global_subscriber:
+            msg_class, real_topic, msg_eval =  rostopic.get_topic_class(self._topic)
+            self.sub = rospy.Subscriber(self._topic, msg_class, self.cb, queue_size=1)
 
     def add_callerid(self, callerid):
         """
@@ -263,6 +264,9 @@ class TimestampSubs():
         Otherwise the callerid is added to list, but without calling a callback.
         :param msg: message from publisher
         """
+
+        curr_rostime = rospy.get_rostime().to_nsec()
+
         if not msg._has_header:
             return
 
@@ -275,7 +279,7 @@ class TimestampSubs():
             base = self._bases.get(current_callerid)
 
         if base:
-            base.cb(msg)
+            base.cb(msg, curr_rostime)
         self._bases_lock.release()
 
     def get_resource_info(self):
@@ -340,7 +344,6 @@ class Timestamp(PluginBase, PluginThread):
         Thread runs in here, till shutdown. It will publish observer info with a defined
         rate and also cleanup old/unused callerids of topics.
         """
-        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
 
             resource_data = []
@@ -349,7 +352,11 @@ class Timestamp(PluginBase, PluginThread):
 
             msg = observer_info(resource_infos=resource_data)
             self.info_pub.publish(msg)
-            self.rate.sleep()
+            try:
+                print '==============================================================='
+                self.rate.sleep()
+            except rospy.exceptions.ROSTimeMovedBackwardsException as e:
+                print e
 
     def initialize(self, config):
         """
@@ -359,13 +366,25 @@ class Timestamp(PluginBase, PluginThread):
         """
 
         self.rate = rospy.Rate(Config.get_param(config, 'main_loop_rate'))
+        try:
+            use_global_subscriber = Config.get_param(config, 'use_global_subscriber')
+        except KeyError:
+            use_global_subscriber = False
+
         for topic_config in Config.get_param(config, 'topics'):
             try:
-                self.subs.append(TimestampSubs(topic_config))
+                self.subs.append(TimestampSubs(topic_config, use_global_subscriber))
             except (KeyError, StandardError) as e:
                 rospy.logerr(e)
 
+        sub_dict = dict()
+        if use_global_subscriber:
+            for sub in self.subs:
+                sub_dict[sub.topic] = sub.cb
+
         self.start()
+
+        return sub_dict
 
 
 timestamp = Timestamp
