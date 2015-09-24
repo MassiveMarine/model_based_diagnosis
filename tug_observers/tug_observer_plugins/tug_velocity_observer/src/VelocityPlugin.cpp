@@ -19,6 +19,8 @@ namespace tug_observer_plugins_cpp
 
     void VelocityPlugin::initialize(XmlRpc::XmlRpcValue params)
     {
+      boost::mutex::scoped_lock the_lock(filter_mutex_);
+
       if (!params.hasMember("source_A"))
       {
         ROS_ERROR("no topic for input A defined");
@@ -136,6 +138,7 @@ namespace tug_observer_plugins_cpp
 
     void VelocityPlugin::updateFilters(MovementReading a, MovementReading b)
     {
+      ROS_DEBUG("update filters");
       if (x_filter_)
         x_filter_->update(a.linear.x - b.linear.x);
 
@@ -158,11 +161,18 @@ namespace tug_observer_plugins_cpp
       rot_y_filter_->update(shortest_difference.y());
       rot_z_filter_->update(shortest_difference.z());
 
-      current_filter_time_ = a.reading_time;
+      if(a.reading_time < b.reading_time)
+        current_filter_time_ = b.reading_time;
+      else
+        current_filter_time_ = a.reading_time;
+
+      ROS_DEBUG_STREAM("reading time sec:" << current_filter_time_.sec << ", nsec:" << current_filter_time_.nsec );
     }
 
     void VelocityPlugin::addTwistA(MovementReading value)
     {
+      boost::mutex::scoped_lock the_lock(filter_mutex_);
+
       ROS_DEBUG_STREAM(
               "add twist of A with accelerations along the axis x:" << value.linear.x << " y:" << value.linear.y <<
               " z:" << value.linear.z << " velocities around the axis x:" << value.angular.x << " y:" <<
@@ -183,6 +193,8 @@ namespace tug_observer_plugins_cpp
 
     void VelocityPlugin::addTwistB(MovementReading value)
     {
+      boost::mutex::scoped_lock the_lock(filter_mutex_);
+
       ROS_DEBUG_STREAM(
               "add twist of B with accelerations along the axis x:" << value.linear.x << " y:" << value.linear.y <<
               " z:" << value.linear.z << " velocities around the axis x:" << value.angular.x << " y:" <<
@@ -201,39 +213,58 @@ namespace tug_observer_plugins_cpp
       }
     }
 
-    std::vector<std::string> VelocityPlugin::estimateStates()
+    std::pair<bool, std::vector<std::string> > VelocityPlugin::estimateStates()
     {
+      boost::mutex::scoped_lock the_lock(filter_mutex_);
+
       ROS_DEBUG("estimate states");
       FilteState<double> x_state;
       if (x_filter_)
       {
         x_state = x_filter_->getFilteState();
-        ROS_ERROR_STREAM("x filter result " << x_state);
+        ROS_DEBUG_STREAM("x filter result " << x_state);
+        if(x_state.sample_size < 2)
+          return std::make_pair(false, std::vector<std::string>());
       }
 
       FilteState<double> y_state;
       if (y_filter_)
       {
         y_state = y_filter_->getFilteState();
-        ROS_ERROR_STREAM("y filter result " << y_state);
+        ROS_DEBUG_STREAM("y filter result " << y_state);
+        if(y_state.sample_size < 2)
+          return std::make_pair(false, std::vector<std::string>());
       }
 
       FilteState<double> z_state;
       if (z_filter_)
       {
         z_state = z_filter_->getFilteState();
-        ROS_ERROR_STREAM("z filter result " << z_state);
+        ROS_DEBUG_STREAM("z filter result " << z_state);
+        if(z_state.sample_size < 2)
+          return std::make_pair(false, std::vector<std::string>());
       }
 
       FilteState<double> rot_x_state = rot_x_filter_->getFilteState();
+      ROS_DEBUG_STREAM("rot x filter result " << rot_x_state);
+      if(rot_x_state.sample_size < 2)
+        return std::make_pair(false, std::vector<std::string>());
+
       FilteState<double> rot_y_state = rot_y_filter_->getFilteState();
+      ROS_DEBUG_STREAM("rot y filter result " << rot_y_state);
+      if(rot_y_state.sample_size < 2)
+        return std::make_pair(false, std::vector<std::string>());
+
       FilteState<double> rot_z_state = rot_z_filter_->getFilteState();
+      ROS_DEBUG_STREAM("rot z filter result " << rot_z_state);
+      if(rot_z_state.sample_size < 2)
+        return std::make_pair(false, std::vector<std::string>());
 
       std::vector<std::string> result;
       for (std::vector<VelocityState>::iterator it = states_.begin(); it != states_.end(); ++it)
       {
         ROS_DEBUG_STREAM("check state: '" << it->getName() << "'");
-        if (x_filter_ && !it->conformsStateX(x_state))
+        if (x_filter_ &&  !it->conformsStateX(x_state))
           continue;
 
         if (y_filter_ && !it->conformsStateY(y_state))
@@ -246,22 +277,27 @@ namespace tug_observer_plugins_cpp
           result.push_back(it->getName());
       }
 
-      return result;
+      return std::make_pair(true, result);
     }
 
     void VelocityPlugin::run()
     {
       while(ros::ok())
       {
-        std::vector<std::string> states = estimateStates();
-        if(states.empty())
+        std::pair<bool, std::vector<std::string> > states = estimateStates();
+        if(states.first)
         {
-          reportError(name_, "no_state_" + name_, "For the node with the name '" + name_ + "' no state could be estimated", tug_observers_msgs::resource_error::NO_STATE_FITS, current_filter_time_);
-        }
-        else
-        {
-          reportStates(name_, states, current_filter_time_);
-          ROS_DEBUG("VelocityPlugin::run 3.1");
+          if (states.second.empty())
+          {
+            reportError(name_, "no_state_" + name_,
+                        "For the node with the name '" + name_ + "' no state could be estimated",
+                        tug_observers_msgs::resource_error::NO_STATE_FITS, current_filter_time_);
+          }
+          else
+          {
+            reportStates(name_, states.second, current_filter_time_);
+            ROS_ERROR("VelocityPlugin::run 3.1");
+          }
         }
         background_rate_.sleep();
       }

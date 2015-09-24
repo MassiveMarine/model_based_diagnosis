@@ -44,6 +44,8 @@ namespace tug_observer_plugins_cpp
 
         ros::Time current_filter_time_;
 
+        boost::mutex filter_mutex_;
+
         MovementReading getCompensatedTwist(MovementReading value);
 
         void updateFilters(MovementReading a, MovementReading b);
@@ -57,7 +59,7 @@ namespace tug_observer_plugins_cpp
 
         void addTwistB(MovementReading value);
 
-        std::vector<std::string> estimateStates();
+        std::pair<bool, std::vector<std::string> > estimateStates();
 
         void run();
     };
