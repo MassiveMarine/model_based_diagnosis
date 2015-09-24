@@ -5,10 +5,10 @@
 #include <tug_velocity_observer/VelocityConverterIMU.h>
 #include <tug_yaml/ProcessYaml.h>
 
-VelocityConverterIMU::VelocityConverterIMU(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base) : VelocityConverter(call_back)
+VelocityConverterIMU::VelocityConverterIMU(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverter(call_back)
 {
-  std::string topic_name = ProcessYaml::getValue<std::string>("topic", params);
-  imu_sub_ = plugin_base->subscribe(topic_name, 1, &VelocityConverterIMU::IMUCB, this);
+  topic_ = ProcessYaml::getValue<std::string>("topic", params);
+  imu_sub_ = plugin_base->subscribe(topic_, 1, &VelocityConverterIMU::IMUCB, this);
 }
 
 void VelocityConverterIMU::IMUCB(const sensor_msgs::Imu& msg)
@@ -23,4 +23,9 @@ void VelocityConverterIMU::IMUCB(const sensor_msgs::Imu& msg)
   reading.angular.z = msg.angular_velocity.z;
 
   sendMovement(reading);
+}
+
+std::string VelocityConverterIMU::getName()
+{
+  return topic_;
 }

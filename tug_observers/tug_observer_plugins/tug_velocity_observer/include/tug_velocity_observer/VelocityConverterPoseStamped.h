@@ -16,12 +16,14 @@ class VelocityConverterPoseStamped : public VelocityConverterTwistStamped
     SingleSideDifferentiation<double> angular_x_velocity_calc_;
     SingleSideDifferentiation<double> angular_y_velocity_calc_;
     SingleSideDifferentiation<double> angular_z_velocity_calc_;
+    std::string topic_;
 
 protected:
     VelocityConverterPoseStamped(boost::function<void (MovementReading)> call_back);
 public:
-    VelocityConverterPoseStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base);
+    VelocityConverterPoseStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base);
     void PoseStampedCB(const geometry_msgs::PoseStamped& msg);
+    virtual std::string getName();
 };
 
 

@@ -8,10 +8,10 @@
 VelocityConverterPose::VelocityConverterPose(boost::function<void (MovementReading)> call_back) : VelocityConverterPoseStamped(call_back)
 { }
 
-VelocityConverterPose::VelocityConverterPose(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base) : VelocityConverterPoseStamped(call_back)
+VelocityConverterPose::VelocityConverterPose(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverterPoseStamped(call_back)
 {
-  std::string topic_name = ProcessYaml::getValue<std::string>("topic", params);
-  sub_ = plugin_base->subscribe(topic_name, 1, &VelocityConverterPose::PoseCB, this);
+  topic_ = ProcessYaml::getValue<std::string>("topic", params);
+  sub_ = plugin_base->subscribe(topic_, 1, &VelocityConverterPose::PoseCB, this);
 }
 
 void VelocityConverterPose::PoseCB(const geometry_msgs::Pose& msg)
@@ -21,4 +21,9 @@ void VelocityConverterPose::PoseCB(const geometry_msgs::Pose& msg)
   pose_stamped.pose = msg;
 
   PoseStampedCB(pose_stamped);
+}
+
+std::string VelocityConverterPose::getName()
+{
+  return topic_;
 }

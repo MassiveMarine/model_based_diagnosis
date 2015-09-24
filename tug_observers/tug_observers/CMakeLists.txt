@@ -104,7 +104,7 @@ include_directories(
 ## Declare a cpp library
 add_library(tug_observer_plugin_base
   src/ObserverPluginBase.cpp
-src/ObserverInfoSender.cpp include/tug_observers/ObserverInfoSender.h)
+src/ObserverInfoSender.cpp include/tug_observers/ObserverInfoSender.h src/SubscriberFacade.cpp include/tug_observers/SubscriberFacade.h)
 
 ## Declare a cpp executable
 add_executable(tug_observers_node src/ObserverNode.cpp)
