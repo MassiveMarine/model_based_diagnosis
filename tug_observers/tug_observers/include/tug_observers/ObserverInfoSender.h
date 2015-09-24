@@ -9,6 +9,9 @@
 #include <vector>
 #include <map>
 #include <ros/ros.h>
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/asio/deadline_timer.hpp>
 
 struct ObserverInfo
 {
@@ -35,11 +38,13 @@ class ObserverInfoSender
   std::map<ObserverInfo, std::pair<std::vector<std::string>, ros::Time> > current_observer_infos_;
   ros::NodeHandle nh_;
   ros::Publisher info_pub_;
-  ros::Timer timer_;
+  boost::thread background_thread_;
+  boost::mutex observer_infos_mutex_;
+  boost::posix_time::microseconds wait_period_;
 
   ObserverInfoSender();
 
-  void timerCallback(const ros::TimerEvent& timer_evnt);
+  void run();
   void updateInfo(ObserverInfo info, std::vector<std::string> states, ros::Time time_of_occurence);
   void removeInfo(ObserverInfo info);
 
