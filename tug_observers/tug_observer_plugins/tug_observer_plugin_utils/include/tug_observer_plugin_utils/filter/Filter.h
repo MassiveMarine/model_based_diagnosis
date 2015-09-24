@@ -9,7 +9,7 @@
 #include <tug_observer_plugin_utils/filter/value_filter/ValueFilter.h>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <tug_observer_plugin_utils/filter/FilteState.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <tug_observer_plugin_utils/filter/value_filter/ValueFilterFactory.h>
 #include <tug_observer_plugin_utils/filter/deviation_filter/DeviationFilterFactory.h>
 

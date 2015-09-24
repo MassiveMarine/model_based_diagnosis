@@ -3,7 +3,7 @@
 //
 
 #include <tug_velocity_observer/VelocityConverterTwistStamped.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 VelocityConverterTwistStamped::VelocityConverterTwistStamped(boost::function<void (MovementReading)> call_back) : VelocityConverter(call_back)
 { }

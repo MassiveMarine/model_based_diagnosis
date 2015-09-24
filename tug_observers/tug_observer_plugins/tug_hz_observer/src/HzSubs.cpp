@@ -3,7 +3,7 @@
 //
 
 #include <tug_hz_observer/HzSubs.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 HzSubs::HzSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* plugin_base)
 {

@@ -3,7 +3,7 @@
 //
 
 #include <tug_velocity_observer/VelocityConverterPoseStamped.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Matrix3x3.h>
 

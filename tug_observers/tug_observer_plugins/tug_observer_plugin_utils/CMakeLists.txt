@@ -7,6 +7,7 @@ project(tug_observer_plugin_utils)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  tug_yaml
 )
 
 ## System dependencies are found with CMake's conventions
@@ -80,7 +81,7 @@ catkin_python_setup()
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES observer_plugin_utils
-#  CATKIN_DEPENDS roscpp tug_observer_plugins_cpp tug_resource_monitor
+  CATKIN_DEPENDS tug_yaml
 #  DEPENDS system_lib
 )
 
@@ -97,8 +98,7 @@ include_directories(
 )
 
 ## Declare a cpp library
-add_library(observer_plugin_utils   src/ProcessYaml.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.cpp
+add_library(observer_plugin_utils   src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.cpp
                                     src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValueFactory.cpp
                                     src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GaussNominalValue.cpp
                                     src/filter/value_filter/ValueFilter.cpp

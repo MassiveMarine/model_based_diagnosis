@@ -4,7 +4,7 @@
 
 #include <tug_velocity_observer/VelocityPlugin.h>
 #include <pluginlib/class_list_macros.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <tug_velocity_observer/VelocityConverterFactory.h>
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Matrix3x3.h>
@@ -134,6 +134,8 @@ namespace tug_observer_plugins_cpp
         result.angular.z = value.angular.z;
       else
         result.angular.z = 0.;
+
+      return result;
     }
 
     void VelocityPlugin::updateFilters(MovementReading a, MovementReading b)
@@ -299,7 +301,9 @@ namespace tug_observer_plugins_cpp
             ROS_ERROR("VelocityPlugin::run 3.1");
           }
         }
-        background_rate_.sleep();
+        //background_rate_.sleep();
+
+        sleep(1);
       }
     }
 }

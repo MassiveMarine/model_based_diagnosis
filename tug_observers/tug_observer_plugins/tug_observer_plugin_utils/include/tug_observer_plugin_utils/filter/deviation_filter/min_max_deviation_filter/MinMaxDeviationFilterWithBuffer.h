@@ -9,7 +9,7 @@
 #include <limits>
 #include <boost/circular_buffer.hpp>
 #include <boost/thread/mutex.hpp>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 template<class T>
 class MinMaxDeviationFilterWithBuffer : public DeviationFilter<T>

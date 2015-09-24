@@ -8,7 +8,7 @@
 #include <tug_observer_plugin_utils/filter/deviation_filter/DeviationFilter.h>
 #include <boost/circular_buffer.hpp>
 #include <boost/thread/mutex.hpp>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <numeric>
 
 template<class T>

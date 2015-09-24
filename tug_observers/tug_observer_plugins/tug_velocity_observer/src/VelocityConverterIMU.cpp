@@ -3,7 +3,7 @@
 //
 
 #include <tug_velocity_observer/VelocityConverterIMU.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 VelocityConverterIMU::VelocityConverterIMU(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base) : VelocityConverter(call_back)
 {

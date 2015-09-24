@@ -3,7 +3,7 @@
 //
 
 #include <tug_velocity_observer/VelocityConverterTwist.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 VelocityConverterTwist::VelocityConverterTwist(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base) : VelocityConverterTwistStamped(call_back)
 {

@@ -6,7 +6,7 @@
 #define TUG_OBSERVER_PLUGINS_CPP_INBETWEENNOMINALVALUE_H
 
 #include <tug_observer_plugin_utils/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 template <class T>
 class InBetweenNominalValue : public NominalValue<T>

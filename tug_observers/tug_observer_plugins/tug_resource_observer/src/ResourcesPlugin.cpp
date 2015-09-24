@@ -4,7 +4,7 @@
 
 #include <tug_resource_observer/ResourcesPlugin.h>
 #include <ros/ros.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <pluginlib/class_list_macros.h>
 #include <tug_observers_msgs/resource_error.h>
 

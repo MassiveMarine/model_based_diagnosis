@@ -4,7 +4,7 @@
 
 #include <tug_hz_observer/HzPlugin.h>
 #include <pluginlib/class_list_macros.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 namespace tug_observer_plugins_cpp
 {

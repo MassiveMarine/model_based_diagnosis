@@ -9,53 +9,48 @@ setup:
   x_filter:
     type: mean
     window_size: 50
-    deviation_type: std
   y_filter:
     type: mean
     window_size: 50
-    deviation_type: std
   use_yaw: true
   rot_x_filter:
     type: mean
     window_size: 50
-    deviation_type: std
   rot_y_filter:
     type: mean
     window_size: 50
-    deviation_type: std
   rot_z_filter:
     type: mean
     window_size: 50
-    deviation_type: std
   states:
   - state: '1'
     x:
       type: nominal_value
-      value:
+      value:    
         type: gauss
         mean: 0.0
-        std_deviation: 0.5
+        std_deviation: 0.001
     y:
       type: nominal_value
-      value:
+      value:    
         type: gauss
         mean: 0.0
-        std_deviation: 0.5
+        std_deviation: 0.001
     rot_x:
       type: nominal_value
-      value:
+      value:    
         type: gauss
         mean: 0.0
-        std_deviation: 0.5
+        std_deviation: 0.001
     rot_y:
       type: nominal_value
-      value:
+      value:    
         type: gauss
         mean: 0.0
-        std_deviation: 0.5
+        std_deviation: 0.001
     rot_z:
       type: nominal_value
-      value:
+      value:    
         type: gauss
         mean: 0.0
-        std_deviation: 0.5
+        std_deviation: 0.001

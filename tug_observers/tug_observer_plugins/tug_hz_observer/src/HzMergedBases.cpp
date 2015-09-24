@@ -5,7 +5,7 @@
 #include <tug_hz_observer/HzMergedBases.h>
 #include <ros/ros.h>
 #include <tug_observers_msgs/resource_error.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <sstream>
 
 HzMergedBases::HzMergedBases(std::string topic, XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* plugin_base) : plugin_base_(plugin_base)

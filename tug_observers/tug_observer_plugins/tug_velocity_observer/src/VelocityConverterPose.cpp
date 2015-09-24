@@ -3,7 +3,7 @@
 //
 
 #include <tug_velocity_observer/VelocityConverterPose.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 VelocityConverterPose::VelocityConverterPose(boost::function<void (MovementReading)> call_back) : VelocityConverterPoseStamped(call_back)
 { }
