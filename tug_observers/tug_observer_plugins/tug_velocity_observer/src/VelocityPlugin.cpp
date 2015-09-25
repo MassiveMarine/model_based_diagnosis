@@ -16,36 +16,29 @@ namespace tug_observer_plugins_cpp
     {
       init(params, this);
 
-      background_thread_ = boost::thread(boost::bind(&VelocityPlugin::run, this));
+      timer_ = boost::make_shared<Timer>(boost::posix_time::microseconds(1./rate * 1000. * 1000.), boost::bind(&VelocityPlugin::run, this));
     }
 
     void VelocityPlugin::run()
     {
-      while(ros::ok())
+      std::vector<boost::tuple<std::string, std::vector<std::string>, ros::Time> > observations = velocityObservations();
+
+      for(size_t i = 0; i < observations.size(); ++i)
       {
-        std::vector<boost::tuple<std::string, std::vector<std::string>, ros::Time> > observations = velocityObservations();
-
-        for(size_t i = 0; i < observations.size(); ++i)
+        ROS_DEBUG_STREAM("VelocityPlugin::run 3.1");
+        std::string name = observations[i].head;
+        std::vector<std::string> states = observations[i].tail.head;
+        ros::Time observation_time = observations[i].tail.tail.head;
+        if (states.empty())
         {
-          ROS_DEBUG_STREAM("VelocityPlugin::run 3.1");
-          std::string name = observations[i].head;
-          std::vector<std::string> states = observations[i].tail.head;
-          ros::Time observation_time = observations[i].tail.tail.head;
-          if (states.empty())
-          {
-            reportError(name, "no_state_" + name,
-                        "For the node with the name '" + name + "' no state could be estimated",
-                        tug_observers_msgs::resource_error::NO_STATE_FITS, observation_time);
-          }
-          else
-          {
-            reportStates(name, states, observation_time);
-          }
+          reportError(name, "no_state_" + name,
+                      "For the node with the name '" + name + "' no state could be estimated",
+                      tug_observers_msgs::resource_error::NO_STATE_FITS, observation_time);
         }
-
-        //background_rate_.sleep();
-
-        sleep(1);
+        else
+        {
+          reportStates(name, states, observation_time);
+        }
       }
     }
 }

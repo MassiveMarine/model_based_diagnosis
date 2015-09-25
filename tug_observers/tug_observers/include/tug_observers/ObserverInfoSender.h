@@ -12,6 +12,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/asio/deadline_timer.hpp>
+#include <tug_timers/Timer.h>
 
 struct ObserverInfo
 {
@@ -38,9 +39,8 @@ class ObserverInfoSender
   std::map<ObserverInfo, std::pair<std::vector<std::string>, ros::Time> > current_observer_infos_;
   ros::NodeHandle nh_;
   ros::Publisher info_pub_;
-  boost::thread background_thread_;
   boost::mutex observer_infos_mutex_;
-  boost::posix_time::microseconds wait_period_;
+  boost::shared_ptr<Timer> timer_;
 
   ObserverInfoSender();
 

@@ -8,12 +8,13 @@
 #include <tug_observers/ObserverPluginBase.h>
 #include <tug_velocity_observer/VelocityObserver.h>
 #include <tug_velocity_observer/VelocityChecker.h>
+#include <tug_timers/Timer.h>
 
 namespace tug_observer_plugins_cpp
 {
     class VelocityPlugin : public tug_observers::ObserverPluginBase, public VelocityChecker
     {
-        boost::thread background_thread_;
+        boost::shared_ptr<Timer> timer_;
     public:
         VelocityPlugin();
 

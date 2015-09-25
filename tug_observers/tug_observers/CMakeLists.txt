@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   tug_plugin_manager
   tug_observers_msgs
+  tug_timers
 )
 
 ## System dependencies are found with CMake's conventions
