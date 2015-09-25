@@ -9,6 +9,11 @@ find_package(catkin REQUIRED COMPONENTS
   tug_observer_plugin_utils
   tug_python_utils
   tug_observers
+  roscpp
+  pluginlib
+  tug_observers_msgs
+  topic_tools
+  tug_time
 )
 
 ## System dependencies are found with CMake's conventions
@@ -116,12 +121,12 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  include
 )
 
 ## Declare a C++ library
-# add_library(tug_hz_observer
-#   src/${PROJECT_NAME}/tug_hz_observer.cpp
-# )
+add_library(timeout_plugin
+        src/TimeoutPlugin.cpp src/TimeoutSubs.cpp src/TimeoutBase.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -136,9 +141,9 @@ include_directories(
 # add_dependencies(tug_hz_observer_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(tug_hz_observer_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(timeout_plugin
+        ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

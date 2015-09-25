@@ -1,0 +1,8 @@
+<library path="lib/libtimeout_plugin">
+  <class name="timeout" type="tug_observer_plugins_cpp::TimeoutPlugin"
+         base_class_type="tug_observers::ObserverPluginBase">
+    <description>
+      Observer plugin which if a topic does not received in time raise a error.
+    </description>
+  </class>
+</library>
