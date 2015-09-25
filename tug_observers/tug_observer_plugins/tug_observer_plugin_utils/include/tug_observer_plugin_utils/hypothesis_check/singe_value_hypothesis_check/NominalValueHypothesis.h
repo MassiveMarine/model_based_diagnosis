@@ -9,7 +9,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <tug_observer_plugin_utils/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.h>
 #include <stdexcept>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <tug_observer_plugin_utils/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValueFactory.h>
 
 template <class T>

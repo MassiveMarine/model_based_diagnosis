@@ -17,8 +17,9 @@ class VelocityConverterTf : public VelocityConverterPoseStamped
     std::string target_frame_;
     tf::TransformListener tf_listener_;
 public:
-    VelocityConverterTf(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base);
+    VelocityConverterTf(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back);
     void run();
+    virtual std::string getName();
 };
 
 

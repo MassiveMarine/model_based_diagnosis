@@ -10,11 +10,13 @@
 
 class VelocityConverterPose : public VelocityConverterPoseStamped
 {
+    std::string topic_;
 protected:
     VelocityConverterPose(boost::function<void (MovementReading)> call_back);
 public:
-    VelocityConverterPose(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base);
+    VelocityConverterPose(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base);
     void PoseCB(const geometry_msgs::Pose& msg);
+    virtual std::string getName();
 };
 
 #endif //TUG_VELOCITY_OBSERVER_VELOCITYCONVERTERPOSE_H

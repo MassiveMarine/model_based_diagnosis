@@ -10,7 +10,7 @@
 #include <boost/make_shared.hpp>
 #include <tug_observer_plugin_utils/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithBuffer.h>
 #include <tug_observer_plugin_utils/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithoutBuffer.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 template<class T>
 class MinMaxDeviationFilter : public DeviationFilter<T>

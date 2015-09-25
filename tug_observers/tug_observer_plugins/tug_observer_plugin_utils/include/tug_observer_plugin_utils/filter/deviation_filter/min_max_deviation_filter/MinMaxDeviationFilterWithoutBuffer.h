@@ -7,7 +7,7 @@
 
 #include <tug_observer_plugin_utils/filter/deviation_filter/DeviationFilter.h>
 #include <limits>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 
 template<class T>

@@ -11,6 +11,7 @@ namespace tug_observers
 
     ObserverPluginBase::ObserverPluginBase(std::string type) : spinner_(1, &internal_call_back_queue_), type_(type)
     {
+      nh_.setCallbackQueue(&internal_call_back_queue_);
       error_pub_ = nh_.advertise<tug_observers_msgs::observer_error>("/observers/error", 1);
     }
 

@@ -11,12 +11,12 @@
 #include <boost/shared_ptr.hpp>
 #include <tug_velocity_observer/VelocityConverter.h>
 #include <tug_velocity_observer/MovementReading.h>
-#include <tug_observers/ObserverPluginBase.h>
+#include <tug_observers/SubscriberFacade.h>
 
 class VelocityConverterFactory
 {
 public:
-    static boost::shared_ptr<VelocityConverter> createVelocityConverter(std::string type, XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base);
+    static boost::shared_ptr<VelocityConverter> createVelocityConverter(std::string type, XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base);
 };
 
 

@@ -3,7 +3,7 @@
 //
 
 #include <tug_velocity_observer/VelocityState.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <stdexcept>
 #include <tug_observer_plugin_utils/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheckFactory.h>
 

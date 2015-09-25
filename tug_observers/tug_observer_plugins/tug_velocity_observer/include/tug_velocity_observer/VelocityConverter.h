@@ -14,6 +14,8 @@ class VelocityConverter
 protected:
     VelocityConverter(boost::function<void (MovementReading)> call_back);
     void sendMovement(MovementReading twist);
+public:
+    virtual std::string getName() = 0;
 };
 
 

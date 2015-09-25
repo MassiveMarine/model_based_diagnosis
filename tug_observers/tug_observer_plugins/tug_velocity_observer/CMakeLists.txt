@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   tug_observer_plugin_utils
   tug_observers
   tug_observers_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -120,14 +121,17 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_library(velocity_observer   src/VelocityState.cpp src/VelocityConverter.cpp
+                                src/VelocityConverterFactory.cpp src/VelocityConverterTwist.cpp
+                                src/VelocityConverterTwistStamped.cpp src/VelocityConverterIMU.cpp
+                                src/VelocityConverterOdometry.cpp src/VelocityConverterPoseStamped.cpp
+                                src/VelocityConverterTf.cpp src/MovementReading.cpp
+                                src/VelocityConverterPose.cpp src/VelocityObserver.cpp
+                                src/VelocityChecker.cpp)
+
 ## Declare a C++ library
 add_library(velocity_plugin
-                            src/VelocityPlugin.cpp src/VelocityState.cpp src/VelocityConverter.cpp
-                            src/VelocityConverterFactory.cpp src/VelocityConverterTwist.cpp
-                            src/VelocityConverterTwistStamped.cpp src/VelocityConverterIMU.cpp
-                            src/VelocityConverterOdometry.cpp src/VelocityConverterPoseStamped.cpp
-                            src/VelocityConverterTf.cpp src/MovementReading.cpp
-                            src/VelocityConverterPose.cpp)
+                            src/VelocityPlugin.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -142,8 +146,13 @@ add_library(velocity_plugin
 # add_dependencies(tug_velocity_observer_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
+target_link_libraries(velocity_observer
+  ${catkin_LIBRARIES}
+)
+
 target_link_libraries(velocity_plugin
   ${catkin_LIBRARIES}
+  velocity_observer
 )
 
 #############

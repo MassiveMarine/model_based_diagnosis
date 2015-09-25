@@ -3,17 +3,17 @@
 //
 
 #include <tug_velocity_observer/VelocityConverterPoseStamped.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Matrix3x3.h>
 
 VelocityConverterPoseStamped::VelocityConverterPoseStamped(boost::function<void (MovementReading)> call_back) : VelocityConverterTwistStamped(call_back)
 { }
 
-VelocityConverterPoseStamped::VelocityConverterPoseStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base) : VelocityConverterTwistStamped(call_back)
+VelocityConverterPoseStamped::VelocityConverterPoseStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverterTwistStamped(call_back)
 {
-  std::string topic_name = ProcessYaml::getValue<std::string>("topic", params);
-  sub_ = plugin_base->subscribe(topic_name, 1, &VelocityConverterPoseStamped::PoseStampedCB, this);
+  topic_ = ProcessYaml::getValue<std::string>("topic", params);
+  sub_ = plugin_base->subscribe(topic_, 1, &VelocityConverterPoseStamped::PoseStampedCB, this);
 }
 
 void VelocityConverterPoseStamped::PoseStampedCB(const geometry_msgs::PoseStamped& msg)
@@ -46,4 +46,9 @@ void VelocityConverterPoseStamped::PoseStampedCB(const geometry_msgs::PoseStampe
 
     TwistStampedCB(twist_msg);
   }
+}
+
+std::string VelocityConverterPoseStamped::getName()
+{
+  return topic_;
 }

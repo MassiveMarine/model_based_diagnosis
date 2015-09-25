@@ -10,7 +10,7 @@
 #include <boost/make_shared.hpp>
 #include <tug_observer_plugin_utils/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithBuffer.h>
 #include <tug_observer_plugin_utils/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithoutBuffer.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 template<class T>
 class StandartDeviationFilter : public DeviationFilter<T>

@@ -3,15 +3,15 @@
 //
 
 #include <tug_velocity_observer/VelocityConverterTwistStamped.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 VelocityConverterTwistStamped::VelocityConverterTwistStamped(boost::function<void (MovementReading)> call_back) : VelocityConverter(call_back)
 { }
 
-VelocityConverterTwistStamped::VelocityConverterTwistStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base) : VelocityConverter(call_back)
+VelocityConverterTwistStamped::VelocityConverterTwistStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverter(call_back)
 {
-  std::string topic_name = ProcessYaml::getValue<std::string>("topic", params);
-  sub_ = plugin_base->subscribe(topic_name, 1, &VelocityConverterTwistStamped::TwistStampedCB, this);
+  topic_ = ProcessYaml::getValue<std::string>("topic", params);
+  sub_ = plugin_base->subscribe(topic_, 1, &VelocityConverterTwistStamped::TwistStampedCB, this);
 }
 
 void VelocityConverterTwistStamped::TwistStampedCB(const geometry_msgs::TwistStamped& msg)
@@ -37,4 +37,9 @@ void VelocityConverterTwistStamped::TwistStampedCB(const geometry_msgs::TwistSta
 
     sendMovement(reading);
   }
+}
+
+std::string VelocityConverterTwistStamped::getName()
+{
+  return topic_;
 }

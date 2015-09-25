@@ -6,16 +6,18 @@
 #define TUG_VELOCITY_OBSERVER_VELOCITYCONVERTERIMU_H
 
 #include <tug_velocity_observer/VelocityConverter.h>
-#include <tug_observers/ObserverPluginBase.h>
+#include <tug_observers/SubscriberFacade.h>
 #include <sensor_msgs/Imu.h>
 #include <ros/ros.h>
 
 class VelocityConverterIMU : public VelocityConverter
 {
+    std::string topic_;
     ros::Subscriber imu_sub_;
 public:
-    VelocityConverterIMU(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base);
+    VelocityConverterIMU(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base);
     void IMUCB(const sensor_msgs::Imu& msg);
+    virtual std::string getName();
 };
 
 

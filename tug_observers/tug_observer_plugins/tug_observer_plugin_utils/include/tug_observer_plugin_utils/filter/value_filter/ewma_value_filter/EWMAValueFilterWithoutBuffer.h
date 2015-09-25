@@ -6,7 +6,7 @@
 #define TUG_OBSERVER_PLUGINS_CPP_EWMAVALUEFILTERWITHOUTBUFFER_H
 
 #include <tug_observer_plugin_utils/filter/value_filter/ValueFilter.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 #include <boost/thread/mutex.hpp>
 
 template<class T>

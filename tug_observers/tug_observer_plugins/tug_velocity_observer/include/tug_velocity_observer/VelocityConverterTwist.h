@@ -10,9 +10,11 @@
 
 class VelocityConverterTwist : public VelocityConverterTwistStamped
 {
+    std::string topic_;
 public:
-    VelocityConverterTwist(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, tug_observers::ObserverPluginBase* plugin_base);
+    VelocityConverterTwist(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base);
     void TwistCB(const geometry_msgs::Twist& msg);
+    virtual std::string getName();
 };
 
 
