@@ -10,6 +10,7 @@
 VelocityState::VelocityState(XmlRpc::XmlRpcValue value)
 {
   name_ = ProcessYaml::getValue<std::string>("state", value);
+  number_ = ProcessYaml::getValue<int32_t>("number", value);
 
   if(value.hasMember("x"))
   {
@@ -87,4 +88,9 @@ bool VelocityState::conformsState(FilteState<double> rot_x_state, FilteState<dou
 std::string VelocityState::getName()
 {
   return name_;
+}
+
+int32_t VelocityState::getNumber()
+{
+  return number_;
 }

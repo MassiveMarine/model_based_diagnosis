@@ -16,11 +16,13 @@ namespace tug_observer_plugins_cpp
       boost::shared_ptr<SingleValueHypothesisCheck<double> > cpu_;
       boost::shared_ptr<SingleValueHypothesisCheck<unsigned long> > memory_;
       std::string name_;
+      int32_t number_;
 
     public:
         NodeResourceState(XmlRpc::XmlRpcValue value);
         bool conformsState(FilteState<double> cpu_state, FilteState<unsigned long> memory_state);
         std::string getName();
+        int32_t getNumber();
     };
 }
 

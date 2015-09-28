@@ -3,7 +3,6 @@
 //
 
 #include <tug_observers/ObserverInfoSender.h>
-#include <tug_observers_msgs/observer_info.h>
 
 ObserverInfoSender::ObserverInfoSender()
 {
@@ -13,8 +12,6 @@ ObserverInfoSender::ObserverInfoSender()
   private_nh.param<double>("info_rate", rate, 1.0);
 
   info_pub_ = nh_.advertise<tug_observers_msgs::observer_info>("/observers/info", 1);
-
-  timer_ = boost::make_shared<Timer>(boost::posix_time::microseconds(1./rate * 1000. * 1000.), boost::bind(&ObserverInfoSender::run, this));
 }
 
 ObserverInfoSender& ObserverInfoSender::getInstance()
@@ -24,42 +21,34 @@ ObserverInfoSender& ObserverInfoSender::getInstance()
   return instance;
 }
 
-void ObserverInfoSender::sendInfo(std::string type, std::string resource, std::vector<std::string> states, ros::Time time_of_occurence)
-{
-  getInstance().updateInfo(ObserverInfo(type, resource), states, time_of_occurence);
-}
-
-void ObserverInfoSender::run()
-{/*
-  boost::mutex::scoped_lock the_lock(observer_infos_mutex_);
-  tug_observers_msgs::observer_info msg;
-  for (std::map<ObserverInfo, std::pair<std::vector<std::string>, ros::Time> >::iterator it = current_observer_infos_.begin();
-       it != current_observer_infos_.end(); ++it)
-  {
-    tug_observers_msgs::resource_info info;
-    info.resource = it->first.resource;
-    info.type = it->first.type;
-    info.header.stamp = it->second.second;
-    info.states = it->second.first;
-    msg.resource_infos.push_back(info);
-  }
-  info_pub_.publish(msg);*/
-}
-
-void ObserverInfoSender::updateInfo(ObserverInfo info, std::vector<std::string> states, ros::Time time_of_occurence)
+void ObserverInfoSender::sendInfoIntern(std::string resource, std::string type, std::vector<Observation> observations, ros::Time time_of_occurence)
 {
   boost::mutex::scoped_lock the_lock(observer_infos_mutex_);
-  current_observer_infos_.erase(info);
-  current_observer_infos_.insert(std::make_pair(info, std::make_pair(states, time_of_occurence)));
+
+  tug_observers_msgs::observation_info observation_info;
+  observation_info.header.stamp = time_of_occurence;
+  observation_info.resource = resource;
+  observation_info.type = type;
+
+  for(size_t i = 0; i < observations.size(); ++i)
+    observation_info.observation.push_back(observations[i].toMsg());
+
+  current_obser_info_.observation_infos.push_back(observation_info);
 }
 
-void ObserverInfoSender::removeInfo(std::string type, std::string resource)
-{
-  getInstance().removeInfo(ObserverInfo(type, resource));
-}
-
-void ObserverInfoSender::removeInfo(ObserverInfo info)
+void ObserverInfoSender::flushIntern()
 {
   boost::mutex::scoped_lock the_lock(observer_infos_mutex_);
-  current_observer_infos_.erase(info);
+  info_pub_.publish(current_obser_info_);
+  current_obser_info_.observation_infos.clear();
+}
+
+void ObserverInfoSender::sendInfo(std::string resource, std::string type, std::vector<Observation> observations, ros::Time time_of_occurence)
+{
+  getInstance().sendInfo(resource, type, observations, time_of_occurence);
+}
+
+void ObserverInfoSender::flush()
+{
+  getInstance().flush();
 }

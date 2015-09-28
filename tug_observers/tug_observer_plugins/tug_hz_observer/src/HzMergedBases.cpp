@@ -17,6 +17,7 @@ HzMergedBases::HzMergedBases(std::string topic, XmlRpc::XmlRpcValue params, tug_
   name_stream << topic << " " << params["callerid"];
   name_ = name_stream.str();
 
+
   if (!params.hasMember("states"))
   {
     ROS_ERROR("No states for velocity plugin defined");
@@ -64,12 +65,12 @@ void HzMergedBases::sendResourceInfo()
   if(hz_state.sample_size < 2)
     return;
 
-  std::vector<std::string> states;
+  std::vector<Observation> states;
   for (std::vector<HzState>::iterator it = states_.begin(); it != states_.end(); ++it)
   {
     ROS_DEBUG_STREAM("check state: '" << it->getName() << "'");
     if (it->conformsState(hz_state))
-      states.push_back(it->getName());
+      states.push_back(Observation(it->getName(), it->getNumber()));
   }
   if(states.empty())
   {

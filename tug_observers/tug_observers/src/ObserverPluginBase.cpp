@@ -12,7 +12,6 @@ namespace tug_observers
     ObserverPluginBase::ObserverPluginBase(std::string type) : spinner_(1, &internal_call_back_queue_), type_(type)
     {
       nh_.setCallbackQueue(&internal_call_back_queue_);
-      error_pub_ = nh_.advertise<tug_observers_msgs::observer_error>("/observers/error", 1);
     }
 
     ObserverPluginBase::~ObserverPluginBase()
@@ -25,21 +24,30 @@ namespace tug_observers
       spinner_.start();
     }
 
-    void ObserverPluginBase::reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code, ros::Time time_of_occurence)
+    void ObserverPluginBase::reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, int32_t error_code, ros::Time time_of_occurence)
     {
-      ObserverInfoSender::removeInfo(type_, resource);
-      tug_observers_msgs::observer_error msg;
-      msg.type = type_;
-      msg.resource = resource;
-      msg.error_msg.error_msg = error_msg;
-      msg.error_msg.verbose_error_msg = verbose_error_msg;
-      msg.error_msg.error = error_code;
-      msg.header.stamp = time_of_occurence;
-      error_pub_.publish(msg);
+      if(error_code >= 0)
+      {
+        ROS_WARN_STREAM("report error with state which is positive -> will not be recognized as error -> change signe of error code");
+        error_code *= -1;
+      }
+
+      Observation observation(error_msg,verbose_error_msg, error_code);
+      std::vector<Observation> observations;
+      observations.push_back(observation);
+
+      reportStates(resource, observations, time_of_occurence);
+
+      flush();
     }
 
-    void ObserverPluginBase::reportStates(std::string resource, std::vector<std::string> states, ros::Time time_of_occurence)
+    void ObserverPluginBase::reportStates(std::string resource, std::vector<Observation> observations, ros::Time time_of_occurence)
     {
-      ObserverInfoSender::sendInfo(type_, resource, states, time_of_occurence);
+      ObserverInfoSender::sendInfo(resource, type_, observations, time_of_occurence);
+    }
+
+    void ObserverPluginBase::flush()
+    {
+      ObserverInfoSender::flush();
     }
 }

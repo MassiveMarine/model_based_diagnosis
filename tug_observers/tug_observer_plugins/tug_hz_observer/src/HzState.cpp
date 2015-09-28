@@ -9,6 +9,7 @@
 HzState::HzState(XmlRpc::XmlRpcValue params)
 {
   name_ = ProcessYaml::getValue<std::string>("state", params);
+  number_ = ProcessYaml::getValue<int32_t>("number", params);
   if (!params.hasMember("frequenzy"))
   {
     ROS_ERROR("No frequenzy for state for a hz state");
@@ -26,4 +27,9 @@ bool HzState::conformsState(FilteState<double> hz_state)
 std::string HzState::getName()
 {
   return  name_;
+}
+
+int32_t HzState::getNumber()
+{
+  return number_;
 }

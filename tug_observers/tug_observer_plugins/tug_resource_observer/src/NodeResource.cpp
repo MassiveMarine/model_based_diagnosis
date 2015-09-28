@@ -6,6 +6,7 @@
 #include <tug_yaml/ProcessYaml.h>
 #include <ros/ros.h>
 #include <boost/make_shared.hpp>
+#include <tug_observers/Observation.h>
 
 namespace tug_observer_plugins_cpp
 {
@@ -54,19 +55,19 @@ namespace tug_observer_plugins_cpp
       memory_filter_->update(memory);
     }
 
-    std::vector<std::string> NodeResource::estimateStates()
+    std::vector<Observation> NodeResource::estimateStates()
     {
       ROS_DEBUG("NodeResource::estimateStates 1");
       FilteState<double> cpu = cpu_filter_->getFilteState();
       ROS_DEBUG("NodeResource::estimateStates 2");
       FilteState<unsigned long> memory = memory_filter_->getFilteState();
       ROS_DEBUG("NodeResource::estimateStates 3");
-      std::vector<std::string> result;
+      std::vector<Observation> result;
       for(std::vector<NodeResourceState>::iterator it = states_.begin(); it != states_.end(); ++it)
       {
         ROS_DEBUG("NodeResource::estimateStates 3.1");
         if(it->conformsState(cpu, memory))
-          result.push_back(it->getName());
+          result.push_back(Observation(it->getName(), it->getNumber()));
         ROS_DEBUG("NodeResource::estimateStates 3.2");
       }
       ROS_DEBUG("NodeResource::estimateStates 4");

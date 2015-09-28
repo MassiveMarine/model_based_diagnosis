@@ -30,6 +30,7 @@ namespace tug_observer_plugins_cpp
               ProcessYaml::getValue<std::string>("type", memory_params), memory_params);
 
       name_ = ProcessYaml::getValue<std::string>("state", value);
+      number_ = ProcessYaml::getValue<int32_t>("number", value);
     }
 
     bool NodeResourceState::conformsState(FilteState<double> cpu_state, FilteState<unsigned long> memory_state)
@@ -41,5 +42,10 @@ namespace tug_observer_plugins_cpp
     std::string NodeResourceState::getName()
     {
       return name_;
+    }
+
+    int32_t NodeResourceState::getNumber()
+    {
+      return number_;
     }
 }

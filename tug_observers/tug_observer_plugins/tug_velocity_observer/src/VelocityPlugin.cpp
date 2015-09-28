@@ -22,13 +22,13 @@ namespace tug_observer_plugins_cpp
 
     void VelocityPlugin::run()
     {
-      std::vector<boost::tuple<std::string, std::vector<std::string>, ros::Time> > observations = velocityObservations();
+      std::vector<boost::tuple<std::string, std::vector<Observation>, ros::Time> > observations = velocityObservations();
 
       for(size_t i = 0; i < observations.size(); ++i)
       {
         ROS_DEBUG_STREAM("VelocityPlugin::run 3.1");
         std::string name = observations[i].head;
-        std::vector<std::string> states = observations[i].tail.head;
+        std::vector<Observation> states = observations[i].tail.head;
         ros::Time observation_time = observations[i].tail.tail.head;
         if (states.empty())
         {
@@ -41,6 +41,8 @@ namespace tug_observer_plugins_cpp
           reportStates(name, states, observation_time);
         }
       }
+
+      flush();
     }
 }
 

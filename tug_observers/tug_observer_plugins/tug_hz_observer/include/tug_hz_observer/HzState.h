@@ -13,13 +13,14 @@
 class HzState
 {
     std::string name_;
+    int32_t number_;
     boost::shared_ptr<SingleValueHypothesisCheck<double> > frequency_;
 
 public:
     HzState(XmlRpc::XmlRpcValue params);
     bool conformsState(FilteState<double> hz_state);
     std::string getName();
-
+    int32_t getNumber();
 };
 
 

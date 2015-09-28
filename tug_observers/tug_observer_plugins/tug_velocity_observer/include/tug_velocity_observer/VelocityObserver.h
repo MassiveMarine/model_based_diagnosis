@@ -12,6 +12,7 @@
 #include <tug_velocity_observer/VelocityConverter.h>
 #include <tug_velocity_observer/MovementReading.h>
 #include <tug_observers/SubscriberFacade.h>
+#include <tug_observers/Observation.h>
 
 class VelocityObserver
 {
@@ -49,7 +50,7 @@ public:
 
     void addTwistB(MovementReading value);
 
-    std::pair<bool, std::vector<std::string> > estimateStates();
+    std::pair<bool, std::vector<Observation> > estimateStates();
 
     ros::Time getCurrentFilterTime();
 

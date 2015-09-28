@@ -13,7 +13,7 @@ class VelocityChecker
     std::vector<boost::shared_ptr<VelocityObserver> > observers_;
 
 protected:
-    std::vector<boost::tuple<std::string, std::vector<std::string>, ros::Time> > velocityObservations();
+    std::vector<boost::tuple<std::string, std::vector<Observation>, ros::Time> > velocityObservations();
 public:
     VelocityChecker();
 

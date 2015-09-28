@@ -10,6 +10,7 @@
 #include <vector>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <tug_observer_plugin_utils/filter/Filter.h>
+#include <tug_observers/Observation.h>
 
 namespace tug_observer_plugins_cpp
 {
@@ -25,7 +26,7 @@ namespace tug_observer_plugins_cpp
 
       void update(double cpu, unsigned long memory);
 
-      std::vector<std::string> estimateStates();
+      std::vector<Observation> estimateStates();
     };
 }
 

@@ -89,11 +89,11 @@ namespace tug_observer_plugins_cpp
           ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.3");
           std::string name = (*it)->first;
           ROS_DEBUG_STREAM("ResourcesPlugin::nodeInfoCallback 3.4 " << name);
-          std::vector<std::string> states = (*it)->second.estimateStates();
+          std::vector<Observation> states = (*it)->second.estimateStates();
           ROS_DEBUG_STREAM("ResourcesPlugin::nodeInfoCallback 3.5 " << " with number of states: " << states.size());
           if(states.empty())
           {
-            reportError(name, "no_state_" + name, "For the node with the name '" + name + "' no state could be estimated", tug_observers_msgs::resource_error::NO_STATE_FITS, msg->header.stamp);
+            reportError(name, "no_state_" + name, "For the node with the name '" + name + "' no state could be estimated", tug_observers_msgs::observation::NO_STATE_FITS, msg->header.stamp);
           }
           else
           {
@@ -101,6 +101,8 @@ namespace tug_observer_plugins_cpp
             ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.5");
           }
         }
+
+        flush();
       }
       ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 4");
       received_first_msg_ = true;

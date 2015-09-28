@@ -13,6 +13,7 @@
 #include <ros/transport_hints.h>
 #include <ros/ros.h>
 #include <tug_observers/SubscriberFacade.h>
+#include <tug_observers/Observation.h>
 
 namespace tug_observers
 {
@@ -22,7 +23,6 @@ namespace tug_observers
     private:
       ros::CallbackQueue internal_call_back_queue_;
       ros::AsyncSpinner spinner_;
-      ros::Publisher error_pub_;
       std::string type_;
 
     public:
@@ -32,9 +32,11 @@ namespace tug_observers
 
       virtual void initialize(XmlRpc::XmlRpcValue params) = 0;
 
-      void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, uint32_t error_code, ros::Time time_of_occurence);
+      void reportError(std::string resource, std::string error_msg, std::string verbose_error_msg, int32_t error_code, ros::Time time_of_occurence);
 
-      void reportStates(std::string resource, std::vector<std::string> states, ros::Time time_of_occurence);
+      void reportStates(std::string resource, std::vector<Observation> observations, ros::Time time_of_occurence);
+
+      void flush();
     protected:
       ObserverPluginBase(std::string type);
     };

@@ -13,45 +13,24 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/asio/deadline_timer.hpp>
 #include <tug_time/Timer.h>
-
-struct ObserverInfo
-{
-  std::string type;
-  std::string resource;
-
-  ObserverInfo(const std::string &_type, const std::string &_resource) : type(_type), resource(_resource)
-  { }
-
-  bool operator<(const ObserverInfo& other) const
-  {
-    if(type < other.type)
-      return true;
-
-    if(resource < other.resource)
-      return true;
-
-    return false;
-  }
-};
+#include <tug_observers/Observation.h>
+#include <tug_observers_msgs/observer_info.h>
 
 class ObserverInfoSender
 {
-  std::map<ObserverInfo, std::pair<std::vector<std::string>, ros::Time> > current_observer_infos_;
   ros::NodeHandle nh_;
   ros::Publisher info_pub_;
   boost::mutex observer_infos_mutex_;
-  boost::shared_ptr<Timer> timer_;
+  tug_observers_msgs::observer_info current_obser_info_;
 
   ObserverInfoSender();
-
-  void run();
-  void updateInfo(ObserverInfo info, std::vector<std::string> states, ros::Time time_of_occurence);
-  void removeInfo(ObserverInfo info);
+  void sendInfoIntern(std::string resource, std::string type, std::vector<Observation> observations, ros::Time time_of_occurence);
+  void flushIntern();
 
   public:
     static ObserverInfoSender& getInstance();
-    static void sendInfo(std::string type, std::string resource, std::vector<std::string> states, ros::Time time_of_occurence);
-    static void removeInfo(std::string type, std::string resource);
+    static void sendInfo(std::string resource, std::string type, std::vector<Observation> observations, ros::Time time_of_occurence);
+    static void flush();
 };
 
 

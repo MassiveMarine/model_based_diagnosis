@@ -20,6 +20,7 @@ class VelocityState
     boost::shared_ptr<SingleValueHypothesisCheck<double> > rot_y_;
     boost::shared_ptr<SingleValueHypothesisCheck<double> > rot_z_;
     std::string name_;
+    int32_t number_;
 
 public:
     VelocityState(XmlRpc::XmlRpcValue value);
@@ -28,6 +29,7 @@ public:
     bool conformsStateZ(FilteState<double> z_state);
     bool conformsState(FilteState<double> rot_x_state, FilteState<double> rot_y_state, FilteState<double> rot_z_state);
     std::string getName();
+    int32_t getNumber();
 };
 
 
