@@ -45,10 +45,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  observer_error.msg
+  observation.msg
+  observation_info.msg
   observer_info.msg
-  resource_error.msg
-  resource_info.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -1,1 +1,1 @@
-resource_info[] resource_infos
+observation_info[] observation_infos
