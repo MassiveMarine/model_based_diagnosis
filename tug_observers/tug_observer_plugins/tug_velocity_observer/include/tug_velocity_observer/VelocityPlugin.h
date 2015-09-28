@@ -8,7 +8,7 @@
 #include <tug_observers/ObserverPluginBase.h>
 #include <tug_velocity_observer/VelocityObserver.h>
 #include <tug_velocity_observer/VelocityChecker.h>
-#include <tug_timers/Timer.h>
+#include <tug_time/Timer.h>
 
 namespace tug_observer_plugins_cpp
 {

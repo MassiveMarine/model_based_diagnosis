@@ -16,6 +16,7 @@ namespace tug_observer_plugins_cpp
     {
       init(params, this);
 
+      double rate = 1.0;
       timer_ = boost::make_shared<Timer>(boost::posix_time::microseconds(1./rate * 1000. * 1000.), boost::bind(&VelocityPlugin::run, this));
     }
 

@@ -3,7 +3,7 @@
 //
 
 #include <tug_timeout_observer/TimeoutSubs.h>
-#include <tug_observer_plugin_utils/ProcessYaml.h>
+#include <tug_yaml/ProcessYaml.h>
 
 TimeoutSubs::TimeoutSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* plugin_base) : plugin_base_(plugin_base)
 {

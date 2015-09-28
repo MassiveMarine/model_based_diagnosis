@@ -47,6 +47,8 @@
   <build_depend>tug_observers</build_depend>
   <build_depend>tug_observers_msgs</build_depend>
   <build_depend>tf</build_depend>
+  <build_depend>tug_time</build_depend>
+  <build_depend>tug_yaml</build_depend>
 
   <run_depend>geometry_msgs</run_depend>
   <run_depend>pluginlib</run_depend>
@@ -55,6 +57,8 @@
   <run_depend>tug_observers</run_depend>
   <run_depend>tug_observers_msgs</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>tug_time</run_depend>
+  <run_depend>tug_yaml</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

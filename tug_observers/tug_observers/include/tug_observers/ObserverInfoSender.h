@@ -12,7 +12,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/asio/deadline_timer.hpp>
-#include <tug_timers/Timer.h>
+#include <tug_time/Timer.h>
 
 struct ObserverInfo
 {
