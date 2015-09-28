@@ -33,6 +33,7 @@ setup:
 
       states:
       - state: 'state1'
+        number: 1
         age:
 ########### select one type: ###########
 # 1 ####################################

@@ -53,6 +53,7 @@ setup:
 #        deviation_type: min_max
     states:
     - state: 'state1'
+      number: 1
       cpu:
 ########### select one type: ###########
 # 1 ####################################

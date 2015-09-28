@@ -34,6 +34,7 @@ setup:
 
     states:
     - state: 'state1'
+      number: 1
       delay:
 ########### select one type: ###########
 # 1 ####################################

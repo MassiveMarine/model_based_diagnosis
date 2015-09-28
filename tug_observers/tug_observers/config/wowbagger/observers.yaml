@@ -13,6 +13,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.5                    # @ student_t
@@ -28,6 +29,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.5                    # @ student_t
@@ -43,6 +45,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.5                    # @ student_t
@@ -58,6 +61,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.025                  # @ student_t
@@ -73,6 +77,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.03                   # @ student_t
@@ -88,6 +93,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.01                   # @ student_t
@@ -103,6 +109,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.02                   # @ student_t
@@ -118,6 +125,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.02                   # @ student_t
@@ -133,6 +141,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.02                   # @ student_t
@@ -148,6 +157,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 2.0                    # @ student_t
@@ -163,6 +173,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.025                    # @ student_t
@@ -178,6 +189,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.03                   # @ student_t
@@ -193,6 +205,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.1                    # @ student_t
@@ -208,6 +221,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.037                  # @ student_t
@@ -223,6 +237,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.025                  # @ student_t
@@ -238,6 +253,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.025                    # @ student_t
@@ -253,6 +269,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.03                   # @ student_t
@@ -268,6 +285,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.032                  # @ student_t
@@ -283,6 +301,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.032                  # @ student_t
@@ -298,6 +317,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.04                   # @ student_t
@@ -313,6 +333,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.034                  # @ student_t
@@ -328,6 +349,7 @@ setup:
 #        deviation_type: std_deviation       # std_deviation, min_max
 #      states:
 #      - state: 'ok'
+        number: 1
 #        frequenzy:
 #          type: student_t                   # student_t, nominal_value
 #          true_mean: 0.034                  # @ student_t
@@ -343,6 +365,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.034                 # @ student_t
@@ -358,6 +381,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.034                 # @ student_t
@@ -373,6 +397,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.025                  # @ student_t
@@ -388,6 +413,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.025                    # @ student_t
@@ -403,6 +429,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.01                   # @ student_t
@@ -418,6 +445,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'ok'
+        number: 1
         frequenzy:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.028                  # @ student_t

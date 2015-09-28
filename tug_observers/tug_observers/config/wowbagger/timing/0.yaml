@@ -14,6 +14,7 @@ setup:
       deviation_type: std_deviation       # std_deviation, min_max
     states:
     - state: 'ok'
+      number: 1
       delay:
         type: student_t                   # student_t, nominal_value
         true_mean: 0.01                   # @ student_t
@@ -30,6 +31,7 @@ setup:
       deviation_type: std_deviation       # std_deviation, min_max
     states:
     - state: 'ok'
+      number: 1
       delay:
         type: student_t                   # student_t, nominal_value
         true_mean: 0.01                   # @ student_t
@@ -46,6 +48,7 @@ setup:
       deviation_type: std_deviation       # std_deviation, min_max
     states:
     - state: 'ok'
+      number: 1
       delay:
         type: student_t                   # student_t, nominal_value
         true_mean: 0.01                   # @ student_t
@@ -62,6 +65,7 @@ setup:
       deviation_type: std_deviation       # std_deviation, min_max
     states:
     - state: 'ok'
+      number: 1
       delay:
         type: student_t                   # student_t, nominal_value
         true_mean: 0.01                   # @ student_t
@@ -78,6 +82,7 @@ setup:
       deviation_type: std_deviation       # std_deviation, min_max
     states:
     - state: 'ok'
+      number: 1
       delay:
         type: student_t                   # student_t, nominal_value
         true_mean: 0.01                   # @ student_t

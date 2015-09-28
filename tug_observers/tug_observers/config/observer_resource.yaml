@@ -11,6 +11,7 @@ setup:
       window_size: 3
     states:
     - state: '1'
+      number: 1
       cpu:
         type: nominal_value
         value:
@@ -35,6 +36,7 @@ setup:
       decay_rate: 0.8
     states:
     - state: '1'
+      number: 1
       cpu:
         type: nominal_value
         value:

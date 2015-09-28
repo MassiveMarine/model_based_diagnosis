@@ -14,6 +14,7 @@ setup:
         deviation_type: std_deviation       # std_deviation, min_max
       states:
       - state: 'state1'
+        number: 1
         age:
           type: student_t                   # student_t, nominal_value
           true_mean: 0.10                   # @ student_t

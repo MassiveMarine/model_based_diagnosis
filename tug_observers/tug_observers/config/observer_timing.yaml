@@ -15,6 +15,7 @@ setup:
       deviation_type: std_deviation   # std_deviation, min_max
     states:
     - state: '1'
+      number: 1
       delay:
         type: nominal_value
         value:
