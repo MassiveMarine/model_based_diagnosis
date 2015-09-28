@@ -1,0 +1,3 @@
+Header header
+string type
+resource_mode_assignement diagnosis
