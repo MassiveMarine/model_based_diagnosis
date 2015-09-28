@@ -30,7 +30,7 @@ void ObserverInfoSender::sendInfo(std::string type, std::string resource, std::v
 }
 
 void ObserverInfoSender::run()
-{
+{/*
   boost::mutex::scoped_lock the_lock(observer_infos_mutex_);
   tug_observers_msgs::observer_info msg;
   for (std::map<ObserverInfo, std::pair<std::vector<std::string>, ros::Time> >::iterator it = current_observer_infos_.begin();
@@ -43,7 +43,7 @@ void ObserverInfoSender::run()
     info.states = it->second.first;
     msg.resource_infos.push_back(info);
   }
-  info_pub_.publish(msg);
+  info_pub_.publish(msg);*/
 }
 
 void ObserverInfoSender::updateInfo(ObserverInfo info, std::vector<std::string> states, ros::Time time_of_occurence)
