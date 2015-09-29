@@ -13,6 +13,7 @@ setup:
   # 3 ####################################
   #        type: imu
   #        topic: /topicA
+  #        gravitation_cancelation: false    # optional
   # 4 ####################################
   #        type: odometry
   #        topic: /topicA

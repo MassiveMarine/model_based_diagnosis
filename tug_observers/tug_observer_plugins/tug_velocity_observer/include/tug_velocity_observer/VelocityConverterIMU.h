@@ -12,8 +12,10 @@
 
 class VelocityConverterIMU : public VelocityConverter
 {
+    const static double GRAVITY=9.81;
     std::string topic_;
     ros::Subscriber imu_sub_;
+    bool graviation_cancelation_;
 public:
     VelocityConverterIMU(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base);
     void IMUCB(const sensor_msgs::Imu& msg);
