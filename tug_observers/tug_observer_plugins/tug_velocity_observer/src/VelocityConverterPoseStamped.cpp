@@ -6,6 +6,7 @@
 #include <tug_yaml/ProcessYaml.h>
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Matrix3x3.h>
+#include <tf/LinearMath/Transform.h>
 
 VelocityConverterPoseStamped::VelocityConverterPoseStamped(boost::function<void (MovementReading)> call_back) : VelocityConverterTwistStamped(call_back)
 { }
@@ -21,31 +22,40 @@ void VelocityConverterPoseStamped::PoseStampedCB(const geometry_msgs::PoseStampe
   ROS_DEBUG_STREAM("got pose stamped callback with position x:" << msg.pose.position.x << " y:" << msg.pose.position.y << " z:" << msg.pose.position.z
   << " at time sec:" << msg.header.stamp.sec << " nsec:" << msg.header.stamp.nsec);
 
-  linear_x_velocity_calc_.addValue(msg.pose.position.x, msg.header.stamp);
-  linear_y_velocity_calc_.addValue(msg.pose.position.y, msg.header.stamp);
-  linear_z_velocity_calc_.addValue(msg.pose.position.z, msg.header.stamp);
-
-  tf::Quaternion quat_rot(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w);
-  tf::Matrix3x3 mat_rot(quat_rot);
-  double roll, pitch, yaw;
-  mat_rot.getRPY(roll, pitch, yaw);
-  angular_x_velocity_calc_.addValue(roll, msg.header.stamp);
-  angular_y_velocity_calc_.addValue(pitch, msg.header.stamp);
-  angular_z_velocity_calc_.addValue(yaw, msg.header.stamp);
-
-  if(linear_x_velocity_calc_.hasDifferentiation() && linear_y_velocity_calc_.hasDifferentiation() && linear_z_velocity_calc_.hasDifferentiation() && angular_x_velocity_calc_.hasDifferentiation() && angular_y_velocity_calc_.hasDifferentiation() && angular_z_velocity_calc_.hasDifferentiation())
+  if(has_old_position_)
   {
+    // transform the new position as a relative position to the new position
+    tf::Quaternion old_rotation(old_position_.pose.orientation.x, old_position_.pose.orientation.y, old_position_.pose.orientation.z, old_position_.pose.orientation.w);
+    tf::Vector3 old_translation(old_position_.pose.position.x, old_position_.pose.position.y, old_position_.pose.position.z);
+    tf::Transform old_pose_as_transformation(old_rotation, old_translation);
+
+    tf::Quaternion new_rotation(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w);
+    tf::Vector3 new_translation(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z);
+    tf::Transform new_pose_as_transformation(new_rotation, new_translation);
+
+    tf::Transform difference_between = old_pose_as_transformation.inverseTimes(new_pose_as_transformation);
+
+    // devide the transformation by time as this was the velocity to move between these two positions
+    double time_difference = (msg.header.stamp - old_position_.header.stamp).toSec();
+
     geometry_msgs::TwistStamped twist_msg;
     twist_msg.header = msg.header;
-    twist_msg.twist.linear.x = linear_x_velocity_calc_.getDifferentiation();
-    twist_msg.twist.linear.y = linear_y_velocity_calc_.getDifferentiation();
-    twist_msg.twist.linear.z = linear_z_velocity_calc_.getDifferentiation();
-    twist_msg.twist.angular.x = angular_x_velocity_calc_.getDifferentiation();
-    twist_msg.twist.angular.y = angular_y_velocity_calc_.getDifferentiation();
-    twist_msg.twist.angular.z = angular_z_velocity_calc_.getDifferentiation();
+    twist_msg.twist.linear.x = difference_between.getOrigin().x() / time_difference;
+    twist_msg.twist.linear.y = difference_between.getOrigin().y() / time_difference;
+    twist_msg.twist.linear.z = difference_between.getOrigin().z() / time_difference;
+
+    tf::Matrix3x3 difference_rot(difference_between.getRotation());
+    double roll, pitch, yaw;
+    difference_rot.getRPY(roll, pitch, yaw);
+    twist_msg.twist.angular.x = roll / time_difference;
+    twist_msg.twist.angular.y = pitch / time_difference;
+    twist_msg.twist.angular.z = yaw / time_difference;
 
     TwistStampedCB(twist_msg);
   }
+
+  old_position_ = msg;
+  has_old_position_ = true;
 }
 
 std::string VelocityConverterPoseStamped::getName()

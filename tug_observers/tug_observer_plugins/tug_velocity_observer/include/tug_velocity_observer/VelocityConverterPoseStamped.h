@@ -10,13 +10,9 @@
 
 class VelocityConverterPoseStamped : public VelocityConverterTwistStamped
 {
-    SingleSideDifferentiation<double> linear_x_velocity_calc_;
-    SingleSideDifferentiation<double> linear_y_velocity_calc_;
-    SingleSideDifferentiation<double> linear_z_velocity_calc_;
-    SingleSideDifferentiation<double> angular_x_velocity_calc_;
-    SingleSideDifferentiation<double> angular_y_velocity_calc_;
-    SingleSideDifferentiation<double> angular_z_velocity_calc_;
     std::string topic_;
+    bool has_old_position_;
+    geometry_msgs::PoseStamped old_position_;
 
 protected:
     VelocityConverterPoseStamped(boost::function<void (MovementReading)> call_back);
