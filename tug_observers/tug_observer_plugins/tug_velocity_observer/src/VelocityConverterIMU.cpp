@@ -44,9 +44,9 @@ void VelocityConverterIMU::IMUCB(const sensor_msgs::Imu& msg)
       # compensate accelerometer readings with the expected direction of gravity
       return [acc[0] - g[0], acc[1] - g[1], acc[2] - g[2]]*/
 
-    double g_x = 2. * (msg.orientation.y * msg.orientation.w - msg.orientation.x * msg.orientation.z);
-    double g_y = 2. * (msg.orientation.x * msg.orientation.y + msg.orientation.z * msg.orientation.w);
-    double g_z = msg.orientation.x * msg.orientation.x - msg.orientation.y * msg.orientation.y - msg.orientation.z * msg.orientation.z + msg.orientation.w * msg.orientation.w;
+    double g_x = 2. * (msg.orientation.x * msg.orientation.z - msg.orientation.w * msg.orientation.y);
+    double g_y = 2. * (msg.orientation.w * msg.orientation.x + msg.orientation.y * msg.orientation.z);
+    double g_z = msg.orientation.w * msg.orientation.w - msg.orientation.x * msg.orientation.x - msg.orientation.y * msg.orientation.y + msg.orientation.z * msg.orientation.z;
     reading.linear.x = msg.linear_acceleration.x - g_x * GRAVITY;
     reading.linear.y = msg.linear_acceleration.y - g_y * GRAVITY;
     reading.linear.z = msg.linear_acceleration.z - g_z * GRAVITY;
