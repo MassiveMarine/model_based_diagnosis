@@ -30,13 +30,26 @@ public:
     {
       if(has_past2_value_)
       {
-        if(value_time <= past2_value_time_)
+        if(value_time == past2_value_time_)
+        {
+          ROS_DEBUG_STREAM("skip value for calculation single side differntiation with new value:" << value <<
+                           " and old value:" << past2_value_time_ << " current time sec:" << value_time.sec <<
+                           " nsec:" << value_time.nsec << " old time sec: " << past2_value_time_.sec <<
+                           " nsec:" << past2_value_time_.nsec);
+          return;
+        } else if(value_time < past2_value_time_)
+        {
+          ROS_ERROR_STREAM("can't calculate single side differntiation with new value:" << value <<
+                           " and old value:" << past2_value_time_ << " current time sec:" << value_time.sec <<
+                           " nsec:" << value_time.nsec << " old time sec: " << past2_value_time_.sec <<
+                           " nsec:" << past2_value_time_.nsec);
           throw std::invalid_argument("new added value is in the past can't process this data");
+        }
 
         if(has_past1_value_)
         {
           double time_difference = (value_time - past1_value_time_).toSec();
-          current_differntiation_ = static_cast<T>(static_cast<double>(past1_value_ - value) / time_difference);
+          current_differntiation_ = static_cast<T>(static_cast<double>(value - past1_value_) / time_difference);
           current_differntiation_time_ = past2_value_time_;
           has_current_differntiation_ = true;
         }

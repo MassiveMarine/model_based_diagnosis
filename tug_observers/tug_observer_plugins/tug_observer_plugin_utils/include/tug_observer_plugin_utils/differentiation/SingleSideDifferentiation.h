@@ -26,16 +26,29 @@ public:
     {
       if(has_past_value_)
       {
-        if(value_time <= past_value_time_)
+        if(value_time == past_value_time_)
+        {
+          ROS_DEBUG_STREAM("skip value for calculation single side differntiation with new value:" << value <<
+                          " and old value:" << past_value_ << " current time sec:" << value_time.sec <<
+                          " nsec:" << value_time.nsec << " old time sec: " << past_value_time_.sec <<
+                          " nsec:" << past_value_time_.nsec);
+          return;
+        } else if(value_time < past_value_time_)
+        {
+          ROS_ERROR_STREAM("can't calculate single side differntiation with new value:" << value <<
+                           " and old value:" << past_value_ << " current time sec:" << value_time.sec <<
+                           " nsec:" << value_time.nsec << " old time sec: " << past_value_time_.sec <<
+                           " nsec:" << past_value_time_.nsec);
           throw std::invalid_argument("new added value is in the past can't process this data");
+        }
         ROS_DEBUG_STREAM("calculate single side differntiation with new value:" << value <<
                                  " and old value:" << past_value_ << " current time sec:" << value_time.sec <<
                                 " nsec:" << value_time.nsec << " old time sec: " << past_value_time_.sec <<
                                 " nsec:" << past_value_time_.nsec);
         double time_difference = (value_time - past_value_time_).toSec();
         ROS_DEBUG_STREAM("time difference:" << time_difference);
-        ROS_DEBUG_STREAM("value difference: " << static_cast<double>(past_value_ - value));
-        current_differntiation_ = static_cast<T>(static_cast<double>(past_value_ - value) / time_difference);
+        ROS_DEBUG_STREAM("value difference: " << static_cast<double>(value - past_value_));
+        current_differntiation_ = static_cast<T>(static_cast<double>(value - past_value_) / time_difference);
         current_differntiation_time_ = value_time;
         has_current_differntiation_ = true;
         ROS_DEBUG_STREAM("calculated difference:" << current_differntiation_ << " at time:" << current_differntiation_time_);
