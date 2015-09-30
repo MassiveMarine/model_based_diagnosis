@@ -3,7 +3,7 @@
 //
 
 #include <tug_timeout_observer/TimeoutBase.h>
-#include <tug_observers_msgs/resource_error.h>
+#include <tug_observers_msgs/observation.h>
 
 TimeoutBase::TimeoutBase(std::string topic, XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* plugin_base) : plugin_base_(plugin_base)
 {
@@ -42,7 +42,7 @@ bool TimeoutBase::timeout_callback()
 
   remaining_timeouts_ -= 1;
 
-  plugin_base_->reportError(name_, "no_state_" + name_, "For the node with the name '" + name_ + "' no state could be estimated", tug_observers_msgs::resource_error::NO_AVAILABLE, ros::Time::now());
+  plugin_base_->reportError(name_, "no_state_" + name_, "For the node with the name '" + name_ + "' no state could be estimated", tug_observers_msgs::observation::NO_AVAILABLE, ros::Time::now());
 
   return true;
 }

@@ -45,10 +45,10 @@ void ObserverInfoSender::flushIntern()
 
 void ObserverInfoSender::sendInfo(std::string resource, std::string type, std::vector<Observation> observations, ros::Time time_of_occurence)
 {
-  getInstance().sendInfo(resource, type, observations, time_of_occurence);
+  getInstance().sendInfoIntern(resource, type, observations, time_of_occurence);
 }
 
 void ObserverInfoSender::flush()
 {
-  getInstance().flush();
+  getInstance().flushIntern();
 }

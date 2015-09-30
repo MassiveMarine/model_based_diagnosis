@@ -4,7 +4,7 @@
 
 #include <tug_hz_observer/HzMergedBases.h>
 #include <ros/ros.h>
-#include <tug_observers_msgs/resource_error.h>
+#include <tug_observers_msgs/observation.h>
 #include <tug_yaml/ProcessYaml.h>
 #include <sstream>
 
@@ -74,7 +74,7 @@ void HzMergedBases::sendResourceInfo()
   }
   if(states.empty())
   {
-    plugin_base_->reportError(name_, "no_state_" + name_, "For the node with the name '" + name_ + "' no state could be estimated", tug_observers_msgs::resource_error::NO_STATE_FITS, current_filter_time_);
+    plugin_base_->reportError(name_, "no_state_" + name_, "For the node with the name '" + name_ + "' no state could be estimated", tug_observers_msgs::observation::NO_STATE_FITS, current_filter_time_);
   }
   else
   {

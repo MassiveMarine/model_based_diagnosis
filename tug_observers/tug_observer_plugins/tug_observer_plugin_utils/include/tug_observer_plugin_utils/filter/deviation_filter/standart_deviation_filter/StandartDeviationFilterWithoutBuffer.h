@@ -33,7 +33,7 @@ class StandartDeviationFilterWithoutBuffer : public DeviationFilter<T>
   template<typename Iterator>
   T getMeanValue(Iterator begin, Iterator end, size_t size)
   {
-    if(size)
+    if(size == 0)
       return static_cast<T>(0);
 
     T result = std::accumulate(begin, end, static_cast<T>(0));

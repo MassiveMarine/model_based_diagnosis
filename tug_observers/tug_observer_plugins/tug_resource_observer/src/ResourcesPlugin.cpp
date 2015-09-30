@@ -6,7 +6,7 @@
 #include <ros/ros.h>
 #include <tug_yaml/ProcessYaml.h>
 #include <pluginlib/class_list_macros.h>
-#include <tug_observers_msgs/resource_error.h>
+#include <tug_observers_msgs/observation.h>
 
 namespace tug_observer_plugins_cpp
 {
@@ -81,7 +81,7 @@ namespace tug_observer_plugins_cpp
       {
         ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.1");
         for (std::set<std::string>::iterator it = remaining_nodes.begin(); it != remaining_nodes.end(); ++it)
-          reportError(*it, "not_running_" + *it, "The node with the name '" + *it + "' is not running", tug_observers_msgs::resource_error::NO_AVAILABLE, msg->header.stamp);
+          reportError(*it, "not_running_" + *it, "The node with the name '" + *it + "' is not running", tug_observers_msgs::observation::NO_AVAILABLE, msg->header.stamp);
         ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.2");
         for (std::vector<std::map<std::string, NodeResource>::iterator>::iterator it = found_node_resources.begin();
              it != found_node_resources.end(); ++it)

@@ -3,7 +3,6 @@
 //
 
 #include <tug_observers/ObserverPluginBase.h>
-#include <tug_observers_msgs/observer_error.h>
 #include <tug_observers/ObserverInfoSender.h>
 
 namespace tug_observers
