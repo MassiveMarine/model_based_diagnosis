@@ -7,7 +7,7 @@
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Matrix3x3.h>
 
-VelocityConverterIMU::VelocityConverterIMU(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverter(call_back)
+VelocityConverterIMU::VelocityConverterIMU(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverter(params, call_back)
 {
   topic_ = ProcessYaml::getValue<std::string>("topic", params);
   imu_sub_ = plugin_base->subscribe(topic_, 1, &VelocityConverterIMU::IMUCB, this);

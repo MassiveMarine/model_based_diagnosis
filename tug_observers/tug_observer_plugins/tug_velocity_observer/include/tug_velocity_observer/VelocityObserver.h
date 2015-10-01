@@ -22,16 +22,16 @@ class VelocityObserver
     std::list<MovementReading> a_twists_;
     std::list<MovementReading> b_twists_;
 
-    boost::shared_ptr<Filter<double> > x_filter_;
-    boost::shared_ptr<Filter<double> > y_filter_;
-    boost::shared_ptr<Filter<double> > z_filter_;
+    boost::shared_ptr<Filter<double> > diff_x_filter_;
+    boost::shared_ptr<Filter<double> > diff_y_filter_;
+    boost::shared_ptr<Filter<double> > diff_z_filter_;
 
     bool use_roll_;
     bool use_pitch_;
     bool use_yaw_;
-    boost::shared_ptr<Filter<double> > rot_x_filter_;
-    boost::shared_ptr<Filter<double> > rot_y_filter_;
-    boost::shared_ptr<Filter<double> > rot_z_filter_;
+    boost::shared_ptr<Filter<double> > diff_rot_x_filter_;
+    boost::shared_ptr<Filter<double> > diff_rot_y_filter_;
+    boost::shared_ptr<Filter<double> > diff_rot_z_filter_;
 
     std::vector<VelocityState> states_;
 
@@ -48,6 +48,7 @@ class VelocityObserver
     ros::Publisher b_publisher_;
     ros::Publisher a_paired_publisher_;
     ros::Publisher b_paired_publisher_;
+    ros::Publisher filter_result_publisher_;
     ros::AsyncSpinner spinner_;
 
 public:

@@ -7,7 +7,7 @@
 #include <boost/make_shared.hpp>
 #include <tug_observer_plugin_utils/differentiation/SimpleLinearRegression.h>
 
-VelocityConverterTwistStamped::VelocityConverterTwistStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back) : VelocityConverter(call_back)
+VelocityConverterTwistStamped::VelocityConverterTwistStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back) : VelocityConverter(params, call_back)
 {
   unsigned int window_size = ProcessYaml::getValue<unsigned int>("acceleartion_window_size", params, 7);
   x_acceleration_calc_ = boost::make_shared<SimpleLinearRegression<double> >(window_size);
@@ -15,7 +15,7 @@ VelocityConverterTwistStamped::VelocityConverterTwistStamped(XmlRpc::XmlRpcValue
   z_acceleration_calc_ = boost::make_shared<SimpleLinearRegression<double> >(window_size);
 }
 
-VelocityConverterTwistStamped::VelocityConverterTwistStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverter(call_back)
+VelocityConverterTwistStamped::VelocityConverterTwistStamped(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverter(params, call_back)
 {
   topic_ = ProcessYaml::getValue<std::string>("topic", params);
   sub_ = plugin_base->subscribe(topic_, 1, &VelocityConverterTwistStamped::TwistStampedCB, this);
