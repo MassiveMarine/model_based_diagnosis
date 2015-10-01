@@ -5,7 +5,7 @@
 #include <tug_velocity_observer/VelocityConverterTf.h>
 #include <tug_yaml/ProcessYaml.h>
 
-VelocityConverterTf::VelocityConverterTf(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back) : VelocityConverterPoseStamped(call_back), tf_update_rate_(1.0)
+VelocityConverterTf::VelocityConverterTf(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back) : VelocityConverterPoseStamped(params, call_back), tf_update_rate_(1.0)
 {
   target_frame_ = ProcessYaml::getValue<std::string>("target_frame", params);
   base_frame_ = ProcessYaml::getValue<std::string>("base_frame", params);

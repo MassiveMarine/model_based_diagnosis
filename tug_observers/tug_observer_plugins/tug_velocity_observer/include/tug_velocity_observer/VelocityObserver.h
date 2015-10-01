@@ -43,6 +43,13 @@ class VelocityObserver
 
     void updateFilters(MovementReading a, MovementReading b);
 
+    ros::NodeHandle nh_;
+    ros::Publisher a_publisher_;
+    ros::Publisher b_publisher_;
+    ros::Publisher a_paired_publisher_;
+    ros::Publisher b_paired_publisher_;
+    ros::AsyncSpinner spinner_;
+
 public:
     VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade* plugin_base);
 

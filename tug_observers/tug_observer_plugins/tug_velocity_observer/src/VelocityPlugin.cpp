@@ -18,7 +18,7 @@ namespace tug_observer_plugins_cpp
       init(params, this);
 
       ROS_DEBUG("VelocityPlugin::initialize 2");
-      double rate = 1.0;
+      double rate = ProcessYaml::getValue<double>("loop_rate", params, 1.0);
       timer_ = boost::make_shared<Timer>(boost::posix_time::microseconds(1./rate * 1000. * 1000.), boost::bind(&VelocityPlugin::run, this));
       ROS_DEBUG("VelocityPlugin::initialize 3");
     }
@@ -38,8 +38,8 @@ namespace tug_observer_plugins_cpp
         ROS_DEBUG("VelocityPlugin::run 2.2");
         if (states.empty())
         {
-          reportError(name, "no_state_" + name,
-                      "For the node with the name '" + name + "' no state could be estimated",
+          reportError(name, "no_state",
+                      "For the input pair with the name '" + name + "' no state could be estimated",
                       tug_observers_msgs::observation::NO_STATE_FITS, observation_time);
         }
         else

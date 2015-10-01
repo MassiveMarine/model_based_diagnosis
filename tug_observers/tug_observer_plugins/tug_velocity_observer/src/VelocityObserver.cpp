@@ -7,9 +7,10 @@
 #include <tug_velocity_observer/VelocityConverterFactory.h>
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Matrix3x3.h>
+#include <algorithm>
 
 VelocityObserver::VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade* plugin_base) : use_roll_(false), use_pitch_(false),
-                                       use_yaw_(false)
+                                       use_yaw_(false), spinner_(1)
 {
   boost::mutex::scoped_lock the_lock(filter_mutex_);
 
@@ -87,6 +88,23 @@ VelocityObserver::VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade*
   XmlRpc::XmlRpcValue state_params = params["states"];
   for (int i = 0; i < state_params.size(); ++i)
     states_.push_back(VelocityState(state_params[i]));
+
+  std::string a_name = a_input_->getName();
+  if(a_name.find('/') == 0)
+    a_name = a_name.substr(1, a_name.size());
+  if(a_name.find_last_of('/') == (a_name.size() - 1))
+    a_name = a_name.substr(0, a_name.size() - 1);
+
+  std::string b_name = b_input_->getName();
+  if(b_name.find('/') == 0)
+    b_name = b_name.substr(1, b_name.size());
+  if(b_name.find_last_of('/') == (b_name.size() - 1))
+    b_name = b_name.substr(0, b_name.size() - 1);
+
+  a_publisher_ = nh_.advertise<sensor_msgs::Imu>("/"+a_name+"_a_calc_imu", 10);
+  b_publisher_ = nh_.advertise<sensor_msgs::Imu>("/"+b_name+"_b_calc_imu", 10);
+  a_paired_publisher_ = nh_.advertise<sensor_msgs::Imu>("/"+a_name+"_a_calc_imu_pair", 10);
+  b_paired_publisher_ = nh_.advertise<sensor_msgs::Imu>("/"+b_name+"_b_calc_imu_pair", 10);
 }
 
 MovementReading VelocityObserver::getCompensatedTwist(MovementReading value)
@@ -129,7 +147,10 @@ void VelocityObserver::updateFilters(MovementReading a, MovementReading b)
 {
   ROS_DEBUG("update filters");
   if (x_filter_)
+  {
+    ROS_DEBUG_STREAM("update x filter with a: " << a.linear.x << " and b: " << b.linear.x);
     x_filter_->update(a.linear.x - b.linear.x);
+  }
 
   if (y_filter_)
     y_filter_->update(a.linear.y - b.linear.y);
@@ -155,6 +176,8 @@ void VelocityObserver::updateFilters(MovementReading a, MovementReading b)
   else
     current_filter_time_ = a.reading_time;
 
+  a_paired_publisher_.publish(a.toIMUMsg());
+  b_paired_publisher_.publish(b.toIMUMsg());
   ROS_DEBUG_STREAM("reading time sec:" << current_filter_time_.sec << ", nsec:" << current_filter_time_.nsec);
 }
 
@@ -167,13 +190,18 @@ void VelocityObserver::addTwistA(MovementReading value)
           " z:" << value.linear.z << " velocities around the axis x:" << value.angular.x << " y:" <<
           value.angular.y << " z:" << value.angular.z);
   MovementReading compensated_a = getCompensatedTwist(value);
+  compensated_a.plot_time = ros::Time(ros::WallTime::now().toSec());
   a_twists_.push_back(compensated_a);
+  a_publisher_.publish(compensated_a.toIMUMsg());
 
   while (!b_twists_.empty())
   {
     MovementReading b_twist = b_twists_.front();
     if (b_twist.reading_time > value.reading_time)
+    {
+      ROS_DEBUG_STREAM("break during poping b reading time sec:" << b_twist.reading_time.sec << ", nsec:" << b_twist.reading_time.nsec << " a reading time sec:" << value.reading_time.sec << ", nsec:" << value.reading_time.nsec);
       break;
+    }
 
     b_twists_.pop_front();
     updateFilters(compensated_a, b_twist);
@@ -189,7 +217,9 @@ void VelocityObserver::addTwistB(MovementReading value)
           " z:" << value.linear.z << " velocities around the axis x:" << value.angular.x << " y:" <<
           value.angular.y << " z:" << value.angular.z);
   MovementReading compensated_b = getCompensatedTwist(value);
+  compensated_b.plot_time = ros::Time(ros::WallTime::now().toSec());
   b_twists_.push_back(compensated_b);
+  b_publisher_.publish(compensated_b.toIMUMsg());
 
   while (!a_twists_.empty())
   {
@@ -211,7 +241,7 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
   if (x_filter_)
   {
     x_state = x_filter_->getFilteState();
-    ROS_ERROR_STREAM("x filter result " << x_state);
+    ROS_DEBUG_STREAM("x filter result " << x_state);
     if (x_state.sample_size < 2)
       return std::make_pair(false, std::vector<Observation>());
   }
@@ -220,7 +250,7 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
   if (y_filter_)
   {
     y_state = y_filter_->getFilteState();
-    ROS_ERROR_STREAM("y filter result " << y_state);
+    ROS_DEBUG_STREAM("y filter result " << y_state);
     if (y_state.sample_size < 2)
       return std::make_pair(false, std::vector<Observation>());
   }
@@ -229,23 +259,23 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
   if (z_filter_)
   {
     z_state = z_filter_->getFilteState();
-    ROS_ERROR_STREAM("z filter result " << z_state);
+    ROS_DEBUG_STREAM("z filter result " << z_state);
     if (z_state.sample_size < 2)
       return std::make_pair(false, std::vector<Observation>());
   }
 
   FilteState<double> rot_x_state = rot_x_filter_->getFilteState();
-  ROS_ERROR_STREAM("rot x filter result " << rot_x_state);
+  ROS_DEBUG_STREAM("rot x filter result " << rot_x_state);
   if (rot_x_state.sample_size < 2)
     return std::make_pair(false, std::vector<Observation>());
 
   FilteState<double> rot_y_state = rot_y_filter_->getFilteState();
-  ROS_ERROR_STREAM("rot y filter result " << rot_y_state);
+  ROS_DEBUG_STREAM("rot y filter result " << rot_y_state);
   if (rot_y_state.sample_size < 2)
     return std::make_pair(false, std::vector<Observation>());
 
   FilteState<double> rot_z_state = rot_z_filter_->getFilteState();
-  ROS_ERROR_STREAM("rot z filter result " << rot_z_state);
+  ROS_DEBUG_STREAM("rot z filter result " << rot_z_state);
   if (rot_z_state.sample_size < 2)
     return std::make_pair(false, std::vector<Observation>());
 
@@ -253,18 +283,32 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
   std::vector<Observation> result;
   for (std::vector<VelocityState>::iterator it = states_.begin(); it != states_.end(); ++it)
   {
+    ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.1");
     ROS_DEBUG_STREAM("check state: '" << it->getName() << "'");
     if (x_filter_ && !it->conformsStateX(x_state))
+    {
+      ROS_DEBUG_STREAM("x filter is not confrom result " << x_state);
       continue;
-
+    }
+    ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.2");
     if (y_filter_ && !it->conformsStateY(y_state))
+    {
+      ROS_DEBUG_STREAM("y filter is not confrom result " << y_state);
       continue;
-
+    }
+    ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.3");
     if (z_filter_ && !it->conformsStateZ(z_state))
+    {
+      ROS_DEBUG_STREAM("z filter is not confrom result " << z_state);
       continue;
-
+    }
+    ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.4");
     if (it->conformsState(rot_x_state, rot_y_state, rot_z_state))
       result.push_back(Observation(it->getName(), it->getNumber()));
+    else
+    {
+      ROS_DEBUG_STREAM("rotation filter is not confrom result x:" << rot_x_state << " y:" << rot_y_state << " z:" << rot_z_state);
+    }
   }
 
   return std::make_pair(true, result);
@@ -277,5 +321,19 @@ ros::Time VelocityObserver::getCurrentFilterTime()
 
 std::string VelocityObserver::getName()
 {
-  return a_input_->getName() + "_" + b_input_->getName();
+  std::string a_name = a_input_->getName();
+  if(a_name.find('/') == 0)
+    a_name = a_name.substr(1, a_name.size());
+  if(a_name.find_last_of('/') == (a_name.size() - 1))
+    a_name = a_name.substr(0, a_name.size() - 1);
+
+  std::string b_name = b_input_->getName();
+  if(b_name.find('/') == 0)
+    b_name = b_name.substr(1, b_name.size());
+  if(b_name.find_last_of('/') == (b_name.size() - 1))
+    b_name = b_name.substr(0, b_name.size() - 1);
+
+  std::string result = a_name + "_" + b_name;
+  std::replace(result.begin(), result.end(), '/', '_');
+  return result;
 }

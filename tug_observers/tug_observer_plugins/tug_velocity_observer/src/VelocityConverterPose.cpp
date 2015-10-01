@@ -5,10 +5,10 @@
 #include <tug_velocity_observer/VelocityConverterPose.h>
 #include <tug_yaml/ProcessYaml.h>
 
-VelocityConverterPose::VelocityConverterPose(boost::function<void (MovementReading)> call_back) : VelocityConverterPoseStamped(call_back)
+VelocityConverterPose::VelocityConverterPose(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back) : VelocityConverterPoseStamped(params, call_back)
 { }
 
-VelocityConverterPose::VelocityConverterPose(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverterPoseStamped(call_back)
+VelocityConverterPose::VelocityConverterPose(XmlRpc::XmlRpcValue params, boost::function<void (MovementReading)> call_back, SubscriberFacade* plugin_base) : VelocityConverterPoseStamped(params, call_back)
 {
   topic_ = ProcessYaml::getValue<std::string>("topic", params);
   sub_ = plugin_base->subscribe(topic_, 1, &VelocityConverterPose::PoseCB, this);

@@ -70,6 +70,8 @@ public:
       T t_statistic = mean_difference * std::sqrt(static_cast<T>(state.sample_size)) / std_deviation;
 
       size_t freedoms = state.sample_size - 1;
+      ROS_DEBUG_STREAM("check hypothesis with mean: " << mean_difference << " and t_statistic: " << t_statistic << " and freedoms of: " << freedoms);
+
       boost::math::students_t distribution(freedoms);
       double q = boost::math::cdf(boost::math::complement(distribution, absolut(t_statistic)));
 
