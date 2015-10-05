@@ -8,7 +8,7 @@
 TimeoutSubs::TimeoutSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* plugin_base) : plugin_base_(plugin_base)
 {
   topic_ = ProcessYaml::getValue<std::string>("name", params);
-  sub_ = plugin_base_->subscribe(topic_, 1, &TimeoutSubs::cb, this);
+  sub_ = plugin_base_->subscribe(topic_, 10, &TimeoutSubs::cb, this);
 
   if (!params.hasMember("callerids"))
   {
@@ -18,8 +18,6 @@ TimeoutSubs::TimeoutSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPlug
   XmlRpc::XmlRpcValue callerids_params = params["callerids"];
   for (int i = 0; i < callerids_params.size(); ++i)
   {
-//    boost::shared_ptr<HzMergedBases> tmp_merged_base = boost::make_shared<HzMergedBases>(topic_, callerids_params[i], plugin_base);
-//    merged_bases_.insert(tmp_merged_base);
 
     if (!callerids_params[i].hasMember("callerid"))
     {
@@ -30,7 +28,6 @@ TimeoutSubs::TimeoutSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPlug
     if(callerid_list.empty())
     {
       default_config_ = boost::make_shared<XmlRpc::XmlRpcValue>(callerids_params[i]);
-//      default_merged_bases_ = tmp_merged_base;
     }
     else
     {
@@ -42,7 +39,6 @@ TimeoutSubs::TimeoutSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPlug
         {
           boost::shared_ptr<TimeoutBase> base = boost::make_shared<TimeoutBase>(topic_, callerids_params[i], plugin_base_);
           callerids_config_.insert(std::make_pair(caller_id, base));
-//          tmp_merged_base->addBase(base);
         }
       }
     }
@@ -51,7 +47,7 @@ TimeoutSubs::TimeoutSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPlug
 
 void TimeoutSubs::cb(const ros::MessageEvent<topic_tools::ShapeShifter>& msg_event)
 {
-  boost::shared_ptr<const ros::M_string> const& connection_header = msg_event.getConnectionHeaderPtr();
+  boost::shared_ptr<ros::M_string> connection_header = msg_event.getConnectionHeaderPtr();
   if(connection_header)
   {
     boost::mutex::scoped_lock the_lock(bases_lock_);
@@ -70,7 +66,6 @@ void TimeoutSubs::cb(const ros::MessageEvent<topic_tools::ShapeShifter>& msg_eve
         {
           base = boost::make_shared<TimeoutBase>(topic_, *default_config_, plugin_base_);
           callerids_config_.insert(std::make_pair(caller_id, base));
-//          default_merged_bases_->addBase(base);
         }
         else
         {
