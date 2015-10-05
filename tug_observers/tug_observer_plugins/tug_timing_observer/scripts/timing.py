@@ -15,7 +15,7 @@ error_pub = None
 # predefined resource error msgs that are used if a error is published
 resource_error_timeout = resource_error(error_msg='Timeout',
                                         verbose_error_msg='Timeout of Topic',
-                                        error=resource_error.NO_AVAILABLE)
+                                        error=resource_error.NOT_AVAILABLE)
 resource_error_no_state_fits = resource_error(error_msg='No State fits',
                                               verbose_error_msg='No state can be found for the measured results',
                                               error=resource_error.NO_STATE_FITS)

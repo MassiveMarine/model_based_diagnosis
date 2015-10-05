@@ -2,7 +2,7 @@
 
 import rospy
 from threading import Thread, Event
-from tug_observers_msgs.msg import observer_error, observer_info
+from tug_observers_msgs.msg import observer_info
 
 
 class PluginBase():
@@ -16,7 +16,6 @@ class PluginBase():
         """
         self.type = plugin_type
 
-        self.error_pub = rospy.Publisher('/observers/error', observer_error, queue_size=1)
         self.info_pub = rospy.Publisher('/observers/info', observer_info, queue_size=1)
 
     def initialize(self, config):

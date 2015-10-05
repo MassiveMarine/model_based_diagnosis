@@ -5,16 +5,16 @@ from threading import Lock
 import rospy
 
 from tug_observers import PluginBase, PluginThread, PluginTimeout
-from tug_observers_msgs.msg import observer_error, resource_error
+from tug_observers_msgs.msg import observer_info, observation_info, observation
 from tug_python_utils import YamlHelper as Config
 
 
-error_pub = None
+info_pub = None
 
 # predefined resource error msgs that are used if a error is published
-resource_error_timeout = resource_error(error_msg='Timeout',
-                                        verbose_error_msg='Timeout of Topic',
-                                        error=resource_error.NO_AVAILABLE)
+observation_timeout = observation(observation_msg='Timeout',
+                                  verbose_observation_msg='Timeout of Topic',
+                                  observation=observation.TIMEOUT)
 
 
 class TimeoutBase():
@@ -34,7 +34,7 @@ class TimeoutBase():
         self.remaining_timeouts = self.max_timeouts
 
         # create a predefined error msg
-        self._observer_error = observer_error(type='timeout', resource=str(topic + '[' + str(callerid)) + ']')
+        self._observation_info = observation_info(type='timeout', resource=str(topic + '[' + str(callerid)) + ']')
 
         # print self.max_timeouts, Config.get_param(config, 'timeout')
 
@@ -47,15 +47,15 @@ class TimeoutBase():
         if self.max_timeouts is not None:
             self.remaining_timeouts -= 1
 
-        if not error_pub:
+        if not info_pub:
             return
 
         # publish error
         if self.remaining_timeouts is None or self.remaining_timeouts >= 0:
             # print 'self.remaining_timeouts: ', self.remaining_timeouts
-            self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
-            self._observer_error.error_msg = resource_error_timeout
-            error_pub.publish(self._observer_error)
+            self._observation_info.header = rospy.Header(stamp=rospy.Time.now())
+            self._observation_info.observation = [observation_timeout]
+            info_pub.publish(observer_info(observation_infos=[self._observation_info]))
 
     def cb(self, msg):
         """
@@ -192,8 +192,8 @@ class Timeout(PluginBase, PluginThread):
 
         self.subs = []
         self.topics = None
-        global error_pub
-        error_pub = self.error_pub
+        global info_pub
+        info_pub = self.info_pub
 
     def run(self):
         """

@@ -5,18 +5,15 @@ from threading import Lock
 import rospy
 
 from tug_observers import PluginBase, PluginThread
-from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
+from tug_observers_msgs.msg import observer_info, observation_info, observation
 from tug_observer_plugin_utils import Filter, SingleValueHypothesisCheckFactory
 from tug_python_utils import YamlHelper as Config
 
 
-# max_timeouts_in_a_row = 10
-error_pub = None
-
 # predefined resource error msgs that are used if a error is published
-resource_error_no_state_fits = resource_error(error_msg='No State fits',
-                                              verbose_error_msg='No state can be found for the measured results',
-                                              error=resource_error.NO_STATE_FITS)
+observation_no_state_fits = observation(observation_msg='No State fits',
+                                        verbose_observation_msg='No state can be found for the measured results',
+                                        observation=observation.NO_STATE_FITS)
 
 
 class HzState():
@@ -30,6 +27,7 @@ class HzState():
         :param config: Configuration from yaml file
         """
         self.name = Config.get_param(config, 'state')
+        self.number = Config.get_param(config, 'number')
         frequency = Config.get_param(config, 'frequenzy')
         self.hypothesis_check = SingleValueHypothesisCheckFactory.create_single_value_hypothesis_check(frequency)
 
@@ -113,24 +111,23 @@ class HzMergedBase():
             except KeyError as e:
                 rospy.logerr(e)
 
-        # create a predefined msgs for info and error
-        self._resource_info = resource_info(type='hz', resource=str(topic + ' ' + str(self.callerids)))
-        self._observer_error = observer_error(type='hz', resource=str(topic + ' ' + str(self.callerids)))
+        # create a predefined msgs for info
+        self._observation_info = observation_info(type='hz', resource=str(topic + ' ' + str(self.callerids)))
 
         self._topic = topic
 
-    def get_resource_info(self, callerids):
+    def get_observation_info(self, callerids):
         """
-        Generate a resource information for publishing by readout and combine the given callerids and
+        Generate a observation information for publishing by readout and combine the given callerids and
         make hypotheses checks.
         :param callerids: objects of all callerids that should be combined
-        :return a resource information that can be published
+        :return a observation information that can be published
         """
 
         if not len(callerids):
-            self._resource_info.states = []
-            self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
-            return self._resource_info
+            self._observation_info.observation = []
+            self._observation_info.header = rospy.Header(stamp=rospy.Time.now())
+            return self._observation_info
 
         def merge_callerids(callerids_to_merge):
             """
@@ -175,31 +172,33 @@ class HzMergedBase():
             :param deviation: deviation values which should be checked
             :param sample_size: number of samples that are used for mean and deviation
             """
-            states = []
+            observations = []
             for state in self._states:
                 try:
                     # print self._topic, value, deviation, sample_size
                     if state.check_hypothesis(value, deviation, sample_size):
-                        states.append(state.name)
+                        observations.append(observation(observation_msg=state.name,
+                                                        verbose_observation_msg=state.name,
+                                                        observation=state.number))
                 except AttributeError as e:
                     rospy.logerr(e)
 
-            if not states:
-                self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
-                self._observer_error.error_msg = resource_error_no_state_fits
-                error_pub.publish(self._observer_error)
-            return states
+            if not observations:
+                observations.append(observation_no_state_fits)
+
+            print observations
+            return observations
 
         # combine callerids
         mean_merged, deviation_merged, sample_size_merged, informations_valid = merge_callerids(callerids)
 
         # setup predefined resource information
         if informations_valid:
-            self._resource_info.states = get_valid_states(mean_merged, deviation_merged, sample_size_merged)
+            self._observation_info.observation = get_valid_states(mean_merged, deviation_merged, sample_size_merged)
         else:
-            self._resource_info.states = []
-        self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
-        return self._resource_info
+            self._observation_info.observation = [observation_no_state_fits]
+        self._observation_info.header = rospy.Header(stamp=rospy.Time.now())
+        return self._observation_info
 
 
 class HzSubs():
@@ -288,7 +287,7 @@ class HzSubs():
             base.cb(msg)
         self._bases_lock.release()
 
-    def get_resource_info(self):
+    def get_observation_info(self):
         """
         Create array of resource-info of all defined combinations of callerids.
         """
@@ -305,7 +304,7 @@ class HzSubs():
             self._bases_lock.release()
 
             # get resource info of subset of callerids and add it to resource info list
-            info += [merge.get_resource_info(callerids)]
+            info += [merge.get_observation_info(callerids)]
 
         return info
 
@@ -324,8 +323,6 @@ class Hz(PluginBase, PluginThread):
 
         self.subs = []
         self.topics = None
-        global error_pub
-        error_pub = self.error_pub
         self.rate = rospy.Rate(1)
 
     def run(self):
@@ -334,11 +331,11 @@ class Hz(PluginBase, PluginThread):
         rate and also cleanup old/unused callerids of topics.
         """
         while not rospy.is_shutdown():
-            resource_data = []
+            observation_data = []
             for sub in self.subs:
-                resource_data += sub.get_resource_info()
+                observation_data += sub.get_observation_info()
 
-            msg = observer_info(resource_infos=resource_data)
+            msg = observer_info(observation_infos=observation_data)
             self.info_pub.publish(msg)
             try:
                 self.rate.sleep()
