@@ -111,7 +111,8 @@ add_executable(tug_observers_node src/ObserverNode.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(tug_observers_cpp_node tug_observers_cpp_generate_messages_cpp)
+add_dependencies(tug_observer_plugin_base tug_observers_msgs_generate_messages_cpp)
+add_dependencies(tug_observers_node tug_observers_msgs_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(tug_observer_plugin_base
