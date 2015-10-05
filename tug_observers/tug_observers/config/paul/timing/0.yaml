@@ -1,0 +1,90 @@
+setup:
+- type: timing
+  main_loop_rate: 1.0
+  use_global_subscriber: false
+  topics:
+# 1 # /calculate_observation_pose/* ###########################################
+  - topicA: /calculate_observation_pose/goal
+    calleridA: []
+    topicB: /calculate_observation_pose/result
+    calleridB: []
+    filter:
+      type: mean                          # mean, median, kmeans, ewma, nofilter
+      window_size: 2000 #window_size: 150                    # @ mean, median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: 'ok'
+      number: 1
+      delay:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.01                   # @ student_t
+        std_deviation: 0.005              # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+# 2 # /change/* ###############################################################
+  - topicA: /change/goal
+    calleridA: []
+    topicB: /change/result
+    calleridB: []
+    filter:
+      type: mean                          # mean, median, kmeans, ewma, nofilter
+      window_size: 2000 #window_size: 150                    # @ mean, median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: 'ok'
+      number: 1
+      delay:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.01                   # @ student_t
+        std_deviation: 0.005              # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+# 3 # /costmap_add_obstacle/* #################################################
+  - topicA: /costmap_add_obstacle/goal
+    calleridA: []
+    topicB: /costmap_add_obstacle/result
+    calleridB: []
+    filter:
+      type: mean                          # mean, median, kmeans, ewma, nofilter
+      window_size: 2000 #window_size: 150                    # @ mean, median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: 'ok'
+      number: 1
+      delay:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.01                   # @ student_t
+        std_deviation: 0.005              # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+# 4 # /costmap_dynamic_obstacles/* ############################################
+  - topicA: /costmap_dynamic_obstacles/goal
+    calleridA: []
+    topicB: /costmap_dynamic_obstacles/result
+    calleridB: []
+    filter:
+      type: mean                          # mean, median, kmeans, ewma, nofilter
+      window_size: 2000 #window_size: 150                    # @ mean, median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: 'ok'
+      number: 1
+      delay:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.01                   # @ student_t
+        std_deviation: 0.005              # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+# 5 # /exploration_path/* #####################################################
+  - topicA: /exploration_path/goal
+    calleridA: []
+    topicB: /exploration_path/result
+    calleridB: []
+    filter:
+      type: mean                          # mean, median, kmeans, ewma, nofilter
+      window_size: 2000 #window_size: 150                    # @ mean, median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: 'ok'
+      number: 1
+      delay:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.01                   # @ student_t
+        std_deviation: 0.005              # @ student_t(optional)
+        significance_level: 0.05          # @ student_t

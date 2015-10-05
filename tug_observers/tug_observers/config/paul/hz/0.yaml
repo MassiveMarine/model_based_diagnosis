@@ -1,0 +1,373 @@
+setup:
+- type: hz
+  main_loop_rate: 1.0
+  use_global_subscriber: true
+  topics:
+# 1 # /configuration ###########################################################
+  - name: /configuration
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 1.0                    # @ student_t
+          std_deviation: 0.006              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 2 # /diagnostics #######################################################
+  - name: /diagnostics
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 1.0                    # @ student_t
+          std_deviation: 0.006              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 3 # /multi_position_share #######################################################
+  - name: /multi_position_share
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 1.0                    # @ student_t
+          std_deviation: 0.006              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 4 # /multi_robot_status #######################################################
+  - name: /multi_robot_status
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 1.0                    # @ student_t
+          std_deviation: 0.006              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t                    
+# 5 # /position_share #######################################################
+  - name: /multi_robot_status
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 1.0                    # @ student_t
+          std_deviation: 0.006              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t   
+# 6 # /robot_41/amcl_pose ###############################################################
+  - name: /robot_41/amcl_pose
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                    # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.14                   # @ student_t
+          std_deviation: 0.05            # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 7 # /robot_41/battery_status ###########################################################
+  - name: /robot_41/battery_status
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 1.0                    # @ student_t
+          std_deviation: 0.07              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t 
+# 8 # /robot_41/cmd_vel ##############################################
+  - name: /robot_41/cmd_vel
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                    # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.14                   # @ student_t
+          std_deviation: 0.05            # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 9 # /robot_41/cmd_vel_watchdog ###############################################
+  - name: /robot_41/cmd_vel_watchdog
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                    # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.14                   # @ student_t
+          std_deviation: 0.05            # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 10 # /robot_41/core_status ###################################################################
+  - name: /robot_41/core_status
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 1.0                    # @ student_t
+          std_deviation: 0.006              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t 
+# 11 # /robot_41/corrected_odometry_pose ####################################################
+  - name: /robot_41/corrected_odometry_pose
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 1.0                    # @ student_t
+          std_deviation: 0.006              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t 
+# 12 # /robot_41/hardware_status #####################################################
+  - name: /robot_41/hardware_status
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.05                    # @ student_t
+          std_deviation: 0.02              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t 
+# 13 # /robot_41/imu/data ##################################################################
+  - name: /robot_41/imu/data
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.03                    # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 14 # /robot_41/left_acc_wheel_vel_rpm ############################################################
+  - name: /robot_41/left_acc_wheel_vel_rpm
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.05                  # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 15 # /robot_41/localization_score ############################################################
+  - name: /robot_41/localization_score
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.11                 # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 16 # /robot_41/odom #####################################################
+  - name: /robot_41/odom
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.11                    # @ student_t
+          std_deviation: 0.4              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 17 # /robot_41/right_acc_wheel_vel_rpm ##################################################################
+  - name: /robot_41/right_acc_wheel_vel_rpm
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.11                   # @ student_t
+          std_deviation: 0.4              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 18 # /robot_41/scan ##################################################
+  - name: /robot_41/scan
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 11                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.11                 # @ student_t
+          std_deviation: 0.02               # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 19 # /robot_41/state_of_charge ##########################################
+  - name: /robot_41/state_of_charge
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 1.0                  # @ student_t
+          std_deviation: 0.05               # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 20 # /robot_41/wheel_dists ########################################################
+  - name: /robot_41/wheel_dists
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.05                   # @ student_t
+          std_deviation: 0.02              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 21 # /robot_41/wheel_rpm ###########################################
+  - name: /robot_41/wheel_rpm
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.05                  # @ student_t
+          std_deviation: 0.035              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 22 # /robot_41/wheel_vels ######################################
+  - name: /robot_41/wheel_vels
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 5                     # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        frequenzy:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.05                  # @ student_t
+          std_deviation: 0.035              # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+# 23 # /tf #############################################
+#  - name: /tf
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 5                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        number: 1
+#        frequenzy:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.02                 # @ student_t
+#          std_deviation: 0.04              # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
