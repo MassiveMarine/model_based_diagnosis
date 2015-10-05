@@ -6,10 +6,11 @@
 #include <pluginlib/class_list_macros.h>
 #include <tug_yaml/ProcessYaml.h>
 
+
 namespace tug_observer_plugins_cpp
 {
 
-    HzPlugin::HzPlugin() : ObserverPluginBase("hz"), background_rate_(1.0)
+    HzPlugin::HzPlugin() : ObserverPluginBase("hz")
     { }
 
     void HzPlugin::initialize(XmlRpc::XmlRpcValue params)
@@ -24,21 +25,16 @@ namespace tug_observer_plugins_cpp
         subs_.push_back(boost::make_shared<HzSubs>(topics_params[i], this));
 
       double main_loop_rate = ProcessYaml::getValue<double>("main_loop_rate", params, 1.0);
-      background_rate_ = ros::Rate(main_loop_rate);
 
-      background_thread_ = boost::thread(boost::bind(&HzPlugin::run, this));
+      timer_ = boost::make_shared<Timer>(boost::posix_time::microseconds(1./main_loop_rate * 1000. * 1000.), boost::bind(&HzPlugin::run, this));
     }
 
     void HzPlugin::run()
     {
-      while(ros::ok())
-      {
         for(std::vector<boost::shared_ptr<HzSubs> >::iterator it = subs_.begin(); it != subs_.end(); ++it)
           (*it)->sendResourceInfo();
 
         flush();
-        background_rate_.sleep();
-      }
     }
 }
 

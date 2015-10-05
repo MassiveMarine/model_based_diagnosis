@@ -4,7 +4,7 @@
 
 #include <tug_hz_observer/HzBase.h>
 
-HzBase::HzBase(XmlRpc::XmlRpcValue params)
+HzBase::HzBase(XmlRpc::XmlRpcValue params) : has_last_messurment_(false)
 {
   if (!params.hasMember("filter"))
   {

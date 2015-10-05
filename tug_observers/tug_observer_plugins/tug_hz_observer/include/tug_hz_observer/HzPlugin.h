@@ -10,14 +10,14 @@
 #include <boost/thread.hpp>
 #include <vector>
 #include <tug_hz_observer/HzSubs.h>
+#include <tug_time/Timer.h>
 
 namespace tug_observer_plugins_cpp
 {
     class HzPlugin : public tug_observers::ObserverPluginBase
     {
-        ros::Rate background_rate_;
-        boost::thread background_thread_;
         std::vector<boost::shared_ptr<HzSubs> > subs_;
+        boost::shared_ptr<Timer> timer_;
 
     public:
         HzPlugin();

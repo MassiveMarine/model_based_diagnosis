@@ -8,7 +8,7 @@
 HzSubs::HzSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* plugin_base)
 {
   topic_ = ProcessYaml::getValue<std::string>("name", params);
-  sub_ = plugin_base->subscribe(topic_, 1, &HzSubs::cb, this);
+  sub_ = plugin_base->subscribe(topic_, 10, &HzSubs::cb, this);
 
   if (!params.hasMember("callerids"))
   {
@@ -51,7 +51,7 @@ HzSubs::HzSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* pl
 
 void HzSubs::cb(const ros::MessageEvent<topic_tools::ShapeShifter>& msg_event)
 {
-  boost::shared_ptr<const ros::M_string> const& connection_header = msg_event.getConnectionHeaderPtr();
+  boost::shared_ptr<ros::M_string> connection_header = msg_event.getConnectionHeaderPtr();
   if(connection_header)
   {
     boost::mutex::scoped_lock the_lock(bases_lock_);
@@ -65,6 +65,7 @@ void HzSubs::cb(const ros::MessageEvent<topic_tools::ShapeShifter>& msg_event)
       std::map<std::string, boost::shared_ptr<HzBase> >::iterator it = callerids_config_.find(caller_id);
       if(it == callerids_config_.end())
       {
+        ROS_DEBUG_STREAM("insert new caller id:" << caller_id);
         // caller id is not bound to a base we can only use the default config if it exists
         if(default_config_ && default_merged_bases_)
         {
