@@ -125,7 +125,7 @@ class HzMergedBase():
         """
 
         if not len(callerids):
-            self._observation_info.observation = []
+            self._observation_info.observation = [observation_no_state_fits]
             self._observation_info.header = rospy.Header(stamp=rospy.Time.now())
             return self._observation_info
 
@@ -186,7 +186,6 @@ class HzMergedBase():
             if not observations:
                 observations.append(observation_no_state_fits)
 
-            print observations
             return observations
 
         # combine callerids
