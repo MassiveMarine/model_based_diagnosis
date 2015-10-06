@@ -179,8 +179,6 @@ class TimestampMergedBase():
         # combine callerids
         mean_merged, deviation_merged, sample_size_merged = merge_callerids(callerids)
 
-        print mean_merged, deviation_merged, sample_size_merged
-
         # setup predefined resource information
         self._observation_info.observation = get_valid_states(mean_merged, deviation_merged, sample_size_merged)
         self._observation_info.header = rospy.Header(stamp=rospy.Time.now())
@@ -247,7 +245,7 @@ class TimestampSubs():
             except KeyError as e:
                 rospy.logerr(e)
 
-        print best_config
+        # print best_config
 
         if best_config:
             new_base = TimestampBase(self.topic, callerid, best_config)
@@ -268,7 +266,7 @@ class TimestampSubs():
         curr_rostime = rospy.get_rostime().to_nsec()
 
         if not msg._has_header:
-            print 'no header!'
+            # print 'no header!'
             return
 
         current_callerid = msg._connection_header['callerid']
@@ -379,7 +377,7 @@ class Timestamp(PluginBase, PluginThread):
         sub_dict = dict()
         if use_global_subscriber:
             for sub in self.subs:
-                print sub
+                # print sub
                 sub_dict[sub.topic] = sub.cb
 
         self.start()

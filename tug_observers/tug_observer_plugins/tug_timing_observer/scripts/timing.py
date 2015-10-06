@@ -5,20 +5,15 @@ from threading import Lock
 import rospy
 
 from tug_observers import PluginBase, PluginThread, PluginTimeout
-from tug_observers_msgs.msg import observer_error, observer_info, resource_info, resource_error
+from tug_observers_msgs.msg import observer_info, observation_info, observation
 from tug_observer_plugin_utils import Filter, SingleValueHypothesisCheckFactory
 from tug_python_utils import YamlHelper as Config
 
 
-error_pub = None
-
 # predefined resource error msgs that are used if a error is published
-resource_error_timeout = resource_error(error_msg='Timeout',
-                                        verbose_error_msg='Timeout of Topic',
-                                        error=resource_error.NOT_AVAILABLE)
-resource_error_no_state_fits = resource_error(error_msg='No State fits',
-                                              verbose_error_msg='No state can be found for the measured results',
-                                              error=resource_error.NO_STATE_FITS)
+observation_no_state_fits = observation(observation_msg='No State fits',
+                                        verbose_observation_msg='No state can be found for the measured results',
+                                        observation=observation.NO_STATE_FITS)
 
 
 class TimingState():
@@ -32,6 +27,7 @@ class TimingState():
         :param config: Configuration from yaml file
         """
         self.name = Config.get_param(config, 'state')
+        self.number = Config.get_param(config, 'number')
         frequency = Config.get_param(config, 'delay')
         self.hypothesis_check = SingleValueHypothesisCheckFactory.create_single_value_hypothesis_check(frequency)
 
@@ -78,8 +74,7 @@ class TimingBase():
                 rospy.logerr(e)
 
         # create a predefined msgs for info and error
-        self._resource_info = resource_info(type='timing', resource=str(topicA + str(calleridA) + ' --> ' + topicB + str(calleridB)))
-        self._observer_error = observer_error(type='timing', resource=str(topicA + str(calleridA) + ' --> ' + topicB + str(calleridB)))
+        self._observation_info = observation_info(type='timing', resource=str(topicA + str(calleridA) + ' --> ' + topicB + str(calleridB)))
 
         # create a filter
         self._filter = Filter(Config.get_param(config, 'filter'))
@@ -106,12 +101,12 @@ class TimingBase():
         if self._first_topic_time_a:
             delay = time - self._first_topic_time_a
             self._filter.update(delay)
-            print delay
+            # print delay
 
         self._first_topic_time_a = 0
         self._first_topic_time_a_lock.release()
 
-    def get_resource_info(self):
+    def get_observation_info(self):
         """
         Generate a resource information for publishing by readout the filter and
         make hypotheses checks.
@@ -124,32 +119,33 @@ class TimingBase():
             :param deviation: deviation values which should be checked
             :param sample_size: number of samples that are used for mean and deviation
             """
-            states = []
+            observations = []
             for state in self._states:
                 try:
                     if state.check_hypothesis(value, deviation, sample_size):
-                        states.append(state.name)
+                        observations.append(observation(observation_msg=state.name,
+                                                        verbose_observation_msg=state.name,
+                                                        observation=state.number))
                 except AttributeError as e:
                     rospy.logerr(e)
 
-            if not states:
-                self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
-                self._observer_error.error_msg = resource_error_no_state_fits
-                error_pub.publish(self._observer_error)
-            return states
+            if not observations:
+                observations.append(observation_no_state_fits)
+
+            return observations
 
         mean, deviation, sample_size = self._filter.get_value()
 
         # check if filter contains usable information
         if mean is None:
-            self._resource_info.states = []
-            self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
-            return self._resource_info
+            self._observation_info.observation = [observation_no_state_fits]
+            self._observation_info.header = rospy.Header(stamp=rospy.Time.now())
+            return self._observation_info
 
         # setup predefined resource information
-        self._resource_info.states = get_valid_states(mean, deviation, sample_size)
-        self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
-        return self._resource_info
+        self._observation_info.observation = get_valid_states(mean, deviation, sample_size)
+        self._observation_info.header = rospy.Header(stamp=rospy.Time.now())
+        return self._observation_info
 
 
 class TimingTopicGroup():
@@ -157,15 +153,15 @@ class TimingTopicGroup():
     This class is used to subscribe to the topics and filter the callerids
     if defined and manage the callback methods.
     """
-    def __init__(self, config):
+    def __init__(self, config, use_global_subscriber):
         """
         Constructor to create a object of TimingTopicGroup that exists per topic-pair.
         The callback methods are defined depending on callerid filters.
         :param config: Configuration from yaml file
         """
         # topics that should be subscribed
-        self._topicA = Config.get_param(config, 'topicA')
-        self._topicB = Config.get_param(config, 'topicB')
+        self.topicA = Config.get_param(config, 'topicA')
+        self.topicB = Config.get_param(config, 'topicB')
 
         self._callerA = Config.get_param(config, 'calleridA')
         self._callerB = Config.get_param(config, 'calleridB')
@@ -173,11 +169,12 @@ class TimingTopicGroup():
         self._base = TimingBase(config)
 
         # callbacks and subscriptions to given topics
-        self._cb_a = self._cb_a_with_callerid if len(self._callerA) else self._cb_a_without_callerid
-        self._cb_b = self._cb_b_with_callerid if len(self._callerB) else self._cb_b_without_callerid
+        self.cb_a = self._cb_a_with_callerid if len(self._callerA) else self._cb_a_without_callerid
+        self.cb_b = self._cb_b_with_callerid if len(self._callerB) else self._cb_b_without_callerid
 
-        self.sub_a = rospy.Subscriber(self._topicA, rospy.AnyMsg, self._cb_a, queue_size=1)
-        self.sub_b = rospy.Subscriber(self._topicB, rospy.AnyMsg, self._cb_b, queue_size=1)
+        if not use_global_subscriber:
+            self.sub_a = rospy.Subscriber(self.topicA, rospy.AnyMsg, self.cb_a, queue_size=1)
+            self.sub_b = rospy.Subscriber(self.topicB, rospy.AnyMsg, self.cb_b, queue_size=1)
 
     def _cb_a_with_callerid(self, msg):
         """
@@ -213,11 +210,11 @@ class TimingTopicGroup():
         """
         self._base.set_topic_b(rospy.get_rostime().to_sec())
 
-    def get_resource_info(self):
+    def get_observation_info(self):
         """
         Create array of resource-info of all defined combinations of callerids.
         """
-        return [self._base.get_resource_info()]
+        return [self._base.get_observation_info()]
 
 
 class Timing(PluginBase, PluginThread):
@@ -234,8 +231,6 @@ class Timing(PluginBase, PluginThread):
 
         self.subs = []
         self.topics = None
-        global error_pub
-        error_pub = self.error_pub
         self.rate = rospy.Rate(1)
 
     def run(self):
@@ -245,11 +240,11 @@ class Timing(PluginBase, PluginThread):
         """
 
         while not rospy.is_shutdown():
-            resource_data = []
+            observation_data = []
             for sub in self.subs:
-                resource_data += sub.get_resource_info()
+                observation_data += sub.get_observation_info()
 
-            msg = observer_info(resource_infos=resource_data)
+            msg = observer_info(observation_infos=observation_data)
             self.info_pub.publish(msg)
             self.rate.sleep()
 
@@ -260,12 +255,26 @@ class Timing(PluginBase, PluginThread):
         :param config: Configuration from yaml file
         """
         self.rate = rospy.Rate(Config.get_param(config, 'main_loop_rate'))
+        try:
+            use_global_subscriber = Config.get_param(config, 'use_global_subscriber')
+        except KeyError:
+            use_global_subscriber = False
+
         for topic_config in Config.get_param(config, 'topics'):
             try:
-                self.subs.append(TimingTopicGroup(topic_config))
+                self.subs.append(TimingTopicGroup(topic_config, use_global_subscriber))
             except (KeyError, StandardError) as e:
                 rospy.logerr(e)
 
+        sub_dict = dict()
+        if use_global_subscriber:
+            for sub in self.subs:
+                # print sub
+                sub_dict[sub.topicA] = sub.cb_a
+                sub_dict[sub.topicB] = sub.cb_b
+
         self.start()
+
+        return sub_dict
 
 timing = Timing
