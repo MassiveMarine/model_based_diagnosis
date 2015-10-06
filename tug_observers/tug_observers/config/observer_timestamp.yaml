@@ -2,6 +2,7 @@
 setup:
 - type: timestamp
   main_loop_rate: 1.0
+  use_global_subscriber: true
   topics:
   - name: /topicA
     callerids:
@@ -10,10 +11,10 @@ setup:
         #type: ewma                      #exponentially weighted moving average
         #decay_rate: 0.05
         type: mean
-        window_size: 200
+        window_size: 20
         deviation_type: std_deviation   # std_deviation, min_max
       states:
-      - state: '1'
+      - state: 'state 1'
         number: 1
         age:
           type: student_t

@@ -2,7 +2,7 @@
 
 import rospy
 from threading import Thread
-from tug_observers_msgs.msg import observer_error, resource_error
+from tug_observers_msgs.msg import observation, observation_info
 
 
 class InputThread(Thread):
@@ -28,12 +28,12 @@ if __name__ == "__main__":
 
     try:
         rate = rospy.Rate(10.0)
-        _pub = rospy.Publisher('/topicA', observer_error, queue_size=1)
+        _pub = rospy.Publisher('/topicA', observation_info, queue_size=1)
 
-        _observer_error = observer_error(type='timestamp_publisher', resource=' ')
-        _observer_error.error_msg = resource_error(error_msg='No State fits',
-                                                   verbose_error_msg='No state can be found for the measured results',
-                                                   error=resource_error.NO_STATE_FITS)
+        _observation_info = observation_info(type='timestamp_publisher', resource=' ')
+        _observation_info.observation = [observation(observation_msg='No State fits',
+                                                    verbose_observation_msg='No state can be found for the measured results',
+                                                    observation=observation.NO_STATE_FITS)]
         inputs = InputThread()
         inputs.start()
         delay = rospy.Duration(0)
@@ -45,11 +45,11 @@ if __name__ == "__main__":
                 inputs.changed = False
             stamp = rospy.Time.now() - delay
 
-            _observer_error.header = rospy.Header(stamp=stamp)
+            _observation_info.header = rospy.Header(stamp=stamp)
 
             # temp.publish(_observer_error)
 
-            _pub.publish(_observer_error)
+            _pub.publish(_observation_info)
             rate.sleep()
 
     except KeyboardInterrupt:

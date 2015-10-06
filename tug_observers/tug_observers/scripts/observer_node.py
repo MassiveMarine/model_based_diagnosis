@@ -3,6 +3,7 @@
 import rospkg
 import sys
 import importlib
+import rostopic
 
 import rospy
 
@@ -101,7 +102,8 @@ class PluginManager():
 class SubscripberManager():
     def __init__(self, topic, cb_list):
         self._cb_list = cb_list
-        self._sub = rospy.Subscriber(t, rospy.AnyMsg, self.cb, queue_size=1)
+        msg_class, real_topic, msg_eval = rostopic.get_topic_class(topic)
+        self._sub = rospy.Subscriber(t, msg_class, self.cb, queue_size=1)
 
     def cb(self, msg):
         # pass
