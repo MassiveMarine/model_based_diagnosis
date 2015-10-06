@@ -54,16 +54,21 @@ class TimingBase():
         setups the states and initialize stuff for the delay calculation.
         :param config: Configuration from yaml file
         """
-        # necessary stuff to calculate time between topics
-        self._first_topic_time_a = None
-        self._first_topic_time_a_lock = Lock()
-
         # topics and callerids
         topicA = Config.get_param(config, 'topicA')
         topicB = Config.get_param(config, 'topicB')
 
         calleridA = Config.get_param(config, 'calleridA')
         calleridB = Config.get_param(config, 'calleridB')
+
+        try:
+            self._single_shot_mode = Config.get_param(config, 'single_shot_mode')
+        except KeyError:
+            self._single_shot_mode = False
+
+        # necessary stuff to calculate time between topics
+        self._first_topic_time_a = None if not self._single_shot_mode else 0
+        self._first_topic_time_a_lock = Lock()
 
         # Try to load and setup all states as defined in the yaml-file
         self._states = []
@@ -86,7 +91,7 @@ class TimingBase():
         :param time: rostime at which the msg was received
         """
         self._first_topic_time_a_lock.acquire()
-        if self._first_topic_time_a is 0:
+        if self._first_topic_time_a is 0 or self._single_shot_mode:
             self._first_topic_time_a = time
 
         self._first_topic_time_a_lock.release()

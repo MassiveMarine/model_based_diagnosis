@@ -8,7 +8,7 @@ setup:
     calleridA: []
     topicB: /topicB
     calleridB: []
-    single_shot: true
+    single_shot_mode: true
     filter:
       type: ewma                      #exponentially weighted moving average
       window_size: 10
