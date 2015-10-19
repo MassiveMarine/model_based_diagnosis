@@ -5,19 +5,17 @@ from threading import Lock
 import rospy
 
 from tug_observers import PluginBase, PluginThread
-from tug_observers_msgs.msg import observer_error, resource_error, observer_info, resource_info
+from tug_observers_msgs.msg import observer_info, observation_info, observation
 from tug_observer_plugin_utils import Filter, SingleValueHypothesisCheckFactory
 from tug_python_utils import YamlHelper as Config
 
 import rostopic
 
 
-error_pub = None
-
 # predefined resource error msgs that are used if a error is published
-resource_error_no_state_fits = resource_error(error_msg='No State fits',
-                                              verbose_error_msg='No state can be found for the measured results',
-                                              error=resource_error.NO_STATE_FITS)
+observation_no_state_fits = observation(observation_msg='No State fits',
+                                        verbose_observation_msg='No state can be found for the measured results',
+                                        observation=observation.NO_STATE_FITS)
 
 
 class TimestampState():
@@ -31,6 +29,7 @@ class TimestampState():
         :param config: Configuration from yaml file
         """
         self.name = Config.get_param(config, 'state')
+        self.number = Config.get_param(config, 'number')
         age = Config.get_param(config, 'age')
         self.hypothesis_check = SingleValueHypothesisCheckFactory.create_single_value_hypothesis_check(age)
 
@@ -61,7 +60,7 @@ class TimestampBase():
         self._filter = Filter(Config.get_param(config, 'filter'))
 
         # create a predefined error msg
-        self._observer_error = observer_error(type='timestemp', resource=str(topic + '[' + str(callerid)) + ']')
+        # self._observation_info = observation_info(type='timestemp', resource=str(topic + '[' + str(callerid)) + ']')
         self._topic = topic
 
     def cb(self, msg, curr_rostime):
@@ -71,16 +70,15 @@ class TimestampBase():
         :param msg: message from publisher
         """
         self._filter_lock.acquire()
-        self._filter.update(curr_rostime - msg.header.stamp.to_nsec())
+        self._filter.update((curr_rostime - msg.header.stamp.to_nsec()) / 1000000000.0)
         self._filter_lock.release()
-        print curr_rostime, ' - ', msg.header.stamp.to_nsec(), ' = ', curr_rostime - msg.header.stamp.to_nsec()
 
     def get_values(self):
         """
         Get the information of the filter of this callerid
         :return information of the filter of this callerid
         """
-        print self._topic, self._filter.get_value()
+        # print self._topic, self._filter.get_value()
         return self._filter.get_value()
 
 
@@ -108,10 +106,9 @@ class TimestampMergedBase():
                 rospy.logerr(e)
 
         # create a predefined msgs for info and error
-        self._resource_info = resource_info(type='timestamp', resource=str(topic + ' ' + str(self.callerids)))
-        self._observer_error = observer_error(type='timestamp', resource=str(topic + ' ' + str(self.callerids)))
+        self._observation_info = observation_info(type='timestamp', resource=str(topic + ' ' + str(self.callerids)))
 
-    def get_resource_info(self, callerids):
+    def get_observation_info(self, callerids):
         """
         Generate a resource information for publishing by readout and combine the given callerids and
         make hypotheses checks.
@@ -120,9 +117,9 @@ class TimestampMergedBase():
         """
 
         if not len(callerids):
-            self._resource_info.states = []
-            self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
-            return self._resource_info
+            self._observation_info.observation = [observation_no_state_fits]
+            self._observation_info.header = rospy.Header(stamp=rospy.Time.now())
+            return self._observation_info
 
         def merge_callerids(callerids_to_merge):
             """
@@ -164,27 +161,28 @@ class TimestampMergedBase():
             :param deviation: deviation values which should be checked
             :param sample_size: number of samples that are used for mean and deviation
             """
-            states = []
+            observations = []
             for state in self._states:
                 try:
                     if state.check_hypothesis(value, deviation, sample_size):
-                        states.append(state.name)
+                        observations.append(observation(observation_msg=state.name,
+                                                        verbose_observation_msg=state.name,
+                                                        observation=state.number))
                 except AttributeError as e:
                     rospy.logerr(e)
 
-            if not states:
-                self._observer_error.header = rospy.Header(stamp=rospy.Time.now())
-                self._observer_error.error_msg = resource_error_no_state_fits
-                error_pub.publish(self._observer_error)
-            return states
+            if not observations:
+                observations.append(observation_no_state_fits)
+
+            return observations
 
         # combine callerids
         mean_merged, deviation_merged, sample_size_merged = merge_callerids(callerids)
 
         # setup predefined resource information
-        self._resource_info.states = get_valid_states(mean_merged, deviation_merged, sample_size_merged)
-        self._resource_info.header = rospy.Header(stamp=rospy.Time.now())
-        return self._resource_info
+        self._observation_info.observation = get_valid_states(mean_merged, deviation_merged, sample_size_merged)
+        self._observation_info.header = rospy.Header(stamp=rospy.Time.now())
+        return self._observation_info
 
 
 class TimestampSubs():
@@ -201,7 +199,7 @@ class TimestampSubs():
         :param config: Configuration from yaml file
         """
         # topic that should be subscribed
-        self._topic = Config.get_param(config, 'name')
+        self.topic = Config.get_param(config, 'name')
 
         # store all callerids of this topic separately
         self._bases = dict()
@@ -217,7 +215,7 @@ class TimestampSubs():
         for callerid_config in self._callerids_config:
             try:
                 callerid_list = Config.get_param(callerid_config, 'callerid')
-                self._merged_bases.append(TimestampMergedBase(self._topic, callerid_config))
+                self._merged_bases.append(TimestampMergedBase(self.topic, callerid_config))
                 if not len(callerid_list):
                     self._config_for_unknown = callerid_config
             except KeyError as e:
@@ -225,8 +223,8 @@ class TimestampSubs():
 
         # get topic class and subscribe
         if not use_global_subscriber:
-            msg_class, real_topic, msg_eval =  rostopic.get_topic_class(self._topic)
-            self.sub = rospy.Subscriber(self._topic, msg_class, self.cb, queue_size=1)
+            msg_class, real_topic, msg_eval = rostopic.get_topic_class(self.topic)
+            self.sub = rospy.Subscriber(self.topic, msg_class, self.cb, queue_size=1)
 
     def add_callerid(self, callerid):
         """
@@ -247,10 +245,10 @@ class TimestampSubs():
             except KeyError as e:
                 rospy.logerr(e)
 
-        print best_config
+        # print best_config
 
         if best_config:
-            new_base = TimestampBase(self._topic, callerid, best_config)
+            new_base = TimestampBase(self.topic, callerid, best_config)
 
         self._bases[callerid] = new_base
         return new_base
@@ -268,6 +266,7 @@ class TimestampSubs():
         curr_rostime = rospy.get_rostime().to_nsec()
 
         if not msg._has_header:
+            # print 'no header!'
             return
 
         current_callerid = msg._connection_header['callerid']
@@ -282,7 +281,7 @@ class TimestampSubs():
             base.cb(msg, curr_rostime)
         self._bases_lock.release()
 
-    def get_resource_info(self):
+    def get_observation_info(self):
         """
         Create array of resource-info of all defined combinations of callerids.
         """
@@ -299,7 +298,7 @@ class TimestampSubs():
             self._bases_lock.release()
 
             # get resource info of subset of callerids and add it to resource info list
-            info += [merge.get_resource_info(callerids)]
+            info += [merge.get_observation_info(callerids)]
 
         return info
 
@@ -335,8 +334,6 @@ class Timestamp(PluginBase, PluginThread):
 
         self.subs = []
         self.topics = None
-        global error_pub
-        error_pub = self.error_pub
         self.rate = rospy.Rate(1)
 
     def run(self):
@@ -344,16 +341,16 @@ class Timestamp(PluginBase, PluginThread):
         Thread runs in here, till shutdown. It will publish observer info with a defined
         rate and also cleanup old/unused callerids of topics.
         """
+
         while not rospy.is_shutdown():
 
-            resource_data = []
+            observation_data = []
             for sub in self.subs:
-                resource_data += sub.get_resource_info()
+                observation_data += sub.get_observation_info()
 
-            msg = observer_info(resource_infos=resource_data)
+            msg = observer_info(observation_infos=observation_data)
             self.info_pub.publish(msg)
             try:
-                print '==============================================================='
                 self.rate.sleep()
             except rospy.exceptions.ROSTimeMovedBackwardsException as e:
                 print e
@@ -380,6 +377,7 @@ class Timestamp(PluginBase, PluginThread):
         sub_dict = dict()
         if use_global_subscriber:
             for sub in self.subs:
+                # print sub
                 sub_dict[sub.topic] = sub.cb
 
         self.start()

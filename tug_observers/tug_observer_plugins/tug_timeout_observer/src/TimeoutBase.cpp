@@ -43,7 +43,7 @@ bool TimeoutBase::timeout_callback()
   remaining_timeouts_ -= 1;
 
   ROS_ERROR_STREAM("timeout for: " << name_);
-  plugin_base_->reportError(name_, "no_state_" + name_, "For the node with the name '" + name_ + "' no state could be estimated", tug_observers_msgs::observation::NO_AVAILABLE, ros::Time::now());
+  plugin_base_->reportError(name_, "no_state_" + name_, "For the node with the name '" + name_ + "' no state could be estimated", tug_observers_msgs::observation::TIMEOUT, ros::Time::now());
 
   return true;
 }

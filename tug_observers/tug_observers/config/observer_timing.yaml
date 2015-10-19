@@ -2,11 +2,13 @@
 setup:
 - type: timing
   main_loop_rate: 1.0
+  use_global_subscriber: true
   topics:
   - topicA: /topicA
     calleridA: []
     topicB: /topicB
     calleridB: []
+    single_shot_mode: true
     filter:
       type: ewma                      #exponentially weighted moving average
       window_size: 10

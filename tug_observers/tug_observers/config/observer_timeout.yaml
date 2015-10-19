@@ -1,6 +1,7 @@
 ########## node1 ##########
 setup:
 - type: timeout
+  use_global_subscriber: true
   topics:
   - name: /topicA
     callerids:
