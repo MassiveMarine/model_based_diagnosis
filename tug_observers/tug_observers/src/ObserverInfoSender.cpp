@@ -39,10 +39,13 @@ void ObserverInfoSender::sendInfoIntern(std::string resource, std::string type, 
 
 bool ObserverInfoSender::executeFlush()
 {
+  ROS_DEBUG_STREAM("execute flush called");
   boost::mutex::scoped_lock the_lock(observer_infos_mutex_);
+  ROS_DEBUG_STREAM("publish observer info");
   info_pub_.publish(current_obser_info_);
   current_obser_info_.observation_infos.clear();
 
+  ROS_DEBUG_STREAM("return with true");
   return true;
 }
 

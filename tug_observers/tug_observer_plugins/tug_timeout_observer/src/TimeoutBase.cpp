@@ -27,15 +27,21 @@ TimeoutBase::TimeoutBase(std::string topic, XmlRpc::XmlRpcValue params, tug_obse
     has_max_timeouts_in_a_row_ = false;
   remaining_timeouts_ = max_timeouts_in_a_row_;
 
+  ROS_DEBUG_STREAM("init timeout for topic " << topic << " with timeout: " << timeout_);
+
   timeout_thread_ = boost::make_shared<Timeout>(boost::posix_time::seconds(timeout_), boost::bind(&TimeoutBase::timeout_callback, this));
 }
 
 void TimeoutBase::update()
 {
+  ROS_DEBUG_STREAM("TimeoutBase::update called");
   std::vector<Observation> observations;
   observations.push_back(Observation("ok", 1));
+  ROS_DEBUG_STREAM("TimeoutBase::update report states");
   plugin_base_->reportStates(name_, observations, ros::Time::now());
+  ROS_DEBUG_STREAM("TimeoutBase::update set for timeout call");
   timeout_thread_->set();
+  ROS_DEBUG_STREAM("TimeoutBase::update set remaining timouts");
   remaining_timeouts_ = max_timeouts_in_a_row_;
 }
 
