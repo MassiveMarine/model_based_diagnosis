@@ -20,6 +20,7 @@ class TimeoutBase
     ros::Time last_time_;
     double timeout_;
     int max_timeouts_in_a_row_;
+    bool has_max_timeouts_in_a_row_;
     int remaining_timeouts_;
     boost::shared_ptr<Timeout> timeout_thread_;
     std::string name_;

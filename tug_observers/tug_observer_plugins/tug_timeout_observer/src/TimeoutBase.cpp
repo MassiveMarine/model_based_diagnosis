@@ -18,12 +18,13 @@ TimeoutBase::TimeoutBase(std::string topic, XmlRpc::XmlRpcValue params, tug_obse
   }
   timeout_ = ProcessYaml::getValue<double>("timeout", params);
 
-  if (!params.hasMember("max_timeouts_in_a_row"))
+  if (params.hasMember("max_timeouts_in_a_row"))
   {
-    ROS_ERROR("No maximum number of timeouts for timeout plugin defined");
-    throw std::runtime_error("No maximum number of timeouts for timeout plugin defined");
+    has_max_timeouts_in_a_row_ = true;
+    max_timeouts_in_a_row_ = ProcessYaml::getValue<int>("max_timeouts_in_a_row", params);
   }
-  max_timeouts_in_a_row_ = ProcessYaml::getValue<int>("max_timeouts_in_a_row", params);
+  else
+    has_max_timeouts_in_a_row_ = false;
   remaining_timeouts_ = max_timeouts_in_a_row_;
 
   timeout_thread_ = boost::make_shared<Timeout>(boost::posix_time::seconds(timeout_), boost::bind(&TimeoutBase::timeout_callback, this));
@@ -31,16 +32,22 @@ TimeoutBase::TimeoutBase(std::string topic, XmlRpc::XmlRpcValue params, tug_obse
 
 void TimeoutBase::update()
 {
+  std::vector<Observation> observations;
+  observations.push_back(Observation("ok", 1));
+  plugin_base_->reportStates(name_, observations, ros::Time::now());
   timeout_thread_->set();
   remaining_timeouts_ = max_timeouts_in_a_row_;
 }
 
 bool TimeoutBase::timeout_callback()
 {
-  if (remaining_timeouts_ <= 0)
-    return false;
+  if(has_max_timeouts_in_a_row_)
+  {
+    if (remaining_timeouts_ <= 0)
+      return false;
 
-  remaining_timeouts_ -= 1;
+    remaining_timeouts_ -= 1;
+  }
 
   ROS_ERROR_STREAM("timeout for: " << name_);
   plugin_base_->reportError(name_, "no_state_" + name_, "For the node with the name '" + name_ + "' no state could be estimated", tug_observers_msgs::observation::TIMEOUT, ros::Time::now());
