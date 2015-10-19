@@ -8,7 +8,7 @@ import os
 import psutil
 from tug_resource_monitor.msg import NodeInfo, NodeInfoArray
 from std_msgs.msg import Header
-
+from tug_python_utils import YamlHelper as Config
 
 class NodeData:
 
@@ -37,6 +37,13 @@ class TUGResourceMonitor:
     def __init__(self):
         self.own_hostname, node_api = get_hostname()
         self.nodes = dict()
+        rospy.logdebug("resource monitor started")
+        if rospy.has_param(rospy.get_name() + '/nodes_to_observer'):
+            rospy.logdebug("got nodes parameter")
+            node_names = rospy.get_param(rospy.get_name() + '/nodes_to_observer')
+            for name in node_names:
+                self.nodes[name] = NodeData(name=name)
+
         self.node_infos_pub = rospy.Publisher('diag/node_infos', NodeInfoArray, queue_size=10)
 
     def run(self, frequency=1.0):
@@ -67,6 +74,7 @@ class TUGResourceMonitor:
         rate = rospy.Rate(10.0)
         while not self.nodes and not rospy.is_shutdown():
             rate.sleep()
+        rospy.loginfo("done")
 
     def waiting_for_all_nodes_coming_online(self):
         rospy.loginfo("waiting for all nodes coming online")
@@ -79,6 +87,7 @@ class TUGResourceMonitor:
                 for node_name in list(set(self.nodes.keys()) & set(node_names_currently_running)):
                     self.nodes[node_name].state = NodeData.ONLINE
             rate.sleep()
+        rospy.loginfo("done")
 
     def get_pid_of_node(self, node, master=rosnode.rosgraph.Master(rosnode.ID)):
         try:

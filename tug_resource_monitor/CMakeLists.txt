@@ -8,7 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
     rospy
     dynamic_reconfigure
     std_msgs
-    message_generation)
+    message_generation
+    tug_python_utils)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
