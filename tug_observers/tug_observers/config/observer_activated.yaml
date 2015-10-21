@@ -1,0 +1,6 @@
+setup:
+- type: activated
+  resource_topic: /robot_41/diag/node_infos
+  nodes:
+  - name: /robot_41/localize_to_target
+  - name: /robot_41/triangle_extraction
