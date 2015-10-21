@@ -36,7 +36,7 @@ void TimeoutBase::update()
 {
   ROS_DEBUG_STREAM("TimeoutBase::update called");
   std::vector<Observation> observations;
-  observations.push_back(Observation("ok", 1));
+  observations.push_back(Observation("ok", tug_observers_msgs::observation::GENERAL_OK));
   ROS_DEBUG_STREAM("TimeoutBase::update report states");
   plugin_base_->reportStates(name_, observations, ros::Time::now());
   ROS_DEBUG_STREAM("TimeoutBase::update set for timeout call");
