@@ -1,0 +1,8 @@
+<library path="lib/libscores_plugin">
+  <class name="scores" type="tug_observer_plugins_cpp::ScoresPlugin"
+         base_class_type="tug_observers::ObserverPluginBase">
+    <description>
+      Observer plugin which checks if a specific score within a certain bondary
+    </description>
+  </class>
+</library>
