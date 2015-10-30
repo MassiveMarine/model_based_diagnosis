@@ -1,0 +1,8 @@
+<library path="lib/libactivated_plugin">
+  <class name="activated" type="tug_observer_plugins_cpp::ActivatedPlugin"
+         base_class_type="tug_observers::ObserverPluginBase">
+    <description>
+      Observer plugin which checks if a given node is activated in the current system
+    </description>
+  </class>
+</library>

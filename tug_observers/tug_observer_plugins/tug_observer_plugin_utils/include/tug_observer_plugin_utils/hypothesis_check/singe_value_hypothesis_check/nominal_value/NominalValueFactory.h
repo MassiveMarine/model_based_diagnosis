@@ -30,7 +30,7 @@ public:
       return boost::make_shared<ExactNominalValue<T> >(params);
     else if(type == "not")
       return boost::make_shared<NotNominalValue<T> >(params);
-    else if(type == "greater_than")
+    else if(type == "greather_than")
       return boost::make_shared<GreaterThanNominalValue<T> >(params);
     else if(type == "less_than")
       return boost::make_shared<LessThanNominalValue<T> >(params);

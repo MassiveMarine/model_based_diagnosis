@@ -54,8 +54,11 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "tug_observers_node");
     ros::NodeHandle nh("~");
     tug_observers::ObserverNode node(nh);
+    ROS_INFO("init plugins");
     node.initPlugins();
+    ROS_INFO("start plugins");
     node.startPlugins();
+    ROS_INFO("plugins up and running");
     ros::spin();
   }
   catch (std::exception & ex)

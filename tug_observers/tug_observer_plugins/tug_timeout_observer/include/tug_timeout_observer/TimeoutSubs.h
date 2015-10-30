@@ -21,9 +21,7 @@ class TimeoutSubs
     ros::Subscriber sub_;
     boost::mutex bases_lock_;
     std::map<std::string, boost::shared_ptr<TimeoutBase> > callerids_config_;
-//    std::set<boost::shared_ptr<TimeoutMergedBases> > merged_bases_;
-    boost::shared_ptr<XmlRpc::XmlRpcValue> default_config_;
-//    boost::shared_ptr<TimeoutMergedBases> default_merged_bases_;
+    boost::shared_ptr<TimeoutBase> default_base_;
     tug_observers::ObserverPluginBase* plugin_base_;
 
 public:

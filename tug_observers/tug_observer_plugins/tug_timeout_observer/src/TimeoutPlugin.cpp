@@ -14,6 +14,7 @@ namespace tug_observer_plugins_cpp
 
     void TimeoutPlugin::initialize(XmlRpc::XmlRpcValue params)
     {
+      ROS_DEBUG_STREAM("TimeoutPlugin::initialize called");
       if (!params.hasMember("topics"))
       {
         ROS_ERROR("No topics for timeout plugin defined");

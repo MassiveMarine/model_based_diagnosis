@@ -7,8 +7,8 @@
 
 TimeoutSubs::TimeoutSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* plugin_base) : plugin_base_(plugin_base)
 {
+  ROS_DEBUG_STREAM("TimeoutSubs::TimeoutSubs called");
   topic_ = ProcessYaml::getValue<std::string>("name", params);
-  sub_ = plugin_base_->subscribe(topic_, 10, &TimeoutSubs::cb, this);
 
   if (!params.hasMember("callerids"))
   {
@@ -18,16 +18,16 @@ TimeoutSubs::TimeoutSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPlug
   XmlRpc::XmlRpcValue callerids_params = params["callerids"];
   for (int i = 0; i < callerids_params.size(); ++i)
   {
-
     if (!callerids_params[i].hasMember("callerid"))
     {
       ROS_ERROR("No callerid for timeout plugin defined");
       throw std::runtime_error("No callerid for timeout plugin defined");
     }
+
     std::vector<std::string> callerid_list = ProcessYaml::getValue<std::vector<std::string> >("callerid", callerids_params[i]);
     if(callerid_list.empty())
     {
-      default_config_ = boost::make_shared<XmlRpc::XmlRpcValue>(callerids_params[i]);
+      default_base_ = boost::make_shared<TimeoutBase>(topic_, callerids_params[i], plugin_base_);
     }
     else
     {
@@ -43,6 +43,8 @@ TimeoutSubs::TimeoutSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPlug
       }
     }
   }
+
+  sub_ = plugin_base_->subscribe(topic_, 10, &TimeoutSubs::cb, this);
 }
 
 void TimeoutSubs::cb(const ros::MessageEvent<topic_tools::ShapeShifter>& msg_event)
@@ -62,14 +64,13 @@ void TimeoutSubs::cb(const ros::MessageEvent<topic_tools::ShapeShifter>& msg_eve
       if(it == callerids_config_.end())
       {
         // caller id is not bound to a base we can only use the default config if it exists
-        if(default_config_)
+        if(default_base_)
         {
-          base = boost::make_shared<TimeoutBase>(topic_, *default_config_, plugin_base_);
-          callerids_config_.insert(std::make_pair(caller_id, base));
+          base = default_base_;
         }
         else
         {
-          ROS_WARN("unknown caller id and no default merge method");
+          ROS_WARN("unknown caller id and no default base");
           return;
         }
       }
