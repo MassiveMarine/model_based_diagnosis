@@ -23,6 +23,7 @@ class NoValueFilter : public ValueFilter<T>
     virtual void update(const T& new_value)
     {
       boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      current_value_ = new_value;
     }
 
     virtual T getValue()
