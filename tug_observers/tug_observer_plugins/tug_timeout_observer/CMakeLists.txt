@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   topic_tools
   tug_time
   tug_yaml
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
@@ -193,3 +194,6 @@ target_link_libraries(timeout_plugin
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+roslint_cpp()
+roslint_add_test()
