@@ -149,20 +149,20 @@ class Model(object):
         """
         if self.options['separate_tp'] == True:
             self.check_queries += 1
-            if self.check_queries > 100:
-                self.check_queries = 0
-                self.check_problem.finished()
-                self.check_problem = Problem(self.sat_engine_name)
-                self.first_check_call = True
+            # if self.check_queries > 100:
+            self.check_queries = 0
+            self.check_problem.finished()
+            self.check_problem = Problem(self.sat_engine_name)
+            self.first_check_call = True
         else:
             self.queries += 1
-            if self.queries > 100:
-                self.queries = 0
-                self.check_problem.finished()
-                self.check_problem = Problem(self.sat_engine_name)
-                self.comp_problem = self.check_problem
-                self.first_check_call = True
-                self.first_comp_call = True
+            # if self.queries > 100:
+            self.queries = 0
+            self.check_problem.finished()
+            self.check_problem = Problem(self.sat_engine_name)
+            self.comp_problem = self.check_problem
+            self.first_check_call = True
+            self.first_comp_call = True
         
         # if self.options['reuse_sat']:
         #
@@ -251,14 +251,14 @@ class Model(object):
         # rules.append(GateWithAbPredicate(ab_pred(prefix(gate)), prefix_gate(self.gates[gate])))
         rules.append(HzObserver(ab_pred("imu"), "hz_obs_imu_topic"))
 
-        rules.append(PushSentence())
+        # rules.append(PushSentence())
 
         # for all gates not in h set the AB predicate to false.
         for node in set(["imu"])-h:
             rules.append(AbConstraint(node, False))
 
         # get me an unsatisfiable core of AB predicates
-        r = self.comp_problem.solve(Description(vars, rules), calculate_unsat_core=True)
+        r = self.comp_problem.solve(Description(vars, rules), calculate_unsat_core=False)
 
         return r.sat()
             
@@ -271,20 +271,20 @@ class Model(object):
         """
         if self.options['separate_tp'] == True:
             self.comp_queries += 1
-            if self.comp_queries > 100:
-                self.comp_queries = 0
-                self.comp_problem.finished()
-                self.comp_problem = Problem(self.sat_engine_name)
-                self.first_comp_call = True
+            # if self.comp_queries > 100:
+            self.comp_queries = 0
+            self.comp_problem.finished()
+            self.comp_problem = Problem(self.sat_engine_name)
+            self.first_comp_call = True
         else:
             self.queries += 1
-            if self.queries > 100:
-                self.queries = 0
-                self.check_problem.finished()
-                self.check_problem = Problem(self.sat_engine_name)
-                self.comp_problem = self.check_problem
-                self.first_check_call = True
-                self.first_comp_call = True
+            # if self.queries > 100:
+            self.queries = 0
+            self.check_problem.finished()
+            self.check_problem = Problem(self.sat_engine_name)
+            self.comp_problem = self.check_problem
+            self.first_check_call = True
+            self.first_comp_call = True
         #
         # if self.options['reuse_sat']:
         #
@@ -391,14 +391,14 @@ class Model(object):
         
         """
         
-        if self.queries > 100:
-            self.queries = 0
-            self.check_problem.finished()
-            self.check_problem = Problem(self.sat_engine_name)
-            self.comp_problem = self.check_problem
-            self.first_check_call = True
-            self.first_comp_call = True
-            blocked_diagnoses = set(blocked_diagnoses) | self.previous_diagnoses
+        # if self.queries > 100:
+        self.queries = 0
+        self.check_problem.finished()
+        self.check_problem = Problem(self.sat_engine_name)
+        self.comp_problem = self.check_problem
+        self.first_check_call = True
+        self.first_comp_call = True
+        blocked_diagnoses = set(blocked_diagnoses) | self.previous_diagnoses
         
         self.last_max_card = max_card
         
