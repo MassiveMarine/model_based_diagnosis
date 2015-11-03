@@ -18,4 +18,7 @@ class YamlHelper():
     @staticmethod
     def has_key(config, name):
         return name in config
-
+        
+    @staticmethod
+    def has_param(config, name):
+        return name in config

@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   tug_diagnosis_msgs
   tug_observers_msgs
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
@@ -186,3 +187,6 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+roslint_python()
+roslint_add_test()

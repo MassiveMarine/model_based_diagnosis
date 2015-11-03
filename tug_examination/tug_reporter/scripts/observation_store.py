@@ -31,7 +31,7 @@ class ObservationStore(object):
     def add_observation(self, type, resource, observations, time_stamp):
         observation_element = tuple([type, resource])
         should_replace = False
-        if self._observation_timings.has_key(observation_element):
+        if observation_element in self._observation_timings:
             if self._observation_timings[observation_element] < time_stamp:
                 should_replace = True
         else:
@@ -52,11 +52,11 @@ class ObservationStore(object):
     def has_observation(self, type, resource, observation):
         observation_element = tuple([type, resource])
         if isinstance(observation, ObservationWithNumber):
-            if self._observations_int.has_key(observation_element):
+            if observation_element in self._observations_int:
                 return observation.number in self._observations_int[observation_element]
         else:
             if isinstance(observation, ObservationWithString):
-                if self._observations_string.has_key(observation_element):
+                if observation_element in self._observations_string:
                     return observation.message in self._observations_string[observation_element]
         return False
 

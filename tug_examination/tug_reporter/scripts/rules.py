@@ -43,8 +43,9 @@ class PrintRule(Rule):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
                  negative_possible_faulty_resources, message):
-        super(PrintRule, self).__init__(positive_observations, negative_observations, positive_possible_faulty_resources,
-                       negative_possible_faulty_resources)
+        super(PrintRule, self).__init__(positive_observations, negative_observations,
+                                        positive_possible_faulty_resources,
+                                        negative_possible_faulty_resources)
         self._message = message
 
     def trigger(self):
@@ -55,8 +56,9 @@ class ProcessRule(Rule):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
                  negative_possible_faulty_resources, process):
-        super(ProcessRule, self).__init__(positive_observations, negative_observations, positive_possible_faulty_resources,
-                       negative_possible_faulty_resources)
+        super(ProcessRule, self).__init__(positive_observations, negative_observations,
+                                          positive_possible_faulty_resources,
+                                          negative_possible_faulty_resources)
         self._process = process
 
     def trigger(self):
@@ -68,8 +70,9 @@ class EMailRule(Rule):
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
                  negative_possible_faulty_resources, host, port, username, password, subject, to_address, from_address,
                  content):
-        super(EMailRule, self).__init__(positive_observations, negative_observations, positive_possible_faulty_resources,
-                       negative_possible_faulty_resources)
+        super(EMailRule, self).__init__(positive_observations, negative_observations,
+                                        positive_possible_faulty_resources,
+                                        negative_possible_faulty_resources)
         self._server = smtplib.SMTP(host, port)
         self._subject = subject
         self._to_address = to_address
@@ -93,14 +96,14 @@ class EMailRule(Rule):
 class RuleFactory(object):
 
     _factory_map = {
-                    'print' : lambda config : PrintRuleFactory.instantiate_rule(config),
-                    'process' : lambda config : ProcessRuleFactory.instantiate_rule(config),
-                    'email' : lambda config : EMailRuleFactory.instantiate_rule(config)
+                    'print': lambda config: PrintRuleFactory.instantiate_rule(config),
+                    'process': lambda config: ProcessRuleFactory.instantiate_rule(config),
+                    'email': lambda config: EMailRuleFactory.instantiate_rule(config)
                 }
 
     @staticmethod
     def create_rule(rule_type, config):
-        if not RuleFactory._factory_map.has_key(rule_type):
+        if rule_type not in RuleFactory._factory_map:
             raise KeyError("'" + str(rule_type) + "' not known!")
 
         return RuleFactory._factory_map[rule_type](config)
@@ -112,7 +115,7 @@ class RuleFactory(object):
             the_obs = ObservationContainer()
             the_obs.type = YamlHelper.get_param(obs, 'type')
             the_obs.resource = YamlHelper.get_param(obs, 'resource')
-            if YamlHelper.has_key(obs, 'observation'):
+            if YamlHelper.has_param(obs, 'observation'):
                 the_obs.observation = ObservationWithNumber(YamlHelper.get_param(obs, 'observation'))
             else:
                 the_obs.observation = ObservationWithString(YamlHelper.get_param(obs, 'observation_msg'))
@@ -137,11 +140,13 @@ class RuleFactory(object):
 
     @staticmethod
     def pars_positive_possible_faulty_resources(config):
-        return RuleFactory.pars_diag(YamlHelper.get_param_with_default(config, 'positive_possible_faulty_resources', []))
+        return RuleFactory.pars_diag(YamlHelper.get_param_with_default(config,
+                                                                       'positive_possible_faulty_resources', []))
 
     @staticmethod
     def pars_negative_possible_faulty_resources(config):
-        return RuleFactory.pars_diag(YamlHelper.get_param_with_default(config, 'negative_possible_faulty_resources', []))
+        return RuleFactory.pars_diag(YamlHelper.get_param_with_default(config,
+                                                                       'negative_possible_faulty_resources', []))
 
 
 class PrintRuleFactory(RuleFactory):

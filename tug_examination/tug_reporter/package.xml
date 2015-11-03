@@ -44,6 +44,8 @@
   <build_depend>tug_diagnosis_msgs</build_depend>
   <build_depend>tug_observers_msgs</build_depend>
   <build_depend>tug_python_utils</build_depend>
+  <build_depend>roslint</build_depend>
+
   <run_depend>rospy</run_depend>
   <run_depend>tug_diagnosis_msgs</run_depend>
   <run_depend>tug_observers_msgs</run_depend>
