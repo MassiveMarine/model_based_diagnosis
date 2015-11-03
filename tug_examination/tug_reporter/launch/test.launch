@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="tug_reporter" pkg="tug_reporter" type="reporter.py" output="screen">
+    <rosparam command="load" file="$(find tug_reporter)/config/test.yaml" />
+  </node>
+</launch>
