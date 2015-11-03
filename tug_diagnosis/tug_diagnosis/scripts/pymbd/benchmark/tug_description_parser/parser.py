@@ -11,13 +11,13 @@ class SimpleParser(object):
     input variables, the names of the output variables and a list of connections in the form 
     <output> <gate/func> <input> <input> ...
     
-    >>> SimpleParser(open('../../iscas-data/c17.sisc')).parse().input
+    >>> SimpleParser(open(tug_destug_description_parserion_parser)).parse().input
     ['1gat', '2gat', '3gat', '6gat', '7gat']
     
-    >>> SimpleParser(open('../../iscas-data/c17.sisc')).parse().output
+    >>> SimpleParser(open(tug_descripttug_description_parserarser)).parse().output
     ['22gat', '23gat']
     
-    >>> SimpleParser(open('../../iscas-data/c17.sisc')).parse().connections[0]
+    >>> SimpleParser(open(tug_description_ptug_description_parser)).parse().connections[0]
     Gate('10gat', 'nand', ['1gat', '3gat'])
     """
     
