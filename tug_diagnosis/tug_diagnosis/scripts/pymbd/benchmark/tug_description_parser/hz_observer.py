@@ -1,5 +1,5 @@
-from gate import Gate
-from pymbd.util.sethelper import powerset
+# from gate import Gate
+# from pymbd.util.sethelper import powerset
 from pymbd.sat import picosat
 from pymbd.sat.clause import clause
 from pymbd.sat.description import Sentence
@@ -19,91 +19,6 @@ class HzObserver(Sentence):
 
     def to_clause(self):
         return [clause(self.ab_node + " " + self.topic)]
-
-# class GateSentence(Sentence):
-#
-#     def __init__(self, gate):
-#         self.gate = gate
-        
-## ------------------------------------ yices specific code ------------------------------------
-
-# def xor(inputs):
-#     """
-#     Produces yices-syntax code for an XOR for multiple input variables.
-#
-#     >>> xor(['x1', 'x2'])
-#     '(or (and x1 (not x2)) (and (not x1) x2))'
-#
-#     >>> xor(['x1', 'x2', 'x3'])
-#     '(or (and x1 x2 x3) (and x1 (not x2) (not x3)) (and (not x1) (not x2) x3) (and (not x1) x2 (not x3)))'
-#
-#     """
-#     if len(inputs) == 2:
-#         code = '(or (and ' + inputs[0] + ' (not ' + inputs[1] + ')) (and (not ' + inputs[0] + ') ' + inputs[1] + '))'
-#     else:
-#         # the output of a multi-input xor is true if an odd number of inputs is true
-#         code = "(or"
-#         comb = filter(lambda c: len(c) % 2 == 1, powerset(inputs))
-#         for c in comb:
-#             code += " (and"
-#             for i in inputs:
-#                 if i in c:
-#                     code += " " + i
-#                 else:
-#                     code += ' (not ' + i + ')'
-#             code += ")"
-#         code += ")"
-#     return code
-
-# These lambda expressions return yices-syntax code for the basic gates used in the ISCAS networks  
-
-# AB_PREDICATE = "(assert (=> (not {ab}) {gate}))"
-# GATES = {
-#     'nand' : lambda output, inputs: '(= {output} (not (and {inputs})))'.format(output=output, inputs=" ".join(inputs)),
-#     'nor'  : lambda output, inputs: '(= {output} (not (or  {inputs})))'.format(output=output, inputs=" ".join(inputs)),
-#     'not'  : lambda output, inputs: '(= {output} (not      {inputs}) )'.format(output=output, inputs=" ".join(inputs)),
-#     'and'  : lambda output, inputs: '(= {output}      (and {inputs}) )'.format(output=output, inputs=" ".join(inputs)),
-#     'or'   : lambda output, inputs: '(= {output}      (or  {inputs}) )'.format(output=output, inputs=" ".join(inputs)),
-#     'xor'  : lambda output, inputs: '(= {output}           {xor}     )'.format(output=output, xor=xor(inputs)),
-#     'xnor' : lambda output, inputs: '(= {output} (not      {xor}    ))'.format(output=output, xor=xor(inputs)),
-#     'buff' : lambda output, input:  '(= {output} {input})'.format(output=output, input=" ".join(input))
-# }
-# ASSERT = "(assert {gate})"
-#
-# def gate_with_ab_predicate(ab, gate):
-#     """
-#     Returns a sentence/assertion (whatever you call it) in yices-syntax for the given gate using an AB predicate.
-#
-#     >>> gate_with_ab_predicate('ABn1', Gate('x10', 'nand', ['x1', 'x3']))
-#     '(=> (not ABn1) (= x10 (not (and x1 x3))))'
-#
-#     >>> gate_with_ab_predicate('ABn1', Gate('x10', 'xnor', ['x1', 'x3']))
-#     '(=> (not ABn1) (= x10 (not      (or (and x1 (not x3)) (and (not x1) x3))    )))'
-#     """
-#     if gate.type in GATES:
-#         g = GATES[gate.type](gate.output, gate.inputs)
-#         return AB_PREDICATE.format(ab=ab, gate=g)
-#     else:
-#         return "; unknown gate: %s" % gate
-#
-# def gate(gate):
-#     """
-#     Returns a sentence/assertion (whatever you call it) in yices-syntax for the given gate.
-#
-#     >>> gate(Gate('x10', 'nand', ['x1', 'x3']))
-#     '(= x10 (not (and x1 x3)))'
-#
-#     >>> gate(Gate('x10', 'xnor', ['x1', 'x3']))
-#     '(= x10 (not      (or (and x1 (not x3)) (and (not x1) x3))    ))'
-#     """
-#     if gate.type in GATES:
-#         g = GATES[gate.type](gate.output, gate.inputs)
-#         return ASSERT.format(gate=g)
-#     else:
-#         return "; unknown gate: %s" % gate
-
-
-## ------------------------------------ PicoSat specific code ------------------------------------
 
 
 def all_neg(literals):
