@@ -5,7 +5,7 @@ from pymbd.sat.clause import clause
 from pymbd.sat.description import Sentence
 from pymbd.sat.variable import Variable
 
-class HzObserver(Sentence):
+class TsObserver(Sentence):
     """
     Represents the fault injection logic used to enable/disable a gate's function. 
     The implication ab_predicate -> gate_function  
@@ -30,10 +30,10 @@ def generate_model_parameter(obs, topics_from_nodes):
     vars = {}
     rules = []
     for topic in obs['topics']:
-        observation = "hz_obs_" + topic
+        observation = "ts_obs_" + topic
         # vars.append(Variable(observation, Variable.BOOLEAN, 1))
         vars[observation] = Variable(observation, Variable.BOOLEAN, None)
-        rules.append(HzObserver(ab_pred(topics_from_nodes[topic]), observation))
+        rules.append(TsObserver(ab_pred(topics_from_nodes[topic]), observation))
 
     return vars, rules, []
 
@@ -60,4 +60,4 @@ def pos(literal):
     return " " + literal
 
 
-picosat.SENTENCE_INTERPRETERS[HzObserver] = lambda engine, pred, unused: pred.to_clause()
+picosat.SENTENCE_INTERPRETERS[TsObserver] = lambda engine, pred, unused: pred.to_clause()

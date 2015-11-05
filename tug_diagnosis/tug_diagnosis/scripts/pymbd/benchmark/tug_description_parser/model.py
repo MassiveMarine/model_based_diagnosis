@@ -1,7 +1,9 @@
 from ab_constraint import AbConstraint
 # from gate import Gate
 # from gate_with_ab_predicate import GateWithAbPredicate, GateSentence
-from hz_observer import HzObserver
+from hz_observer import generate_model_parameter as hz_model_generator
+from ts_observer import generate_model_parameter as ts_model_generator
+from movement_observer import generate_model_parameter as movement_model_generator
 from sentences import PushSentence, PopSentence, BlockingSentence
 # from collections import OrderedDict
 from pymbd.sat.description import Description
@@ -40,105 +42,137 @@ class Model(object):
         self.first_comp_call = True
         self.previous_diagnoses = set()
         self.last_max_card = 0
-    
-    def set_options(self, **options):
-        self.options.update(options)
-    
-    # def generate_random_inputs(self):
-    #     for i in self.inputs:
-    #         self.inputs[i] = random.uniform(0,1) > 0.5
-            
-    # def reset_outputs(self):
-    #     for i in self.outputs:
-    #         self.outputs[i] = None
-            
-    # def mutate_net(self, gates):
-    #     """
-    #     replaces the gates in the net with those given in `gates' (gates are identified
-    #     by their output name), and returns the original gates
-    #     """
-    #     orig_gates = []
-    #     for g in gates:
-    #         if g.output in self.gates:
-    #             orig_gates.append(self.gates[g.output])
-    #             self.gates[g.output] = g
-    #     return orig_gates
-            
-    # def calculate_outputs(self):
-    #     """
-    #     calculate the output of the net using the current input values (e.g. generated
-    #     using generate_random_inputs above) and output values. Note that for generating
-    #     the SatProblem, all variables are prefixed (using 'x'), because valid identifiers
-    #     must start with a letter (and some ISCAS files use names like 11gat).
-    #     The abnormal predicate of every gate is named AB<gate>, e.g. ABx11gat.
-    #     """
-    #
-    #     vars = []
-    #     for input,value in self.inputs.iteritems():
-    #         vars.append(Variable(prefix(input), Variable.BOOLEAN, value))
-    #
-    #     for output,value in self.outputs.iteritems():
-    #         vars.append(Variable(prefix(output), Variable.BOOLEAN, value))
-    #
-    #     for gate in set(self.gates.keys())-set(self.outputs.keys()):
-    #         vars.append(Variable(prefix(gate), Variable.BOOLEAN, None))
-    #
-    #     sentences = []
-    #     for output, gate in self.gates.iteritems():
-    #         sentences.append(GateSentence(prefix_gate(gate)))
-    #
-    #     p = Problem(self.sat_engine_name)
-    #     result = p.solve(Description(vars, sentences))
-    #     outputs = result.get_values()
-    #     p.finished()
-    #
-    #     for output,value in outputs.iteritems():
-    #         if output[1:] in self.outputs: # just set outputs, no internal lines!
-    #             self.outputs[output[1:]] = value
-    #
-    #     return result.sat()
 
-    def construct_problem_for_reuse(self):
-    
         vars = []
         rules = []
 
+######## movement of imu, loam, odom, cmd
         # vars: alle-topics X alle-observer
+#         vars.append(Variable("imu", Variable.BOOLEAN, None))
+#         vars.append(Variable("loam", Variable.BOOLEAN, None))
+#         vars.append(Variable("base", Variable.BOOLEAN, None))
+#         # ABvars: alle Knoten( node(z.B. imu) )
+#         vars.append(Variable(ab_pred("imu"), Variable.BOOLEAN, None))
+#         vars.append(Variable(ab_pred("loam"), Variable.BOOLEAN, None))
+#         vars.append(Variable(ab_pred("base"), Variable.BOOLEAN, None))
+#
+#
+#         vars.append(Variable("hz_obs_imu_topic", Variable.BOOLEAN, 1))
+#         vars.append(Variable("hz_obs_loam_topic", Variable.BOOLEAN, 1))
+#         vars.append(Variable("hz_obs_odom_topic", Variable.BOOLEAN, 1))
+#         vars.append(Variable("hz_obs_cmd_topic", Variable.BOOLEAN, 1))
+#
+#         vars.append(Variable("movement", Variable.BOOLEAN, None))
+#         vars.append(Variable("movement_imu_loam", Variable.BOOLEAN, 0))
+#         vars.append(Variable("movement_imu_odom", Variable.BOOLEAN, 0))
+#         vars.append(Variable("movement_imu_cmd", Variable.BOOLEAN, 0))
+#         vars.append(Variable("movement_loam_odom", Variable.BOOLEAN, 1))
+#         vars.append(Variable("movement_loam_cmd", Variable.BOOLEAN, 1))
+#         vars.append(Variable("movement_odom_cmd", Variable.BOOLEAN, 1))
+#
+#
+#
+#         vars.append(Variable(ab_pred("movement"), Variable.BOOLEAN, None))
+#
+#         # rules: ein rules-type pro observer type
+#         rules.append(HzObserver(ab_pred("imu"), "hz_obs_imu_topic"))
+#         rules.append(HzObserver(ab_pred("loam"), "hz_obs_loam_topic"))
+#         rules.append(HzObserver(ab_pred("base"), "hz_obs_odom_topic"))
+#         rules.append(HzObserver(ab_pred("base"), "hz_obs_cmd_topic"))
+#
+#         # rules.append(HzObserver(ab_pred("movement"), "imu"))
+#         # rules.append(HzObserver(ab_pred("movement"), "loam"))
+#         # rules.append(HzObserver(ab_pred("movement"), "odom"))
+#
+#         rules.append(MovementObserver(ab_pred("imu"), ab_pred("loam"), ab_pred("movement"), "movement_imu_loam"))
+#         rules.append(MovementObserver(ab_pred("imu"), ab_pred("base"), ab_pred("movement"), "movement_imu_odom"))
+#         rules.append(MovementObserver(ab_pred("imu"), ab_pred("base"), ab_pred("movement"), "movement_imu_cmd"))
+#         rules.append(MovementObserver(ab_pred("loam"), ab_pred("base"), ab_pred("movement"), "movement_loam_odom"))
+#         rules.append(MovementObserver(ab_pred("loam"), ab_pred("base"), ab_pred("movement"), "movement_loam_cmd"))
+#         rules.append(MovementObserver(ab_pred("base"), ab_pred("base"), ab_pred("movement"), "movement_odom_cmd"))
 
-        vars.append(Variable("hz_obs_imu_topic", Variable.BOOLEAN, 1))
-        vars.append(Variable("ts_obs_imu_topic", Variable.BOOLEAN, 1))
+##### imu with hz and ts
 
-        # ABvars: alle Knoten( node(z.B. imu) )
-        vars.append(Variable(ab_pred("imu"), Variable.BOOLEAN, None))
+        config = {'nodes': [{'name': 'imu', 'pub_topic': ['imu_topic'], 'sub_topic': []},
+                            {'name': 'loam', 'pub_topic': ['loam_topic'], 'sub_topic': []},
+                            {'name': 'base', 'pub_topic': ['odom_topic', 'cmd_topic'], 'sub_topic': []}],
+                  'observations': [{'topics': ['imu_topic',
+                              'loam_topic',
+                              'odom_topic',
+                              'cmd_topic'],
+                   'type': 'hz'},
+                  {'topics': ['imu_topic',
+                              'loam_topic',
+                              'odom_topic',
+                              'cmd_topic'],
+                   'type': 'ts'},
+                  {'topics': [['imu_topic', 'loam_topic'],
+                              ['imu_topic', 'odom_topic'],
+                              ['imu_topic', 'cmd_topic'],
+                              ['loam_topic', 'odom_topic'],
+                              ['loam_topic', 'cmd_topic'],
+                              ['odom_topic', 'cmd_topic']],
+                   'type': 'movement'}]}
+        vars = {}
+        rules = []
+        topics_from_nodes = dict()
+        nodes = []
 
-        # rules: ein rules-type pro observer type
-        # rules.append(GateWithAbPredicate(ab_pred(prefix(gate)), prefix_gate(self.gates[gate])))
-        rules.append(HzObserver(ab_pred("imu"), "imu_topic"))
+        for node in config['nodes']:
+            node_name = node['name']
+            nodes.append(node_name)
+            vars[node_name] = Variable(node_name, Variable.BOOLEAN, None)
+            vars[node_name] = Variable(ab_pred(node_name), Variable.BOOLEAN, None)
 
+            for topic in node['pub_topic']:
+                topics_from_nodes[topic] = node_name
 
-        
-        # # primary input variables are constrained to their value
-        # for input,value in self.inputs.iteritems():
-        #     vars.append(Variable(prefix(input), Variable.BOOLEAN, value))
-        #
-        # # primary output variables are constrained to their value
-        # for output,value in self.outputs.iteritems():
-        #     vars.append(Variable(prefix(output), Variable.BOOLEAN, value))
-        #
-        # # all other output variables (internal lines) are unconstrained
-        # for gate in set(self.gates.keys())-set(self.outputs.keys()):
-        #     vars.append(Variable(prefix(gate), Variable.BOOLEAN, None))
-        #
-        # # create a variable for the AB predicate of each gate:
-        # for gate in set(self.gates.keys()):
-        #     vars.append(Variable(ab_pred(prefix(gate)), Variable.BOOLEAN, None))
-        #
-        # # all gates are equipped with (not ABx => (= x ...))
-        # for gate in set(self.gates.keys()):
-        #     sentences.append(GateWithAbPredicate(ab_pred(prefix(gate)), prefix_gate(self.gates[gate])))
-        
-        return vars, rules
+        for obs in config['observations']:
+            new_vars, new_rules, new_nodes = self.get_model_element(obs, topics_from_nodes)
+            vars.update(new_vars)
+            rules += new_rules
+            nodes += new_nodes
 
+        self.temp_vars = vars
+        self.temp_rules = rules
+        self.temp_nodes = nodes
+
+        self.set_observations([('movement_obs_imu_topic_cmd_topic', 0),
+                               ('movement_obs_imu_topic_loam_topic', 0),
+                               ('movement_obs_imu_topic_odom_topic', 0),
+                               ('movement_obs_loam_topic_odom_topic', 1),
+                               ('movement_obs_loam_topic_cmd_topic', 1),
+                               ('movement_obs_odom_topic_cmd_topic', 1),
+                               ('hz_obs_imu_topic', 1),
+                               ('hz_obs_loam_topic', 1),
+                               ('hz_obs_odom_topic', 1),
+                               ('hz_obs_cmd_topic', 1),
+                               ('ts_obs_imu_topic', 1),
+                               ('ts_obs_loam_topic', 1),
+                               ('ts_obs_odom_topic', 1),
+                               ('ts_obs_cmd_topic', 1),
+                               ])
+    @staticmethod
+    def get_model_element(obs, topics_from_nodes):
+        if obs['type'] == 'hz':
+            print 'HzObserver'
+            return hz_model_generator(obs, topics_from_nodes)
+        elif obs['type'] == 'ts':
+            print 'TsObserver'
+            return ts_model_generator(obs, topics_from_nodes)
+        elif obs['type'] == 'movement':
+            print 'MovementObserver'
+            return movement_model_generator(obs, topics_from_nodes)
+
+        return {}, [], []
+
+    def set_observations(self, observations):
+        # pass
+        for name,value in observations:
+            self.temp_vars[name].value = value
+
+    def set_options(self, **options):
+        self.options.update(options)
 
     def check_consistency(self, h):
         """
@@ -163,98 +197,16 @@ class Model(object):
             self.comp_problem = self.check_problem
             self.first_check_call = True
             self.first_comp_call = True
-        
-        # if self.options['reuse_sat']:
-        #
-        #     if self.first_check_call:
-        #         self.first_check_call = False
-        #
-        #         if self.options['separate_tp'] == True and self.check_problem == self.comp_problem:
-        #             self.check_problem = Problem(self.sat_engine_name)
-        #
-        #         vars, sentences = self.construct_problem_for_reuse()
-        #
-        #         sentences.append(PushSentence())
-        #
-        #         # for all gates not in h set the AB predicate to false.
-        #         for gate in set(self.gates.keys())-h:
-        #             sentences.append(AbConstraint(prefix(gate), False, extended=False))
-        #
-        #         for gate in h:
-        #             sentences.append(AbConstraint(prefix(gate), True, extended=False))
-        #
-        #         # is this problem satisfiable?
-        #         r = self.check_problem.solve(Description(vars, sentences), calculate_unsat_core=False)
-        #
-        #         return r.sat()
-        #
-        #     else: # (not self.first_check_consistency)
-        #
-        #         sentences = []
-        #
-        #         sentences.append(PopSentence())
-        #         sentences.append(PushSentence())
-        #
-        #         # for all gates not in h set the AB predicate to false.
-        #         for gate in set(self.gates.keys())-h:
-        #             sentences.append(AbConstraint(prefix(gate), False, extended=False))
-        #
-        #         for gate in h:
-        #             sentences.append(AbConstraint(prefix(gate), True, extended=False))
-        #
-        #         # is this problem satisfiable?
-        #         r = self.check_problem.solve_again(sentences, calculate_unsat_core=False)
-        #
-        #         return r.sat()
-        #
-        #
-        # else: # (not self.reuse_sat)
-            
+
         if self.options['separate_tp'] == True and self.check_problem == self.comp_problem:
             self.check_problem = Problem(self.sat_engine_name)
 
-        # vars = []
-        # sentences = []
-        #
-        # # primary input variables are constrained to their value
-        # for input,value in self.inputs.iteritems():
-        #     vars.append(Variable(prefix(input), Variable.BOOLEAN, value))
-        #
-        # # primary output variables are constrained to their value
-        # for output,value in self.outputs.iteritems():
-        #     vars.append(Variable(prefix(output), Variable.BOOLEAN, value))
-        #
-        # # all other output variables (internal lines) are unconstrained
-        # for gate in set(self.gates.keys())-set(self.outputs.keys()):
-        #     vars.append(Variable(prefix(gate), Variable.BOOLEAN, None))
-        #
-        # # all gate outputs except those in `h' behave according to their gate function
-        # for gate in set(self.gates.keys())-h:
-        #     sentences.append(GateSentence(prefix_gate(self.gates[gate])))
-        #
-        # # is this problem satisfiable?
-        # r = self.check_problem.solve(Description(vars, sentences), calculate_unsat_core=False)
-        #
-        # return r.sat()
-
-        vars = []
-        rules = []
-
-        # vars: alle-topics X alle-observer
-        vars.append(Variable("hz_obs_imu_topic", Variable.BOOLEAN, 0))
-        vars.append(Variable("ts_obs_imu_topic", Variable.BOOLEAN, 1))
-
-        # ABvars: alle Knoten( node(z.B. imu) )
-        vars.append(Variable(ab_pred("imu"), Variable.BOOLEAN, None))
-
-        # rules: ein rules-type pro observer type
-        # rules.append(GateWithAbPredicate(ab_pred(prefix(gate)), prefix_gate(self.gates[gate])))
-        rules.append(HzObserver(ab_pred("imu"), "hz_obs_imu_topic"))
-
-        # rules.append(PushSentence())
+        vars = self.temp_vars.values()
+        rules = self.temp_rules[:]
+        nodes = self.temp_nodes[:]
 
         # for all gates not in h set the AB predicate to false.
-        for node in set(["imu"])-h:
+        for node in set(nodes)-h:
             rules.append(AbConstraint(node, False))
 
         # get me an unsatisfiable core of AB predicates
@@ -285,96 +237,15 @@ class Model(object):
             self.comp_problem = self.check_problem
             self.first_check_call = True
             self.first_comp_call = True
-        #
-        # if self.options['reuse_sat']:
-        #
-        #     if self.first_comp_call:
-        #         self.first_comp_call = False
-        #
-        #         vars, sentences = self.construct_problem_for_reuse()
-        #
-        #         sentences.append(PushSentence())
-        #
-        #         # for all gates not in h set the AB predicate to false.
-        #         for gate in set(self.gates.keys())-h:
-        #             sentences.append(AbConstraint(prefix(gate), False))
-        #
-        #         for gate in h:
-        #             sentences.append(AbConstraint(prefix(gate), True))
-        #
-        #         # get me an unsatisfiable core of AB predicates
-        #         r = self.comp_problem.solve(Description(vars, sentences), calculate_unsat_core=True)
-        #
-        #         if (r.sat()):
-        #             return None
-        #         else:
-        #             conflict = map(lambda x: x[1:], r.get_unsat_core())
-        #             return frozenset(conflict)
-        #
-        #     else: # not self.first_calculate_conflicts:
-        #         sentences = []
-        #
-        #         sentences.append(PopSentence())
-        #         sentences.append(PushSentence())
-        #
-        #         # for all gates not in h set the AB predicate to false.
-        #         for gate in set(self.gates.keys())-h:
-        #             sentences.append(AbConstraint(prefix(gate), False))
-        #
-        #         for gate in h:
-        #             sentences.append(AbConstraint(prefix(gate), True))
-        #
-        #         r = self.comp_problem.solve_again(sentences, calculate_unsat_core=True)
-        #
-        #         if (r.sat()):
-        #             return None
-        #         else:
-        #             conflict = map(lambda x: x[1:], r.get_unsat_core())
-        #             return frozenset(conflict)
-        #
-        # else: # (not self.reuse_sat)
-                   
-        # vars = []
-        # sentences = []
 
-        # primary input variables are constrained to their value
-        # for input, value in self.inputs.iteritems():
-        #     vars.append(Variable(prefix(input), Variable.BOOLEAN, value))
-        #
-        # primary output variables are constrained to their value
-        # for output, value in self.outputs.iteritems():
-        #     vars.append(Variable(prefix(output), Variable.BOOLEAN, value))
-
-        # all other output variables (internal lines) are unconstrained
-        # for gate in set(self.gates.keys())-set(self.outputs.keys()):
-        #     vars.append(Variable(prefix(gate), Variable.BOOLEAN, None))
-
-        # create a variable for the AB predicate of each gate except those in `h':
-        # for gate in set(self.gates.keys())-h:
-        #     vars.append(Variable(ab_pred(prefix(gate)), Variable.BOOLEAN, None))
-
-        # all gates except those in `h' are equipped with (not ABx => (= x ...))
-        # for gate in set(self.gates.keys())-h:
-        #     sentences.append(GateWithAbPredicate(ab_pred(prefix(gate)), prefix_gate(self.gates[gate])))
-
-        vars = []
-        rules = []
-
-        # vars: alle-topics X alle-observer
-        vars.append(Variable("hz_obs_imu_topic", Variable.BOOLEAN, 0))
-        vars.append(Variable("ts_obs_imu_topic", Variable.BOOLEAN, 1))
-
-        # ABvars: alle Knoten( node(z.B. imu) )
-        vars.append(Variable(ab_pred("imu"), Variable.BOOLEAN, None))
-
-        # rules: ein rules-type pro observer type
-        # rules.append(GateWithAbPredicate(ab_pred(prefix(gate)), prefix_gate(self.gates[gate])))
-        rules.append(HzObserver(ab_pred("imu"), "hz_obs_imu_topic"))
+        vars = self.temp_vars.values()
+        rules = self.temp_rules[:]
+        nodes = self.temp_nodes[:]
 
         rules.append(PushSentence())
 
         # for all gates not in h set the AB predicate to false.
-        for node in set(["imu"])-h:
+        for node in set(nodes)-h:
             rules.append(AbConstraint(node, False))
 
         # get me an unsatisfiable core of AB predicates
@@ -385,104 +256,6 @@ class Model(object):
         else:
             conflict = map(lambda x: x, r.get_unsat_core())
             return frozenset(conflict)
-            
-    def calculate_next_diagnosis(self, blocked_diagnoses, max_card=None, find_all_sols=False):
-        """
-        
-        """
-        
-        # if self.queries > 100:
-        self.queries = 0
-        self.check_problem.finished()
-        self.check_problem = Problem(self.sat_engine_name)
-        self.comp_problem = self.check_problem
-        self.first_check_call = True
-        self.first_comp_call = True
-        blocked_diagnoses = set(blocked_diagnoses) | self.previous_diagnoses
-        
-        self.last_max_card = max_card
-        
-        if self.options['reuse_sat']:
-            
-            self.ab_vars = []
-            if self.first_comp_call:
-                self.first_comp_call = False
-                
-                vars, sentences = self.construct_problem_for_reuse()
-                
-                # for all gates not in h set the AB predicate to false.
-                for gate in set(self.gates.keys()):
-                    sentences.append(AbConstraint(prefix(gate), False, weight=1))
-                    self.ab_vars.append("AB"+prefix(gate))
-                
-                for diag in blocked_diagnoses:
-                    sentences.append(BlockingSentence(diag))
-        
-                # get me an unsatisfiable core of AB predicates
-                r = self.comp_problem.solve(Description(vars, sentences), calculate_unsat_core=True, max_card=max_card, find_all_sols=find_all_sols, ab_vars=self.ab_vars)
-                
-                if r:
-                    self.previous_diagnoses |= frozenset(r)
-                return r
-                
-            else: # not self.first_calculate_conflicts:
-                sentences = []
-                           
-                for diag in blocked_diagnoses:
-                    sentences.append(BlockingSentence(diag))
-
-                r = self.comp_problem.solve_again(sentences, calculate_unsat_core=True, max_card=max_card, find_all_sols=find_all_sols, ab_vars=self.ab_vars)
-                
-                if r:
-                    self.previous_diagnoses |= frozenset(r)
-                return r
-        
-        else: # (not self.reuse_sat)
-                   
-            vars = []
-            sentences = []
-            ab_vars = []
-            
-            # primary input variables are constrained to their value
-            for input, value in self.inputs.iteritems():
-                vars.append(Variable(prefix(input), Variable.BOOLEAN, value))  
-    
-            # primary output variables are constrained to their value
-            for output, value in self.outputs.iteritems():
-                vars.append(Variable(prefix(output), Variable.BOOLEAN, value))
-    
-            # all other output variables (internal lines) are unconstrained
-            for gate in set(self.gates.keys())-set(self.outputs.keys()):
-                vars.append(Variable(prefix(gate), Variable.BOOLEAN, None))
-    
-            # create a variable for the AB predicate of each gate except those in `h':
-            for gate in set(self.gates.keys()):
-                vars.append(Variable(ab_pred(prefix(gate)), Variable.BOOLEAN, None))
-            
-            # all gates except those in `h' are equipped with (not ABx => (= x ...))
-            for gate in set(self.gates.keys()):
-                sentences.append(GateWithAbPredicate(ab_pred(prefix(gate)), prefix_gate(self.gates[gate])))
-            
-            # for all gates not in h set the AB predicate to false.
-            for gate in set(self.gates.keys()):
-                sentences.append(AbConstraint(prefix(gate), False, weight=1))
-                ab_vars.append("AB"+prefix(gate))
-    
-            for diag in blocked_diagnoses:
-                sentences.append(BlockingSentence(diag))
-    
-            # get me an unsatisfiable core of AB predicates
-            r = self.comp_problem.solve(Description(vars, sentences), calculate_unsat_core=True, ab_vars=ab_vars, max_card=max_card, find_all_sols=find_all_sols)
-            
-            if r:
-                self.previous_diagnoses |= frozenset(r)
-            return r
-
-    def input_values_compact(self):
-        return map(lambda v: v and 1 or 0, self.inputs.values())
-
-    def output_values_compact(self):
-        return map(lambda v: v and 1 or 0, self.outputs.values())
 
     def finished(self):
         if self.check_problem:

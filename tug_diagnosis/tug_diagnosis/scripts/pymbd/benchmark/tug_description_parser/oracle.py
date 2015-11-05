@@ -1,5 +1,4 @@
 from model import Model
-from parser import SimpleParser
 from pymbd.diagnosis.description import Description
 from pymbd.util.two_way_dict import TwoWayDict
 import time
@@ -23,11 +22,7 @@ class TUGDescriptionOracle(Description):
         if not self.setup:
             self.setup = True
             self.net = Model(**self.options)
-            # for c,i in enumerate(self.net.inputs):
-            #     self.net.inputs[i] = self.inputs[c] == 1
-            # for c,i in enumerate(self.net.outputs):
-            #     self.net.outputs[i] = self.outputs[c] == 1
-            self.nodes = TwoWayDict(dict(enumerate(["imu"])))
+            self.nodes = TwoWayDict(dict(enumerate(self.net.temp_nodes)))
             
     def set_options(self, **options):
         super(TUGDescriptionOracle, self).set_options(**options)
@@ -60,41 +55,10 @@ class TUGDescriptionOracle(Description):
         self.check_time += t1-t0
         return sat
 
-    def get_next_diagnosis(self, previous_diagnoses, max_card=None):
-        self.setup_system_model()
-        self.comp_calls += 1
-        t0 = time.time()
-#        print "get_next_diagnosis(%s,%d)"%(previous_diagnoses, max_card)
-        diag = self.net.calculate_next_diagnosis(map(self.numbers_to_gates,previous_diagnoses), max_card=max_card)
-#        print "solution:", diag
-        t1 = time.time()
-        self.comp_time += t1-t0
-        if diag:
-            return self.gates_to_numbers(diag)
-        else:
-            return None
-        
-    def get_all_diagnoses(self, previous_diagnoses, max_card=None, max_solutions=None):
-        self.setup_system_model()
-        self.comp_calls += 1
-        t0 = time.time()
-        diag = self.net.calculate_next_diagnosis(map(self.numbers_to_gates,previous_diagnoses), max_card=max_card, find_all_sols=True)
-        t1 = time.time()
-        self.comp_time += t1-t0
-        if diag:
-            return map(self.gates_to_numbers, diag)
-        else:
-            return None
-        
 
     def finished(self):
         self.net.finished()
-        
-    # def gates_to_numbers(self, gates):
-    #     return frozenset(map(lambda g: self.components.key(g), gates))
-    #
-    # def numbers_to_gates(self, numbers):
-    #     return frozenset(map(lambda n: self.components[n], numbers))
+
     def nodes_to_numbers(self, nodes):
         return frozenset(map(lambda g: self.nodes.key(g), nodes))
 
