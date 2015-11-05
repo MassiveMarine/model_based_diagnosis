@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   tug_yaml
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
@@ -190,3 +191,6 @@ target_link_libraries(observer_plugin_utils
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+roslint_cpp()
+roslint_add_test()
