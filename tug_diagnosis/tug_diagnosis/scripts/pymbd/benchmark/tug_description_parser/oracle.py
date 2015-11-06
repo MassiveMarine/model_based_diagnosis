@@ -6,9 +6,9 @@ import time
 
 class TUGDescriptionOracle(Description):
     
-    def __init__(self, sisc_file, observations, **options):
+    def __init__(self, configs, observations, **options):
         super(TUGDescriptionOracle, self).__init__([], **options)
-        self.sisc_file = sisc_file
+        self.configs = configs
         self.comp_calls = 0
         self.check_calls = 0
         self.comp_time = 0
@@ -17,11 +17,12 @@ class TUGDescriptionOracle(Description):
         self.setup = False
         self.observations = observations
         self.net = None
-        
+
     def setup_system_model(self):
         if not self.setup:
             self.setup = True
-            self.net = Model(**self.options)
+            self.net = Model(self.configs, **self.options)
+            self.net.set_observations(self.observations)
             self.nodes = TwoWayDict(dict(enumerate(self.net.temp_nodes)))
             
     def set_options(self, **options):
