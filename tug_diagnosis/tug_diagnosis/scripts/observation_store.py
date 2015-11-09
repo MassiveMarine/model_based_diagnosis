@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from pymbd.benchmark.tug_description_parser.observer import decrypt_resource_info
 __author__ = 'clemens'
 
 
@@ -63,13 +64,15 @@ class ObservationStore(object):
     def get_observations(self):
         observations = []
         for obs in self._observations_int.iterkeys():
-            topic = obs[0] + '_obs_' + obs[1][1:-3]
-            error =  0 if list(self._observations_int[obs])[0] < 0 else 1
-            observations.append((topic, error))
+            try:
+                topic = decrypt_resource_info(obs)
+                error = 0 if list(self._observations_int[obs])[0] < 0 else 1
+                observations.append((topic, error))
+            except AttributeError as e:
+                pass
+                # print e
 
         return observations
-
-
 
     def has_changed(self):
         return self._has_changed

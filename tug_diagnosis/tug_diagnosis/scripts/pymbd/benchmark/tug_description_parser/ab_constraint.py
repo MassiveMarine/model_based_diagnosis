@@ -3,6 +3,7 @@ from pymbd.sat.clause import Clause
 from pymbd.sat.description import Sentence
 from pymbd.sat.literal import Literal
 
+
 class AbConstraint(Sentence):
     
     def __init__(self, ab_predicate, value, extended=True, weight=None):
@@ -10,7 +11,8 @@ class AbConstraint(Sentence):
         self.value = value
         self.extended = extended
         self.weight = weight
-        
+
+
 def ab_constraint(engine, ab_constraint):
     # yices spits out "id: x" lines for each assert+ we give
     # This records each AbConstraint to map the ids back to names later on
@@ -26,6 +28,7 @@ def ab_constraint(engine, ab_constraint):
             return "(assert (= AB%s true))" % ab_constraint.ab_predicate
         else:
             return "(assert (= AB%s false))" % ab_constraint.ab_predicate 
+
 
 def clause_ab_constraint(engine, ab_constraint):
     """

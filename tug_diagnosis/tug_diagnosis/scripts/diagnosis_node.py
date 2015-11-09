@@ -9,6 +9,7 @@ from tug_diagnosis_msgs.msg import diagnosis_set
 from observation_store import ObservationStore
 import threading
 
+
 class Diagnosis(object):
 
     def __init__(self):
@@ -71,7 +72,7 @@ if __name__ == "__main__":
 
     the_diagnostics.run()
 
-#
+
 #     p = Problem()
 #
 #     the_list = ['hst-picosat',
@@ -86,8 +87,22 @@ if __name__ == "__main__":
 #             # 'hsdag-sicf-cache-picosat'
 #             ]
 #
+#     configs = {'nodes': [{'name': 'imu', 'pub_topic': ['imu_topic'], 'sub_topic': []},
+#                          {'name': 'loam', 'pub_topic': ['loam_topic'], 'sub_topic': []},
+#                          {'name': 'base','pub_topic': ['odom_topic', 'cmd_topic'], 'sub_topic': []}],
+#                'observations': [{'topics': ['imu_topic', 'loam_topic', 'odom_topic', 'cmd_topic'], 'type': 'hz'},
+#                                 {'topics': [['imu_topic', 'loam_topic'],
+#                                             ['imu_topic', 'odom_topic'],
+#                                             ['imu_topic', 'cmd_topic'],
+#                                             ['loam_topic', 'odom_topic'],
+#                                             ['loam_topic', 'cmd_topic'],
+#                                             ['odom_topic', 'cmd_topic']], 'type': 'movement'}
+#                                 ]
+#                }
+#
 # # for i in the_list:
-#     observations = [('movement_obs_imu_topic_cmd_topic', 0),
+#     observations = [
+#                     ('movement_obs_imu_topic_cmd_topic', 0),
 #                     ('movement_obs_imu_topic_loam_topic', 0),
 #                     ('movement_obs_imu_topic_odom_topic', 0),
 #                     ('movement_obs_loam_topic_odom_topic', 1),
@@ -97,10 +112,10 @@ if __name__ == "__main__":
 #                     ('hz_obs_loam_topic', 1),
 #                     ('hz_obs_odom_topic', 1),
 #                     ('hz_obs_cmd_topic', 1),
-#                     ('ts_obs_imu_topic', 1),
-#                     ('ts_obs_loam_topic', 1),
-#                     ('ts_obs_odom_topic', 1),
-#                     ('ts_obs_cmd_topic', 1),
+#                     # ('ts_obs_imu_topic', 1),
+#                     # ('ts_obs_loam_topic', 1),
+#                     # ('ts_obs_odom_topic', 1),
+#                     # ('ts_obs_cmd_topic', 1),
 #                     ]
 #
 #     try:
@@ -108,7 +123,7 @@ if __name__ == "__main__":
 #         r = p.compute_with_description(o, 'hst-picosat', max_card=3)
 #         d = r.get_diagnoses()
 #         d = map(o.numbers_to_nodes, d)
-#         rospy.loginfo(str(r.get_stats()['total_time']) + " " + write_sets(d))
+#         print str(r.get_stats()['total_time']) + " " + write_sets(d)
 #     except AttributeError as e:
-#         rospy.logwarn('Can not be solved')
-#
+#         print 'Can not be solved'
+# #

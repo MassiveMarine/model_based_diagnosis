@@ -1,16 +1,11 @@
 from ab_constraint import AbConstraint
-from hz_observer import generate_model_parameter as hz_model_generator
-from ts_observer import generate_model_parameter as ts_model_generator
-from movement_observer import generate_model_parameter as movement_model_generator
+from observer import generate_model_parameter
+from observers.base_observer import ab_pred
 from sentences import PushSentence
 from pymbd.sat.description import Description
 from pymbd.sat.problem import Problem
 from pymbd.sat.variable import Variable
 
-
-def ab_pred(var):
-    return 'AB' + var
-        
 
 class Model(object):
     
@@ -45,7 +40,7 @@ class Model(object):
                 topics_from_nodes[topic] = node_name
 
         for obs in configs['observations']:
-            new_vars, new_rules, new_nodes = self.get_model_element(obs, topics_from_nodes)
+            new_vars, new_rules, new_nodes = generate_model_parameter(obs, topics_from_nodes)
             vars.update(new_vars)
             rules += new_rules
             nodes += new_nodes
@@ -54,23 +49,9 @@ class Model(object):
         self.temp_rules = rules
         self.temp_nodes = nodes
 
-    @staticmethod
-    def get_model_element(obs, topics_from_nodes):
-        if obs['type'] == 'hz':
-            print 'HzObserver'
-            return hz_model_generator(obs, topics_from_nodes)
-        elif obs['type'] == 'ts':
-            print 'TsObserver'
-            return ts_model_generator(obs, topics_from_nodes)
-        elif obs['type'] == 'movement':
-            print 'MovementObserver'
-            return movement_model_generator(obs, topics_from_nodes)
-
-        return {}, [], []
-
     def set_observations(self, observations):
         # pass
-        for name,value in observations:
+        for name, value in observations:
             self.temp_vars[name].value = value
 
     def set_options(self, **options):

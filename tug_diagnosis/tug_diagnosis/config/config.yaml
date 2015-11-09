@@ -1,35 +1,35 @@
   nodes:
     - name: "imu"
       sub_topic: []
-      pub_topic: ["imu_topic"]
+      pub_topic: ["/imu_topic"]
 
     - name: "loam"
       sub_topic: []
-      pub_topic: ["loam_topic"]
+      pub_topic: ["/loam_topic"]
 
     - name: "base"
       sub_topic: []
-      pub_topic: ["odom_topic", "cmd_topic"]
+      pub_topic: ["/odom_topic", "/cmd_topic"]
 
   observations:
   #  - type: "resource"
   #    nodes: ["imu", "loam", "base"]
 
     - type: "hz"
-      topics: ["imu_topic", "loam_topic", "odom_topic", "cmd_topic"]
+      topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic"]
 
   #  - type: "ts"
-  #    topics: ["imu_topic", "loam_topic", "odom_topic", "cmd_topic"]
+  #    topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic"]
 
   #  - type: "timeout"
-  #    topics: ["imu_topic", "loam_topic", "odom_topic", "cmd_topic"]
+  #    topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic"]
   #
   ##  - type: "timimg"
-  ##    topics: ["imu_topic", "loam_topic"]
+  ##    topics: ["/imu_topic", "/loam_topic"]
     - type: "movement"
-      topics: [["imu_topic", "loam_topic"],
-               ["imu_topic", "odom_topic"],
-               ["imu_topic", "cmd_topic"],
-               ["loam_topic", "odom_topic"],
-               ["loam_topic", "cmd_topic"],
-               ["odom_topic", "cmd_topic"]]
+      topics: [["/imu_topic", "/loam_topic"],
+               ["/imu_topic", "/odom_topic"],
+               ["/imu_topic", "/cmd_topic"],
+               ["/loam_topic", "/odom_topic"],
+               ["/loam_topic", "/cmd_topic"],
+               ["/odom_topic", "/cmd_topic"]]
