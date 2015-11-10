@@ -34,7 +34,7 @@ class Model(object):
             node_name = node['name']
             nodes.append(node_name)
             vars[node_name] = Variable(node_name, Variable.BOOLEAN, None)
-            vars[node_name] = Variable(ab_pred(node_name), Variable.BOOLEAN, None)
+            vars[ab_pred(node_name)] = Variable(ab_pred(node_name), Variable.BOOLEAN, None)
 
             for topic in node['pub_topic']:
                 topics_from_nodes[topic] = node_name
@@ -48,6 +48,13 @@ class Model(object):
         self.temp_vars = vars
         self.temp_rules = rules
         self.temp_nodes = nodes
+
+        # print "vars:"
+        # print vars
+        # print "rules:"
+        # print rules
+        # print "nodes:"
+        # print nodes
 
     def set_observations(self, observations):
         # pass

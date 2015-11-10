@@ -45,14 +45,14 @@ class Diagnosis(object):
             p = Problem()
 
             the_list = ['hst-picosat']
-            try:
-                o = TUGDescriptionOracle(configs, observations)
-                r = p.compute_with_description(o, 'hst-picosat', max_card=3)
-                d = r.get_diagnoses()
-                d = map(o.numbers_to_nodes, d)
-                rospy.loginfo(str(r.get_stats()['total_time']) + " " + write_sets(d))
-            except AttributeError as e:
-                rospy.logwarn('Can not be solved')
+            # try:
+            o = TUGDescriptionOracle(configs, observations)
+            r = p.compute_with_description(o, 'hst-picosat', max_card=3)
+            d = r.get_diagnoses()
+            d = map(o.numbers_to_nodes, d)
+            rospy.loginfo(str(r.get_stats()['total_time']) + " " + write_sets(d))
+            # except AttributeError as e:
+            #     rospy.logwarn('Can not be solved')
 
 
 

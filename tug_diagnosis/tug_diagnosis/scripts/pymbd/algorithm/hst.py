@@ -53,7 +53,10 @@ class HSTree(object):
         self.cs_cache.append = lambda v: self.cs_cache.add(v)
         
     def num_nodes(self):
-        return self.root.num_children()
+        if self.root:
+            return self.root.num_children()
+        else:
+            return 0
     
     def nodes(self):
         return self.root.get_children()

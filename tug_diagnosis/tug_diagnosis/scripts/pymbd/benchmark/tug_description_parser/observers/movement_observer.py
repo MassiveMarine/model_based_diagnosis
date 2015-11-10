@@ -18,7 +18,7 @@ class MovementObserver(BaseObserver):
         self.observation = observation
 
     def __repr__(self):
-        return "(!%s && !%s &*& !%s => %s)" % (self.ab_node_a, self.ab_node_b, self.ab_function, self.observation)
+        return "(!%s && !%s && !%s => %s)" % (self.ab_node_a, self.ab_node_b, self.ab_function, self.observation)
 
     def to_clause(self):
         return [ clause(self.ab_node_a + " " + self.ab_node_b + " " + self.ab_function + " " + self.observation)]
@@ -42,7 +42,7 @@ class MovementObserver(BaseObserver):
 
     @staticmethod
     def decrypt_resource_info(resource_info):
-        print "movement" + str(resource_info)
+        return 'movement_obs_' + resource_info
 
 
 picosat.SENTENCE_INTERPRETERS[MovementObserver] = lambda engine, pred, unused: pred.to_clause()
