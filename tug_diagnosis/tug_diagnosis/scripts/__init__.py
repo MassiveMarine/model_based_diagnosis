@@ -1,1 +1,1 @@
-__author__ = 'stefan'
+__all__ = ["pymbd"]
