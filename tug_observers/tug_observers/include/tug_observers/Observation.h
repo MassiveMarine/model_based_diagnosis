@@ -17,6 +17,7 @@ public:
     Observation(std::string observation_msg, int32_t observation_code);
     Observation(std::string observation_msg, std::string verbose_observation_msg, int32_t observation_code);
     tug_observers_msgs::observation toMsg();
+    bool isFaulty();
 };
 
 

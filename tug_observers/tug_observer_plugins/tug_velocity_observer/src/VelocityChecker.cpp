@@ -41,3 +41,76 @@ std::vector<boost::tuple<std::string, std::vector<Observation>, ros::Time> > Vel
 
   return result;
 }
+
+std::map<std::string, bool> VelocityChecker::getValidInputs()
+{
+  // we use a simple counting based diagnosis to decide which component is faulty. As long as no correlation or common
+  // inputs are considered between inputs to the velocity checker this is a simple and valid method.
+  std::map<std::string, unsigned  int> fault_count;
+  std::set<std::string> inputs;
+
+  // flag to optimze case of no fault
+  bool has_fault = false;
+  // increment the count for each input if a faulty state is plausible
+  for(std::vector<boost::shared_ptr<VelocityObserver> >::iterator it = observers_.begin(); it != observers_.end(); ++it)
+  {
+    std::pair<bool, std::vector<Observation> > states = (*it)->estimateStates();
+    if (states.first)
+    {
+      std::string input_a = (*it)->getInputAName();
+      inputs.insert(input_a);
+      std::string input_b = (*it)->getInputBName();
+      inputs.insert(input_b);
+
+      for(size_t i = 0; i < states.second.size(); ++i)
+      {
+        if(states.second[i].isFaulty())
+        {
+          has_fault = true;
+          updateFaultCount(input_a, 1, fault_count);
+          updateFaultCount(input_b, 1, fault_count);
+        }
+      }
+    }
+    else
+      ROS_DEBUG("got no estimated states");
+  }
+
+  std::map<std::string, bool> result;
+  for(std::set<std::string>::iterator it = inputs.begin(); it != inputs.end(); ++it) // enshure every input has a count
+  {
+    updateFaultCount(*it, 0, fault_count);
+    result.insert(std::make_pair(*it, false));
+  }
+
+  if(has_fault)
+  {
+    //get maximum count -> shows faulty input
+    unsigned int maximum = 0;
+    for(std::map<std::string, unsigned  int>::iterator it = fault_count.begin(); it != fault_count.end(); ++it)
+    {
+      if(maximum < it->second)
+        maximum = it->second;
+    }
+    // all inputs with the maximum count are faulty
+    for(std::map<std::string, unsigned  int>::iterator it = fault_count.begin(); it != fault_count.end(); ++it)
+    {
+      if(it->second == maximum)
+        result[it->first] = true;
+    }
+  }
+
+  return result;
+};
+
+void VelocityChecker::updateFaultCount(std::string name, unsigned int increment,
+                                       std::map<std::string, unsigned  int>& fault_count)
+{
+  std::map<std::string, unsigned  int>::iterator name_pos = fault_count.find(name);
+  if(name_pos != fault_count.end())
+    name_pos->second += increment;
+  else
+  {
+    fault_count.insert(std::make_pair(name, increment));
+  }
+}

@@ -63,6 +63,10 @@ public:
     ros::Time getCurrentFilterTime();
 
     std::string getName();
+
+    std::string getInputAName();
+
+    std::string getInputBName();
 };
 
 

@@ -19,3 +19,8 @@ tug_observers_msgs::observation Observation::toMsg()
 
   return result;
 }
+
+bool Observation::isFaulty()
+{
+  return observation_code_ < 0;
+}

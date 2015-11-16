@@ -344,3 +344,13 @@ std::string VelocityObserver::getName()
   std::replace(result.begin(), result.end(), '/', '_');
   return result;
 }
+
+std::string VelocityObserver::getInputAName()
+{
+  return a_input_->getName();
+}
+
+std::string VelocityObserver::getInputBName()
+{
+  return b_input_->getName();
+}
