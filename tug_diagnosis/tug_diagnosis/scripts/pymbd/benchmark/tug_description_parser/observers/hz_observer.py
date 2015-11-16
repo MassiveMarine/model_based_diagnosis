@@ -11,14 +11,8 @@ class HzObserver(BaseObserver):
     """
     def __init__(self, ab_node, topic):
         super(HzObserver, self).__init__()
-        if not ab_node or ab_node is ab_pred(""):
-            raise ValueError
-        if not isinstance(ab_node, str):
-            raise TypeError
-        if not topic or topic is "/":
-            raise ValueError
-        if not isinstance(topic, str):
-            raise TypeError
+        checkInputData.str_data_valid(ab_node)
+        checkInputData.str_data_valid(topic)
 
         self.ab_node = ab_node
         self.topic = topic
@@ -31,32 +25,22 @@ class HzObserver(BaseObserver):
 
     @staticmethod
     def generate_model_parameter(config, topics_from_nodes):
-        if not len(config['topics']):
-            raise ValueError
-        if not isinstance(config['topics'], list):
-            raise TypeError
+        print "1"
+        checkInputData.dict_data_valid(config, False)
+        topics = config['topics']
+
+        checkInputData.list_data_valid(topics)
+
+        checkInputData.dict_data_valid(topics_from_nodes, False)
 
         vars = {}
         rules = []
         nodes = []
 
-        for topic in config['topics']:
-            if topic is '':
-                raise ValueError
-            if not isinstance(topic, str):
-                raise TypeError
-            if not len(topics_from_nodes[topic]):
-                raise ValueError
-            if not isinstance(topics_from_nodes[topic], list):
-                raise TypeError
+        for topic in topics:
+            checkInputData.list_data_valid(topics_from_nodes[topic])
 
-            print topics_from_nodes[topic]
             for callerid in topics_from_nodes[topic]:
-                if callerid is '/' or callerid is '':
-                    raise ValueError
-                if not isinstance(callerid, str):
-                    raise TypeError
-
                 observation = "hz_obs_" + topic + "_" + callerid
                 vars[observation] = Variable(observation, Variable.BOOLEAN, None)
                 rules.append(HzObserver(ab_pred(str(callerid)), observation))
@@ -78,10 +62,7 @@ class HzObserver(BaseObserver):
 
         [topic_name, callerids_str] = resource_info.split(' ', 1)
 
-        if not topic_name or topic_name is "/":
-            raise ValueError
-        if not isinstance(topic_name, str):
-            raise TypeError
+        checkInputData.str_data_valid(topic_name)
 
         if len(callerids_str) <= 2:
             return ['hz_obs_' + str(topic_name) + "_all"]
@@ -90,6 +71,7 @@ class HzObserver(BaseObserver):
 
         infos = []
         for callerid in callerids:
+            checkInputData.str_data_valid(callerid)
             infos.append('hz_obs_' + str(topic_name) + "_" + str(callerid))
 
         return infos
@@ -110,7 +92,11 @@ class TestHzObserver(unittest.TestCase):
         with self.assertRaises(ValueError):
             HzObserver(ab_pred(""), "/topic")
         with self.assertRaises(ValueError):
+            HzObserver(ab_pred("/"), "/topic")
+        with self.assertRaises(ValueError):
             HzObserver("", "/topic")
+        with self.assertRaises(ValueError):
+            HzObserver("/", "/topic")
         with self.assertRaises(ValueError):
             HzObserver(ab_pred("name"), "")
         with self.assertRaises(ValueError):
@@ -140,6 +126,7 @@ class TestHzObserver(unittest.TestCase):
                     'hz_obs_/topic_/node1': Variable('hz_obs_/topic_/node1', 1, None),
                     'hz_obs_/topic_/node2': Variable('hz_obs_/topic_/node2', 1, None)}
 
+        self.assertEqual(len(vars), len(vars_req), "Hz added wrong number of variables!")
         for i, obj in vars.items():
             self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
             self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
@@ -211,7 +198,15 @@ class TestHzObserver(unittest.TestCase):
         with self.assertRaises(ValueError):
             HzObserver.decrypt_resource_info("/ [node1, node2]")
         with self.assertRaises(ValueError):
+            HzObserver.decrypt_resource_info("/ [node1, /]")
+        with self.assertRaises(ValueError):
             HzObserver.decrypt_resource_info("/topic_name")
+        with self.assertRaises(ValueError):
+            HzObserver.decrypt_resource_info("/topic_name [/]")
+        with self.assertRaises(ValueError):
+            HzObserver.decrypt_resource_info("/topic_name [/node1, ]")
+        with self.assertRaises(ValueError):
+            HzObserver.decrypt_resource_info("/topic_name [/node1, /]")
         with self.assertRaises(ValueError):
             HzObserver.decrypt_resource_info("/")
         with self.assertRaises(ValueError):
