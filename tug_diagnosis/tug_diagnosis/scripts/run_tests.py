@@ -9,12 +9,13 @@ sys.path.append('/home/stefan/ros/diag_ws/src/model_based_diagnosis/tug_diagnosi
 
 # print sys.path
 
-from pymbd.benchmark.tug_description_parser.observers.hz_observer import TestHzObserver
 from pymbd.benchmark.tug_description_parser.observers.base_observer import TestCalleridsObserver
-
+from pymbd.benchmark.tug_description_parser.observers.hz_observer import TestHzObserver
+from pymbd.benchmark.tug_description_parser.observers.timestamp_observer import TestTimestampObserver
 
 
 if __name__ == '__main__':
 
-    rostest.rosrun(PKG, 'test_hz_observer', TestHzObserver)
     rostest.rosrun(PKG, 'test_base_observer', TestCalleridsObserver)
+    rostest.rosrun(PKG, 'test_hz_observer', TestHzObserver)
+    rostest.rosrun(PKG, 'test_timestamp_observer', TestTimestampObserver)

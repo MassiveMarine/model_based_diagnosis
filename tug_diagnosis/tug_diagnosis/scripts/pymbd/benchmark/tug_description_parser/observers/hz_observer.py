@@ -25,7 +25,6 @@ class HzObserver(BaseObserver):
 
     @staticmethod
     def generate_model_parameter(config, topics_from_nodes):
-        print "1"
         checkInputData.dict_data_valid(config, False)
         topics = config['topics']
 
