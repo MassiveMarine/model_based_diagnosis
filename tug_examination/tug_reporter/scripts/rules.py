@@ -6,6 +6,7 @@ from tug_python_utils import YamlHelper
 from observation_store import ObservationWithNumber
 from observation_store import ObservationWithString
 from observation_store import ObservationContainer
+import rospy
 
 __author__ = 'clemens'
 
@@ -13,13 +14,18 @@ __author__ = 'clemens'
 class Rule(object):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
-                 negative_possible_faulty_resources):
+                 negative_possible_faulty_resources, recall_duration):
         self._positive_observations = positive_observations
         self._negative_observations = negative_observations
         self._positive_possible_faulty_resources = positive_possible_faulty_resources
         self._negative_possible_faulty_resources = negative_possible_faulty_resources
+        self._last_called = None
+        self._recall_duration = recall_duration
 
     def can_trigger(self, observation_store, diagnosis_store):
+        if self._last_called is not None and self._last_called + self._recall_duration > rospy.Time.now():
+            return False
+
         for p_obs in self._positive_observations:
             if not observation_store.has_observation(p_obs.type, p_obs.resource, p_obs.observation):
                 return False
@@ -38,41 +44,46 @@ class Rule(object):
 
         return True
 
+    def trigger_intern(self):
+        self._last_called = rospy.Time.now()
+
 
 class PrintRule(Rule):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
-                 negative_possible_faulty_resources, message):
+                 negative_possible_faulty_resources, recall_duration, message):
         super(PrintRule, self).__init__(positive_observations, negative_observations,
                                         positive_possible_faulty_resources,
-                                        negative_possible_faulty_resources)
+                                        negative_possible_faulty_resources, recall_duration)
         self._message = message
 
     def trigger(self):
+        super(PrintRule, self).trigger_intern()
         print self._message
 
 
 class ProcessRule(Rule):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
-                 negative_possible_faulty_resources, process):
+                 negative_possible_faulty_resources, recall_duration, process):
         super(ProcessRule, self).__init__(positive_observations, negative_observations,
                                           positive_possible_faulty_resources,
-                                          negative_possible_faulty_resources)
+                                          negative_possible_faulty_resources, recall_duration)
         self._process = process
 
     def trigger(self):
+        super(ProcessRule, self).trigger_intern()
         subprocess.call(self._process.split(" "))
 
 
 class EMailRule(Rule):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
-                 negative_possible_faulty_resources, host, port, username, password, subject, to_address, from_address,
-                 content):
+                 negative_possible_faulty_resources, recall_duration, host, port, username, password, subject,
+                 to_address, from_address, content):
         super(EMailRule, self).__init__(positive_observations, negative_observations,
                                         positive_possible_faulty_resources,
-                                        negative_possible_faulty_resources)
+                                        negative_possible_faulty_resources, recall_duration)
         self._server = smtplib.SMTP(host, port)
         self._subject = subject
         self._to_address = to_address
@@ -80,6 +91,7 @@ class EMailRule(Rule):
         self._content = content
 
     def trigger(self):
+        super(EMailRule, self).trigger_intern()
         server = smtplib.SMTP(self._host, self._port)
         server.login(self._username, self._password)
 
@@ -158,9 +170,10 @@ class PrintRuleFactory(RuleFactory):
         negative_observations = RuleFactory.pars_negative_observations(config)
         positive_possible_faulty_resources = RuleFactory.pars_positive_possible_faulty_resources(config)
         negative_possible_faulty_resources = RuleFactory.pars_negative_possible_faulty_resources(config)
+        recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
 
         return PrintRule(positive_observations, negative_observations, positive_possible_faulty_resources,
-                         negative_possible_faulty_resources, message)
+                         negative_possible_faulty_resources, recall_duration, message)
 
 
 class ProcessRuleFactory(RuleFactory):
@@ -172,9 +185,10 @@ class ProcessRuleFactory(RuleFactory):
         negative_observations = RuleFactory.pars_negative_observations(config)
         positive_possible_faulty_resources = RuleFactory.pars_positive_possible_faulty_resources(config)
         negative_possible_faulty_resources = RuleFactory.pars_negative_possible_faulty_resources(config)
+        recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
 
         return ProcessRule(positive_observations, negative_observations, positive_possible_faulty_resources,
-                           negative_possible_faulty_resources, process)
+                           negative_possible_faulty_resources, recall_duration, process)
 
 
 class EMailRuleFactory(RuleFactory):
@@ -193,7 +207,8 @@ class EMailRuleFactory(RuleFactory):
         negative_observations = RuleFactory.pars_negative_observations(config)
         positive_possible_faulty_resources = RuleFactory.pars_positive_possible_faulty_resources(config)
         negative_possible_faulty_resources = RuleFactory.pars_negative_possible_faulty_resources(config)
+        recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
 
         return EMailRule(positive_observations, negative_observations, positive_possible_faulty_resources,
-                         negative_possible_faulty_resources, host, port, username, password, subject, to_address,
-                         from_address, content)
+                         negative_possible_faulty_resources, recall_duration, host, port, username, password, subject,
+                         to_address, from_address, content)

@@ -5,7 +5,9 @@ rules:
         - type: 'hz'
           resource: 'imu'
           observation: 0
+    recall_duration: 10.0
   - type: print
     message: 'second rule'
     positive_possible_faulty_resources:
         - resource: 'imu'
+    recall_duration: 10.0
