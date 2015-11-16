@@ -1,7 +1,7 @@
 from pymbd.sat import picosat
 from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
-from base_observer import *
+from pymbd.benchmark.tug_description_parser.observers.base_observer import *
 
 
 class TimestampObserver(BaseObserver):
