@@ -65,9 +65,10 @@ class ObservationStore(object):
         observations = []
         for obs in self._observations_int.iterkeys():
             try:
-                topic = decrypt_resource_info(obs)
+                topics = decrypt_resource_info(obs)
                 error = 0 if list(self._observations_int[obs])[0] < 0 else 1
-                observations.append((topic, error))
+                for topic in topics:
+                    observations.append((topic, error))
             except AttributeError as e:
                 pass
                 # print e

@@ -3,6 +3,9 @@ from pymbd.diagnosis.problem import Problem
 from pymbd.benchmark.tug_description_parser.oracle import TUGDescriptionOracle
 from pymbd.util.sethelper import write_sets
 
+from pymbd.benchmark.tug_description_parser.observers import *
+from pymbd.benchmark.tug_description_parser.observer import OBSERVERS
+
 import rospy
 from tug_observers_msgs.msg import observer_info
 from tug_diagnosis_msgs.msg import diagnosis_set
