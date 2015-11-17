@@ -6,6 +6,7 @@ project(tug_diagnosis)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   rospy
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
@@ -184,3 +185,5 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 catkin_add_nosetests(scripts)
+roslint_python()
+roslint_add_test()

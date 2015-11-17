@@ -1,6 +1,18 @@
-//
-// Created by clemens on 24.09.15.
-//
+/*
+This file is part of the tug model based diagnosis software for robots
+Copyright (c) 2015, Clemens Muehlbacher, Stefan Loige
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <tug_velocity_observer/VelocityObserver.h>
 #include <tug_yaml/ProcessYaml.h>
@@ -8,9 +20,14 @@
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Matrix3x3.h>
 #include <algorithm>
+#include <utility>
+#include <string>
+#include <vector>
 
-VelocityObserver::VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade* plugin_base) : use_roll_(false), use_pitch_(false),
-                                       use_yaw_(false), spinner_(1)
+VelocityObserver::VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade *plugin_base) : use_roll_(false),
+                                                                                                use_pitch_(false),
+                                                                                                use_yaw_(false),
+                                                                                                spinner_(1)
 {
   boost::mutex::scoped_lock the_lock(filter_mutex_);
 
@@ -90,22 +107,22 @@ VelocityObserver::VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade*
     states_.push_back(VelocityState(state_params[i]));
 
   std::string a_name = a_input_->getName();
-  if(a_name.find('/') == 0)
+  if (a_name.find('/') == 0)
     a_name = a_name.substr(1, a_name.size());
-  if(a_name.find_last_of('/') == (a_name.size() - 1))
+  if (a_name.find_last_of('/') == (a_name.size() - 1))
     a_name = a_name.substr(0, a_name.size() - 1);
 
   std::string b_name = b_input_->getName();
-  if(b_name.find('/') == 0)
+  if (b_name.find('/') == 0)
     b_name = b_name.substr(1, b_name.size());
-  if(b_name.find_last_of('/') == (b_name.size() - 1))
+  if (b_name.find_last_of('/') == (b_name.size() - 1))
     b_name = b_name.substr(0, b_name.size() - 1);
 
-  a_publisher_ = nh_.advertise<sensor_msgs::Imu>("/"+a_name+"_a_calc_imu", 10);
-  b_publisher_ = nh_.advertise<sensor_msgs::Imu>("/"+b_name+"_b_calc_imu", 10);
-  a_paired_publisher_ = nh_.advertise<sensor_msgs::Imu>("/"+a_name+"_a_calc_imu_pair", 10);
-  b_paired_publisher_ = nh_.advertise<sensor_msgs::Imu>("/"+b_name+"_b_calc_imu_pair", 10);
-  filter_result_publisher_ = nh_.advertise<sensor_msgs::Imu>("/"+a_name+ "_" + b_name+"_filter_imu", 10);
+  a_publisher_ = nh_.advertise<sensor_msgs::Imu>("/" + a_name + "_a_calc_imu", 10);
+  b_publisher_ = nh_.advertise<sensor_msgs::Imu>("/" + b_name + "_b_calc_imu", 10);
+  a_paired_publisher_ = nh_.advertise<sensor_msgs::Imu>("/" + a_name + "_a_calc_imu_pair", 10);
+  b_paired_publisher_ = nh_.advertise<sensor_msgs::Imu>("/" + b_name + "_b_calc_imu_pair", 10);
+  filter_result_publisher_ = nh_.advertise<sensor_msgs::Imu>("/" + a_name + "_" + b_name + "_filter_imu", 10);
 }
 
 MovementReading VelocityObserver::getCompensatedTwist(MovementReading value)
@@ -191,7 +208,9 @@ void VelocityObserver::addTwistA(MovementReading value)
     MovementReading b_twist = b_twists_.front();
     if (b_twist.reading_time > value.reading_time)
     {
-      ROS_DEBUG_STREAM("break during poping b reading time sec:" << b_twist.reading_time.sec << ", nsec:" << b_twist.reading_time.nsec << " a reading time sec:" << value.reading_time.sec << ", nsec:" << value.reading_time.nsec);
+      ROS_DEBUG_STREAM("break during poping b reading time sec:" << b_twist.reading_time.sec << ", nsec:" <<
+                       b_twist.reading_time.nsec << " a reading time sec:" << value.reading_time.sec << ", nsec:" <<
+                       value.reading_time.nsec);
       break;
     }
 
@@ -273,11 +292,11 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
 
   sensor_msgs::Imu imu_msg;
   imu_msg.header.stamp = ros::Time(ros::WallTime::now().toSec());
-  if(diff_x_filter_)
+  if (diff_x_filter_)
     imu_msg.linear_acceleration.x = x_state.value;
-  if(diff_y_filter_)
+  if (diff_y_filter_)
     imu_msg.linear_acceleration.y = y_state.value;
-  if(diff_z_filter_)
+  if (diff_z_filter_)
     imu_msg.linear_acceleration.z = z_state.value;
 
   imu_msg.angular_velocity.x = rot_x_state.value;
@@ -314,7 +333,8 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
       result.push_back(Observation(it->getName(), it->getNumber()));
     else
     {
-      ROS_ERROR_STREAM("rotation filter is not confrom result x:" << rot_x_state << " y:" << rot_y_state << " z:" << rot_z_state);
+      ROS_ERROR_STREAM("rotation filter is not confrom result x:" << rot_x_state << " y:" << rot_y_state << " z:" <<
+                       rot_z_state);
     }
   }
 
@@ -329,18 +349,28 @@ ros::Time VelocityObserver::getCurrentFilterTime()
 std::string VelocityObserver::getName()
 {
   std::string a_name = a_input_->getName();
-  if(a_name.find('/') == 0)
+  if (a_name.find('/') == 0)
     a_name = a_name.substr(1, a_name.size());
-  if(a_name.find_last_of('/') == (a_name.size() - 1))
+  if (a_name.find_last_of('/') == (a_name.size() - 1))
     a_name = a_name.substr(0, a_name.size() - 1);
 
   std::string b_name = b_input_->getName();
-  if(b_name.find('/') == 0)
+  if (b_name.find('/') == 0)
     b_name = b_name.substr(1, b_name.size());
-  if(b_name.find_last_of('/') == (b_name.size() - 1))
+  if (b_name.find_last_of('/') == (b_name.size() - 1))
     b_name = b_name.substr(0, b_name.size() - 1);
 
   std::string result = a_name + "_" + b_name;
   std::replace(result.begin(), result.end(), '/', '_');
   return result;
+}
+
+std::string VelocityObserver::getInputAName()
+{
+  return a_input_->getName();
+}
+
+std::string VelocityObserver::getInputBName()
+{
+  return b_input_->getName();
 }

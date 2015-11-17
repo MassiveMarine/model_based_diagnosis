@@ -79,7 +79,8 @@ class TimingBase():
                 rospy.logerr(e)
 
         # create a predefined msgs for info and error
-        self._observation_info = observation_info(type='timing', resource=str(topicA + ' ' + str(calleridA) + ' ' + topicB + ' ' + str(calleridB)))
+        self._observation_info = observation_info(type='timing', resource=str(topicA + ' ' + str(calleridA) + ' ' +
+                                                                              topicB + ' ' + str(calleridB)))
 
         # create a filter
         self._filter = Filter(Config.get_param(config, 'filter'))

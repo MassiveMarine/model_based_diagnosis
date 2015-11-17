@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   tug_plugin_manager
   tug_observers_msgs
   tug_time
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
@@ -173,3 +174,5 @@ target_link_libraries(tug_observers_node
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+roslint_cpp()
+roslint_add_test()
