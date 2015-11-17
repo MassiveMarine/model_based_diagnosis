@@ -13,6 +13,7 @@ from pymbd.benchmark.tug_description_parser.observers.base_observer import TestC
 from pymbd.benchmark.tug_description_parser.observers.hz_observer import TestHzObserver
 from pymbd.benchmark.tug_description_parser.observers.timestamp_observer import TestTimestampObserver
 from pymbd.benchmark.tug_description_parser.observers.timeout_observer import TestTimeoutObserver
+from pymbd.benchmark.tug_description_parser.observers.resources_observer import TestResourcesObserver
 
 
 if __name__ == '__main__':
@@ -21,3 +22,4 @@ if __name__ == '__main__':
     rostest.rosrun(PKG, 'test_hz_observer', TestHzObserver)
     rostest.rosrun(PKG, 'test_timestamp_observer', TestTimestampObserver)
     rostest.rosrun(PKG, 'test_timeout_observer', TestTimeoutObserver)
+    rostest.rosrun(PKG, 'test_resources_observer', TestResourcesObserver)

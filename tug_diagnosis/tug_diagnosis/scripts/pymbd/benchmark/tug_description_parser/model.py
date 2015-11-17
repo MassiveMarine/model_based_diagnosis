@@ -36,8 +36,9 @@ class Model(object):
             vars[node_name] = Variable(node_name, Variable.BOOLEAN, None)
             vars[ab_pred(node_name)] = Variable(ab_pred(node_name), Variable.BOOLEAN, None)
 
-            for topic in node['pub_topic']:
-                topics_from_nodes.setdefault(topic, []).append(node_name)
+            if node.has_key('pub_topic'):
+                for topic in node['pub_topic']:
+                    topics_from_nodes.setdefault(topic, []).append(node_name)
 
         for config in configs['observations']:
             new_vars, new_rules, new_nodes = generate_model_parameter(config, topics_from_nodes)

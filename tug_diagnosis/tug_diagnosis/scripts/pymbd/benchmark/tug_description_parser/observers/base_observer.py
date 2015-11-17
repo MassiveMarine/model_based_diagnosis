@@ -56,16 +56,17 @@ def ab_pred(var):
 
 class checkInputData():
     @staticmethod
-    def str_data_valid(data):
+    def str_data_valid(data, forbidden_chars=[], forbidden_str=[]):
         if not data:
             raise ValueError
 
         if not isinstance(data, str):
             raise TypeError
 
-        if data == ab_pred("/") or data == ab_pred(""):
+        if any(x == data for x in ['/', '', ab_pred("/"), ab_pred("")]+forbidden_str):
             raise ValueError
-        if data == "/" or data == "":
+
+        if any(x in data for x in ['$', '#', '|']+forbidden_chars):
             raise ValueError
 
     @staticmethod
