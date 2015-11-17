@@ -26,7 +26,8 @@
   <!-- Authors do not have to be maintianers, but could be -->
   <!-- Example: -->
   <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
-
+  <author email="stefan.loigge@student.tugraz.at">Stefan Loigge</author>
+  <author email="cmuehlba@ist.tugraz.at">Clemens Muehlbacher</author>
 
   <!-- The *_depend tags are used to specify dependencies -->
   <!-- Dependencies can be catkin packages or system dependencies -->
