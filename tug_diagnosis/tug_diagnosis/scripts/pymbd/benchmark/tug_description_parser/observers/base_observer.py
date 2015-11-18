@@ -50,6 +50,10 @@ def pos(literal):
     return " " + literal
 
 
+def all_ab_pred(var):
+    return [ab_pred(var_entry) for var_entry in var]
+
+
 def ab_pred(var):
     return 'AB' + var
 
@@ -141,18 +145,52 @@ class CalleridsObserver(BaseObserver):
 
 
     @staticmethod
-    def generate_model_parameter(obs_type, topic, observations):
+    def generate_model_parameter(obs_type, topic, callerids):
         vars = {}
         rules = []
 
         checkInputData.str_data_valid(obs_type)
         checkInputData.str_data_valid(topic)
-        checkInputData.list_data_valid(observations)
+        checkInputData.list_data_valid(callerids)
 
         observation_all = obs_type + "_obs_" + topic + "_all"
-        observations_w_prefix = [obs_type + "_obs_" + topic + "_" + obs for obs in observations]
+        observations_w_prefix = [obs_type + "_obs_" + topic + "_" + obs for obs in callerids]
         vars[observation_all] = Variable(observation_all, Variable.BOOLEAN, None)
         rules.append(CalleridsObserver(observation_all, observations_w_prefix))
+        return vars, rules, []
+
+    @staticmethod
+    def generate_model_parameter_2(obs_type, topic_a, callerids_a, topic_b, callerids_b):
+        vars = {}
+        rules = []
+
+        checkInputData.str_data_valid(obs_type)
+        checkInputData.str_data_valid(topic_a)
+        checkInputData.str_data_valid(topic_b)
+        checkInputData.list_data_valid(callerids_a)
+        checkInputData.list_data_valid(callerids_b)
+
+        observation_all_all = obs_type + "_obs_" + topic_a + "_all_" + topic_b + "_all"
+        vars[observation_all_all] = Variable(observation_all_all, Variable.BOOLEAN, None)
+
+        observations_all_items = [obs_type + "_obs_" + topic_a + "_all_" + topic_b + "_" + obs_item for obs_item in callerids_b]
+        rules.append(CalleridsObserver(observation_all_all, observations_all_items))
+
+        observations_items_all = [obs_type + "_obs_" + topic_a + "_" + obs_item + "_" + topic_b + "_all" for obs_item in callerids_a]
+        rules.append(CalleridsObserver(observation_all_all, observations_items_all))
+
+        for node_a in callerids_a:
+            observations_item_all = obs_type + "_obs_" + topic_a + "_" + node_a + "_" + topic_b + "_all"
+            vars[observations_item_all] = Variable(observations_item_all, Variable.BOOLEAN, None)
+            observations_item_items = [obs_type + "_obs_" + topic_a + "_" + node_a + "_" + topic_b + "_" + obs for obs in callerids_b]
+            rules.append(CalleridsObserver(observations_item_all, observations_item_items))
+
+        for node_b in callerids_b:
+            observations_all_item = obs_type + "_obs_" + topic_a + "_all_" + topic_b + "_" + node_b
+            vars[observations_all_item] = Variable(observations_all_item, Variable.BOOLEAN, None)
+            observations_items_item = [obs_type + "_obs_" + topic_a + "_" + obs + "_" + topic_b + "_" + node_b for obs in callerids_a]
+            rules.append(CalleridsObserver(observations_all_item, observations_items_item))
+
         return vars, rules, []
 
     @staticmethod
