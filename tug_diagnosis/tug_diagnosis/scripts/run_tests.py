@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 import rostest
 PKG = 'tug_diagnosis'
+
 import sys
+import os
 
-# print sys.path
-sys.path.append('/home/stefan/ros/diag_ws/src/model_based_diagnosis/tug_diagnosis/tug_diagnosis/scripts')
-# import roslib; roslib.load_manifest(PKG)
-
-# print sys.path
+# add own folder to sys path. No pymbd is accessible!
+sys.path.append(os.path.dirname(__file__))
 
 from pymbd.benchmark.tug_description_parser.observers.base_observer import TestCalleridsObserver
 from pymbd.benchmark.tug_description_parser.observers.hz_observer import TestHzObserver
@@ -18,6 +17,8 @@ from pymbd.benchmark.tug_description_parser.observers.timing_observer import Tes
 
 
 if __name__ == '__main__':
+
+    print "Hallo"
 
     rostest.rosrun(PKG, 'test_base_observer', TestCalleridsObserver)
     rostest.rosrun(PKG, 'test_hz_observer', TestHzObserver)
