@@ -24,7 +24,7 @@ ObserverInfoSender::ObserverInfoSender()
   ros::NodeHandle private_nh("~");
   double rate;
   private_nh.param<double>("info_rate", rate, 1.0);
-  timeout_thread_ = boost::make_shared<Timeout>(boost::posix_time::seconds(1. / rate),
+  timeout_thread_ = boost::make_shared<Timeout>(boost::posix_time::milliseconds(1. / rate * 1000.),
                                                 boost::bind(&ObserverInfoSender::executeFlush, this));
 
   info_pub_ = nh_.advertise<tug_observers_msgs::observer_info>("/observers/info", 1);
@@ -70,6 +70,7 @@ bool ObserverInfoSender::executeFlush()
 
 void ObserverInfoSender::flushIntern()
 {
+  ROS_DEBUG_STREAM("flushIntern");
   timeout_thread_->set();
   executeFlush();
 }
