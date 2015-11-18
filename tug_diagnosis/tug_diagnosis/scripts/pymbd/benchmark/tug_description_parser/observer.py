@@ -2,8 +2,8 @@
 OBSERVERS = {}
 
 
-def generate_model_parameter(config, topics_from_nodes):
-    return OBSERVERS[config['type']].generate_model_parameter(config, topics_from_nodes)
+def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes):
+    return OBSERVERS[config['type']].generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes)
 
 
 def decrypt_resource_info(obs):

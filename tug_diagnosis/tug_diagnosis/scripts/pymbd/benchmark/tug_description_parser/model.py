@@ -27,7 +27,8 @@ class Model(object):
 
         vars = {}
         rules = []
-        topics_from_nodes = dict()
+        topics_published_from_nodes = dict()
+        topics_subscribed_from_nodes = dict()
         nodes = []
 
         for node in configs['nodes']:
@@ -38,10 +39,13 @@ class Model(object):
 
             if node.has_key('pub_topic'):
                 for topic in node['pub_topic']:
-                    topics_from_nodes.setdefault(topic, []).append(node_name)
+                    topics_published_from_nodes.setdefault(topic, []).append(node_name)
+            if node.has_key('sub_topic'):
+                for topic in node['sub_topic']:
+                    topics_subscribed_from_nodes.setdefault(topic, []).append(node_name)
 
         for config in configs['observations']:
-            new_vars, new_rules, new_nodes = generate_model_parameter(config, topics_from_nodes)
+            new_vars, new_rules, new_nodes = generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes)
             vars.update(new_vars)
             rules += new_rules
             nodes += new_nodes
