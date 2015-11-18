@@ -4,15 +4,28 @@ project(tug_observers)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  rospy
-  roscpp
-  pluginlib
-  tug_plugin_manager
-  tug_observers_msgs
-  tug_time
-  roslint
-)
+if(CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+    find_package(catkin REQUIRED COMPONENTS
+            rospy
+            roscpp
+            pluginlib
+            tug_plugin_manager
+            tug_observers_msgs
+            tug_time
+            roslint
+            tug_testing
+    )
+else()
+    find_package(catkin REQUIRED COMPONENTS
+      rospy
+      roscpp
+      pluginlib
+      tug_plugin_manager
+      tug_observers_msgs
+      tug_time
+    )
+endif()
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS thread)
@@ -174,5 +187,14 @@ target_link_libraries(tug_observers_node
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-roslint_cpp()
-roslint_add_test()
+
+if(CATKIN_ENABLE_TESTING)
+    roslint_cpp()
+    roslint_add_test()
+
+    catkin_add_gtest(test_observation test/TestObservation.cpp)
+    target_link_libraries(test_observation ${catkin_LIBRARIES} tug_observer_plugin_base)
+
+    add_rostest_gtest(test_observer_info_sender test/launch/test_observer_info_sender.test test/TestObserverInfoSender.cpp)
+    target_link_libraries(test_observer_info_sender ${catkin_LIBRARIES} tug_observer_plugin_base)
+endif()

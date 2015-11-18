@@ -1,0 +1,19 @@
+setup:
+- type: timeout
+  use_global_subscriber: true
+  topics:
+# 1 ###########################################################
+  - name: /joy
+    callerids:
+    - callerid: []
+      timeout: 1.0
+# 2 ###########################################################
+  - name: /sick_front
+    callerids:
+    - callerid: []
+      timeout: 1.0
+# 3 ###########################################################
+  - name: /sick_back
+    callerids:
+    - callerid: []
+      timeout: 1.0
