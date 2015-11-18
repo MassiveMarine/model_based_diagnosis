@@ -85,10 +85,10 @@ class checkInputData():
                 checkInputData.str_data_valid(entry)
 
     @staticmethod
-    def dict_data_valid(the_dict, check_entries=True, entry_type=str):
+    def dict_data_valid(the_dict, check_entries=True, entry_type=str, allow_empty=False):
         if not isinstance(the_dict, dict):
             raise TypeError
-        if not len(the_dict):
+        if not len(the_dict) and not allow_empty:
             raise KeyError
 
         if check_entries:
