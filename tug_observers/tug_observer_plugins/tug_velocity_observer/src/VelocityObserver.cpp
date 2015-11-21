@@ -349,19 +349,20 @@ ros::Time VelocityObserver::getCurrentFilterTime()
 std::string VelocityObserver::getName()
 {
   std::string a_name = a_input_->getName();
-  if (a_name.find('/') == 0)
-    a_name = a_name.substr(1, a_name.size());
-  if (a_name.find_last_of('/') == (a_name.size() - 1))
-    a_name = a_name.substr(0, a_name.size() - 1);
+//  if (a_name.find('/') == 0)
+//    a_name = a_name.substr(1, a_name.size());
+//  if (a_name.find_last_of('/') == (a_name.size() - 1))
+//    a_name = a_name.substr(0, a_name.size() - 1);
 
   std::string b_name = b_input_->getName();
-  if (b_name.find('/') == 0)
-    b_name = b_name.substr(1, b_name.size());
-  if (b_name.find_last_of('/') == (b_name.size() - 1))
-    b_name = b_name.substr(0, b_name.size() - 1);
+//  if (b_name.find('/') == 0)
+//    b_name = b_name.substr(1, b_name.size());
+//  if (b_name.find_last_of('/') == (b_name.size() - 1))
+//    b_name = b_name.substr(0, b_name.size() - 1);
 
-  std::string result = a_name + "_" + b_name;
-  std::replace(result.begin(), result.end(), '/', '_');
+//  std::string result = a_name + "_" + b_name;
+  std::string result = a_name + " " + b_name;
+//  std::replace(result.begin(), result.end(), '/', '_');
   return result;
 }
 
