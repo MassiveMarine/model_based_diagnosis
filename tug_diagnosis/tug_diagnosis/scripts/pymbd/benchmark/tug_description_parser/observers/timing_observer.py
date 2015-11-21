@@ -29,7 +29,6 @@ class TimingObserver(BaseObserver):
 
     @staticmethod
     def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes):
-        print '=========='
         checkInputData.dict_data_valid(config, check_entries=False)
         checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=False)
         checkInputData.dict_data_valid(topics_subscribed_from_nodes, check_entries=False, allow_empty=True)
@@ -84,13 +83,7 @@ class TimingObserver(BaseObserver):
         if not isinstance(resource_info, str):
             raise TypeError
 
-        [topicA_name, calleridsA_str, topicB_name, calleridsB_str] = list(re.findall(regex_prog,resource_info)[0])
-        # [topicA_name, calleridsA_str, topicB_name, calleridsB_str] = resource_info.split(' ')
-
-        print topicA_name
-        print calleridsA_str
-        print topicB_name
-        print calleridsB_str
+        [topicA_name, calleridsA_str, topicB_name, calleridsB_str] = list(re.findall(regex_prog, resource_info)[0])
 
         checkInputData.str_data_valid(topicA_name)
         checkInputData.str_data_valid(topicB_name)
