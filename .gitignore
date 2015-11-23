@@ -36,3 +36,6 @@ core
 *_obstacle.txt
 .idea/
 pid
+tug_diagnosis/tug_diagnosis/scripts/lib/picosat/picosat.out
+tug_diagnosis/tug_diagnosis/scripts/lib/picosat/picosat.in
+tug_diagnosis/tug_diagnosis/scripts/pymbd/benchmark/iscas.tar.gz
