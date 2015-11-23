@@ -32,9 +32,9 @@ class MovementObserver(BaseObserver):
         return [clause(all_pos(self.ab_node_a) + " " + all_pos(self.ab_node_b) + " " + self.ab_function + " " + self.observation)]
 
     @staticmethod
-    def generate_model_parameter(config, topics_from_nodes):
+    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes={}):
         checkInputData.dict_data_valid(config, check_entries=False)
-        checkInputData.dict_data_valid(topics_from_nodes, check_entries=False)
+        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=False)
         topics = config['topics']
 
         vars = {}
@@ -55,9 +55,9 @@ class MovementObserver(BaseObserver):
             observation = "movement_obs_" + topic_a + "_" + topic_b
             vars[observation] = Variable(observation, Variable.BOOLEAN, None)
 
-            checkInputData.list_data_valid(topics_from_nodes[topic_a], check_entries=True)
-            checkInputData.list_data_valid(topics_from_nodes[topic_b], check_entries=True)
-            rules.append(MovementObserver(all_ab_pred(topics_from_nodes[topic_a]), all_ab_pred(topics_from_nodes[topic_b]), ab_pred("movement"), observation))
+            checkInputData.list_data_valid(topics_published_from_nodes[topic_a], check_entries=True)
+            checkInputData.list_data_valid(topics_published_from_nodes[topic_b], check_entries=True)
+            rules.append(MovementObserver(all_ab_pred(topics_published_from_nodes[topic_a]), all_ab_pred(topics_published_from_nodes[topic_b]), ab_pred("movement"), observation))
 
         return vars, rules, nodes
 

@@ -25,7 +25,7 @@ class ResourcesObserver(BaseObserver):
         return [clause(self.ab_node + " " + self.node)]
 
     @staticmethod
-    def generate_model_parameter(config, topics_from_nodes):
+    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes={}):
         checkInputData.dict_data_valid(config, False)
         nodes = config['nodes']
         checkInputData.list_data_valid(nodes)

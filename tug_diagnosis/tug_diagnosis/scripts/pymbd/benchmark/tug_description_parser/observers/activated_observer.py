@@ -24,27 +24,27 @@ class ActivatedObserver(BaseObserver):
         return [clause(self.ab_node + " " + self.topic)]
 
     @staticmethod
-    def generate_model_parameter(config, topics_from_nodes):
+    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes={}):
         checkInputData.dict_data_valid(config, False)
         topics = config['topics']
 
         checkInputData.list_data_valid(topics)
 
-        checkInputData.dict_data_valid(topics_from_nodes, False)
+        checkInputData.dict_data_valid(topics_published_from_nodes, False)
 
         vars = {}
         rules = []
         nodes = []
 
         for topic in topics:
-            checkInputData.list_data_valid(topics_from_nodes[topic])
+            checkInputData.list_data_valid(topics_published_from_nodes[topic])
 
-            for callerid in topics_from_nodes[topic]:
+            for callerid in topics_published_from_nodes[topic]:
                 observation = "activated_obs_" + topic + "_" + callerid
                 vars[observation] = Variable(observation, Variable.BOOLEAN, None)
                 rules.append(ActivatedObserver(ab_pred(str(callerid)), observation))
 
-            new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("activated", topic, topics_from_nodes[topic])
+            new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("activated", topic, topics_published_from_nodes[topic])
             vars.update(new_vars)
             rules += new_rules
             nodes += new_nodes
