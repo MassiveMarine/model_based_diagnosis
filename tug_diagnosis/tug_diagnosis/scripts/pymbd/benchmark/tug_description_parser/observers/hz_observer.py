@@ -48,7 +48,7 @@ class HzObserver(BaseObserver):
                 vars[observation] = Variable(observation, Variable.BOOLEAN, None)
 
                 subscribed_topics = nodes_subscribe_topics.get(callerid, [])
-                rules.append(HzObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics) ))
+                rules.append(HzObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
 
             new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("hz", topic, topics_published_from_nodes[topic])
             vars.update(new_vars)
@@ -93,62 +93,60 @@ class TestHzObserver(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_hz_observer(self):
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred(""), "/topic", all_ab_pred([]))
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred("/"), "/topic", all_ab_pred([]))
-        with self.assertRaises(ValueError):
-            HzObserver("", "/topic", all_ab_pred([]))
-        with self.assertRaises(ValueError):
-            HzObserver("/", "/topic", all_ab_pred([]))
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred("name"), "", all_ab_pred([]))
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred(""), "", all_ab_pred([]))
-        with self.assertRaises(ValueError):
-            HzObserver("", "", all_ab_pred([]))
-        with self.assertRaises(TypeError):
-            HzObserver(1, "/topic", all_ab_pred([]))
-        with self.assertRaises(TypeError):
-            HzObserver(ab_pred("name"), 1, all_ab_pred([]))
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred("name"), "/", all_ab_pred([]))
+    def test_hz_observer1(self):
+        ab_node = ab_pred("/node1")
+        observation = "/topic"
+        ab_subscribed_topics = all_ab_pred(['/topic1'])
 
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred(""), "/topic", all_ab_pred(['/topic1']))
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred("/"), "/topic",  all_ab_pred(['/topic1']))
-        with self.assertRaises(ValueError):
-            HzObserver("", "/topic",  all_ab_pred(['/topic1']))
-        with self.assertRaises(ValueError):
-            HzObserver("/", "/topic",  all_ab_pred(['/topic1']))
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred("name"), "",  all_ab_pred(['/topic1']))
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred(""), "",  all_ab_pred(['/topic1']))
-        with self.assertRaises(ValueError):
-            HzObserver("", "",  all_ab_pred(['/topic1']))
-        with self.assertRaises(TypeError):
-            HzObserver(1, "/topic",  all_ab_pred(['/topic1']))
-        with self.assertRaises(TypeError):
-            HzObserver(ab_pred("name"), 1,  all_ab_pred(['/topic1']))
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred("name"), "/",  all_ab_pred(['/topic1']))
+        ab_node_tests = [
+            (ValueError, ab_pred("")),
+            (ValueError, ab_pred("/")),
+            (ValueError, ""),
+            (ValueError, "/"),
+            (TypeError, 1),
+        ]
 
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred("/node1"), "/topic", ['/'])
-        with self.assertRaises(ValueError):
-            HzObserver(ab_pred("/node1"), "/topic", all_ab_pred(['/']))
+        for (error, ab_node) in ab_node_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(ab_node) + "'",
+                HzObserver(ab_node, observation, ab_subscribed_topics)
+            print "... DONE"
 
-        with self.assertRaises(TypeError):
-            HzObserver(ab_pred("/node1"), "/topic", [1])
-        with self.assertRaises(TypeError):
-            HzObserver(ab_pred("/node1"), "/topic", "")
-        with self.assertRaises(TypeError):
-            HzObserver(ab_pred("/node1"), "/topic", 1)
+    def test_hz_observer2(self):
+        ab_node = ab_pred("/node1")
+        observation = "/topic"
+        ab_subscribed_topics = all_ab_pred(['/topic1'])
 
+        observation_tests = [
+            (ValueError, ""),
+            (ValueError, "/"),
+            (TypeError, 1),
+        ]
 
+        for (error, observation) in observation_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(observation) + "'",
+                HzObserver(ab_node, observation, ab_subscribed_topics)
+            print "... DONE"
+
+    def test_hz_observer3(self):
+        ab_node = ab_pred("/node1")
+        observation = "/topic"
+        ab_subscribed_topics = all_ab_pred(['/topic1'])
+
+        ab_subscribed_topics_tests = [
+            (ValueError, ["/"]),
+            (ValueError, all_ab_pred(["/"])),
+            (TypeError, [1]),
+            (TypeError, "/"),
+            (TypeError, 1),
+        ]
+
+        for (error, ab_subscribed_topics) in ab_subscribed_topics_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(ab_subscribed_topics) + "'",
+                HzObserver(ab_node, observation, ab_subscribed_topics)
+            print "... DONE"
 
     def test_clause(self):
         observer = HzObserver(ab_pred("name"), "/topic", [])
@@ -178,10 +176,7 @@ class TestHzObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
         nodes_subscribe_topics = {}
-        # topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
-        # topics_subscribed_from_nodes = {}
-        # nodes_publish_topics = {}
-        # nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
+
         vars, rules, nodes = HzObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'hz_obs_/topic_all': Variable('hz_obs_/topic_all', 1, None),
@@ -349,22 +344,21 @@ class TestHzObserver(unittest.TestCase):
         self.assertEqual(HzObserver.decrypt_resource_info("/topic_name [node1]"), ['hz_obs_/topic_name_node1'], "Topic name decryption not correct!")
         self.assertEqual(HzObserver.decrypt_resource_info("/topic_name {}"), ['hz_obs_/topic_name_all'], "Topic name decryption not correct!")
 
-        with self.assertRaises(ValueError):
-            HzObserver.decrypt_resource_info("/ [node1, node2]")
-        with self.assertRaises(ValueError):
-            HzObserver.decrypt_resource_info("/ [node1, /]")
-        with self.assertRaises(ValueError):
-            HzObserver.decrypt_resource_info("/topic_name")
-        with self.assertRaises(ValueError):
-            HzObserver.decrypt_resource_info("/topic_name [/]")
-        with self.assertRaises(ValueError):
-            HzObserver.decrypt_resource_info("/topic_name [/node1, ]")
-        with self.assertRaises(ValueError):
-            HzObserver.decrypt_resource_info("/topic_name [/node1, /]")
-        with self.assertRaises(ValueError):
-            HzObserver.decrypt_resource_info("/")
-        with self.assertRaises(ValueError):
-            HzObserver.decrypt_resource_info("")
-        with self.assertRaises(TypeError):
-            HzObserver.decrypt_resource_info(1)
+        resource_info_tests = [
+            (ValueError, "/ [node1, node2]"),
+            (ValueError, "/ [node1, /]"),
+            (ValueError, "/topic_name"),
+            (ValueError, "/topic_name [/]"),
+            (ValueError, "/topic_name [/node1, ]"),
+            (ValueError, "/topic_name [/node1, /]"),
+            (ValueError, "/"),
+            (ValueError, ""),
+            (TypeError, 1),
+            ]
+
+        for (error, resource_info) in resource_info_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(resource_info) + "'",
+                HzObserver.decrypt_resource_info(resource_info)
+            print "... DONE"
 
