@@ -20,7 +20,7 @@ class BaseObserver(Sentence):
         raise NotImplementedError()
 
     @staticmethod
-    def generate_model_parameter(config, topics_from_nodes):
+    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes):
         raise NotImplementedError("generate_model_parameter() is not implemented yet!")
 
     @staticmethod
@@ -58,6 +58,16 @@ def ab_pred(var):
     return 'AB' + var
 
 
+def get_node_depends_on_nodes_list(node_name, topics_published_from_nodes, topics_subscribed_from_nodes,
+                                   nodes_publish_topics, nodes_subscribe_topics):
+    sub_topics = nodes_subscribe_topics.get(node_name, [])
+    checkInputData.list_data_valid(sub_topics, allow_empty=True)
+    depend_on_nodes = []
+    [depend_on_nodes.extend(topics_published_from_nodes.get(x)) for x in sub_topics]
+    checkInputData.list_data_valid(depend_on_nodes, allow_empty=True)
+    return depend_on_nodes
+
+
 class checkInputData():
     @staticmethod
     def str_data_valid(data, forbidden_chars=[], forbidden_str=[]):
@@ -74,10 +84,10 @@ class checkInputData():
             raise ValueError
 
     @staticmethod
-    def list_data_valid(the_list, check_entries=True):
+    def list_data_valid(the_list, check_entries=True, allow_empty=False):
         if not isinstance(the_list, list):
             raise TypeError
-        if not len(the_list):
+        if not len(the_list) and not allow_empty:
             raise ValueError
 
         if check_entries:

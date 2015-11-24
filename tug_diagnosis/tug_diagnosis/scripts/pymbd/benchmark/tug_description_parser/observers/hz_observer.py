@@ -9,28 +9,31 @@ class HzObserver(BaseObserver):
     Represents the fault injection logic used to enable/disable a gate's function.
     The implication ab_predicate -> gate_function
     """
-    def __init__(self, ab_node, topic):
+    def __init__(self, ab_nodes, topic):
         super(HzObserver, self).__init__()
-        checkInputData.str_data_valid(ab_node)
+        checkInputData.list_data_valid(ab_nodes)
         checkInputData.str_data_valid(topic)
 
-        self.ab_node = ab_node
+        self.ab_nodes = ab_nodes
         self.topic = topic
 
     def __repr__(self):
-        return "hz: %s, %s" % (self.ab_node, self.topic)
+        return "hz: %s, %s" % (self.ab_nodes, self.topic)
 
     def to_clause(self):
-        return [clause(self.ab_node + " " + self.topic)]
+        return [clause(all_pos(self.ab_nodes) + " " + self.topic)]
 
     @staticmethod
-    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes={}):
+    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics):
         checkInputData.dict_data_valid(config, False)
         topics = config['topics']
 
         checkInputData.list_data_valid(topics)
 
-        checkInputData.dict_data_valid(topics_published_from_nodes, False)
+        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=False, allow_empty=False)
+        checkInputData.dict_data_valid(topics_subscribed_from_nodes, check_entries=False, allow_empty=True)
+        checkInputData.dict_data_valid(nodes_publish_topics, check_entries=False, allow_empty=False)
+        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=False, allow_empty=True)
 
         vars = {}
         rules = []
@@ -42,7 +45,11 @@ class HzObserver(BaseObserver):
             for callerid in topics_published_from_nodes[topic]:
                 observation = "hz_obs_" + topic + "_" + callerid
                 vars[observation] = Variable(observation, Variable.BOOLEAN, None)
-                rules.append(HzObserver(ab_pred(str(callerid)), observation))
+
+                depend_on_nodes = get_node_depends_on_nodes_list(callerid, topics_published_from_nodes, topics_subscribed_from_nodes,
+                                                                 nodes_publish_topics, nodes_subscribe_topics)
+
+                rules.append(HzObserver(all_ab_pred([str(callerid)] + depend_on_nodes), observation))
 
             new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("hz", topic, topics_published_from_nodes[topic])
             vars.update(new_vars)
