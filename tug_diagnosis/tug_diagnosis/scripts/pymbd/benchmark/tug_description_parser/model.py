@@ -32,6 +32,7 @@ class Model(object):
         nodes_publish_topics = dict()
         nodes_subscribe_topics = dict()
         nodes = []
+        topics = set()
 
         for node in configs['nodes']:
             node_name = node['name']
@@ -39,14 +40,21 @@ class Model(object):
             vars[node_name] = Variable(node_name, Variable.BOOLEAN, None)
             vars[ab_pred(node_name)] = Variable(ab_pred(node_name), Variable.BOOLEAN, None)
 
-            if node.has_key('pub_topic'):
-                for topic in node['pub_topic']:
-                    topics_published_from_nodes.setdefault(topic, []).append(node_name)
-                    nodes_publish_topics.setdefault(node_name,[]).append(topic)
-            if node.has_key('sub_topic'):
-                for topic in node['sub_topic']:
-                    topics_subscribed_from_nodes.setdefault(topic, []).append(node_name)
-                    nodes_subscribe_topics.setdefault(node_name,[]).append(topic)
+            for topic in node.get('pub_topic', []):
+                topics_published_from_nodes.setdefault(topic, []).append(node_name)
+                nodes_publish_topics.setdefault(node_name, []).append(topic)
+
+            for topic in node.get('sub_topic', []):
+                topics_subscribed_from_nodes.setdefault(topic, []).append(node_name)
+                nodes_subscribe_topics.setdefault(node_name, []).append(topic)
+
+            topics.update(node.get('pub_topic', []))
+            topics.update(node.get('sub_topic', []))
+
+        topics = list(topics)
+        config_for_general = {'topics': topics, 'type': 'general'}
+
+        configs['observations'].append(config_for_general)
 
         for config in configs['observations']:
             new_vars, new_rules, new_nodes = generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
@@ -57,13 +65,6 @@ class Model(object):
         self.temp_vars = vars
         self.temp_rules = rules
         self.temp_nodes = nodes
-
-        # print "vars:"
-        # print vars
-        # print "rules:"
-        # print rules
-        # print "nodes:"
-        # print nodes
 
     def set_observations(self, observations):
         # pass
