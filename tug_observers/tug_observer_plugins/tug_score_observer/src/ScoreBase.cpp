@@ -73,6 +73,9 @@ namespace tug_observer_plugins_cpp
         if (it->conformsState(filter_state))
           states.push_back(Observation(it->getName(), it->getNumber()));
 
+      if(states.empty())
+        ROS_ERROR_STREAM("no state fit for score result " << filter_state);
+
       return states;
     }
 
