@@ -7,9 +7,11 @@ setup:
   # 1 ####################################
   #        type: twist
   #        topic: /topicA
+  #        acceleartion_window_size: 3
   # 2 ####################################
   #        type: twist_stamped
   #        topic: /topicA
+  #        acceleartion_window_size: 3
   # 3 ####################################
   #        type: imu
   #        topic: /topicA
@@ -17,35 +19,159 @@ setup:
   # 4 ####################################
   #        type: odometry
   #        topic: /topicA
+  #        velocity_window_size: 3
+  #        acceleartion_window_size: 3
   # 5 ####################################
   #        type: pose_stamped
   #        topic: /topicA
+  #        velocity_window_size: 3  
+  #        acceleartion_window_size: 3
   # 6 ####################################
   #        type: tf
   #        base_frame: /frameA
   #        target_frame: /frameB
+  #        velocity_window_size: 3  
+  #        acceleartion_window_size: 3
+      x_filter: # optional
+  ########### select one type: ###########
+  # 1 ####################################
+  #        type: mean
+  #        window_size: 200
+  # 2 ####################################
+  #        type: median
+  #        window_size: 200
+  # 3 ####################################
+  #        type: kmeans
+  #        window_size: 200
+  #        k_size: 10
+  # 4 ####################################
+  #        type: ewma                         # exponentially weighted moving average
+  #        window_size: 200                   # optional
+  #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+  # 5 ####################################
+  #        type: nofilter
+      y_filter: # optional
+  ########### select one type: ###########
+  # 1 ####################################
+  #        type: mean
+  #        window_size: 200
+  # 2 ####################################
+  #        type: median
+  #        window_size: 200
+  # 3 ####################################
+  #        type: kmeans
+  #        window_size: 200
+  #        k_size: 10
+  # 4 ####################################
+  #        type: ewma                         # exponentially weighted moving average
+  #        window_size: 200                   # optional
+  #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+  # 5 ####################################
+  #        type: nofilter
+      z_filter: # optional
+  ########### select one type: ###########
+  # 1 ####################################
+  #        type: mean
+  #        window_size: 200
+  # 2 ####################################
+  #        type: median
+  #        window_size: 200
+  # 3 ####################################
+  #        type: kmeans
+  #        window_size: 200
+  #        k_size: 10
+  # 4 ####################################
+  #        type: ewma                         # exponentially weighted moving average
+  #        window_size: 200                   # optional
+  #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+  # 5 ####################################
+  #        type: nofilter
+      rot_x_filter: # optional
+  ########### select one type: ###########
+  # 1 ####################################
+  #        type: mean
+  #        window_size: 200
+  # 2 ####################################
+  #        type: median
+  #        window_size: 200
+  # 3 ####################################
+  #        type: kmeans
+  #        window_size: 200
+  #        k_size: 10
+  # 4 ####################################
+  #        type: ewma                         # exponentially weighted moving average
+  #        window_size: 200                   # optional
+  #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+  # 5 ####################################
+  #        type: nofilter
+      rot_y_filter: # optional
+  ########### select one type: ###########
+  # 1 ####################################
+  #        type: mean
+  #        window_size: 200
+  # 2 ####################################
+  #        type: median
+  #        window_size: 200
+  # 3 ####################################
+  #        type: kmeans
+  #        window_size: 200
+  #        k_size: 10
+  # 4 ####################################
+  #        type: ewma                         # exponentially weighted moving average
+  #        window_size: 200                   # optional
+  #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+  # 5 ####################################
+  #        type: nofilter
+      rot_z_filter: # optional
+  ########### select one type: ###########
+  # 1 ####################################
+  #        type: mean
+  #        window_size: 200
+  # 2 ####################################
+  #        type: median
+  #        window_size: 200
+  # 3 ####################################
+  #        type: kmeans
+  #        window_size: 200
+  #        k_size: 10
+  # 4 ####################################
+  #        type: ewma                         # exponentially weighted moving average
+  #        window_size: 200                   # optional
+  #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+  # 5 ####################################
+  #        type: nofilter 
+  
     source_B:
   ########### select one type: ###########
   # 1 ####################################
   #        type: twist
   #        topic: /topicA
+  #        acceleartion_window_size: 3
   # 2 ####################################
   #        type: twist_stamped
   #        topic: /topicA
+  #        acceleartion_window_size: 3
   # 3 ####################################
   #        type: imu
   #        topic: /topicA
+  #        gravitation_cancelation: false    # optional
   # 4 ####################################
   #        type: odometry
   #        topic: /topicA
+  #        velocity_window_size: 3
+  #        acceleartion_window_size: 3
   # 5 ####################################
   #        type: pose_stamped
   #        topic: /topicA
+  #        velocity_window_size: 3  
+  #        acceleartion_window_size: 3
   # 6 ####################################
   #        type: tf
   #        base_frame: /frameA
   #        target_frame: /frameB
-    x_filter:                                 # optional
+  #        velocity_window_size: 3  
+  #        acceleartion_window_size: 3
+      x_filter: # optional
   ########### select one type: ###########
   # 1 ####################################
   #        type: mean
@@ -63,13 +189,7 @@ setup:
   #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
   # 5 ####################################
   #        type: nofilter
-
-  ###### select one deviation type: ######
-  # 1 ####################################
-  #        deviation_type: std_deviation
-  # 2 ####################################
-  #        deviation_type: min_max
-    y_filter:                                 # optional
+      y_filter: # optional
   ########### select one type: ###########
   # 1 ####################################
   #        type: mean
@@ -87,13 +207,7 @@ setup:
   #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
   # 5 ####################################
   #        type: nofilter
-
-  ###### select one deviation type: ######
-  # 1 ####################################
-  #        deviation_type: std_deviation
-  # 2 ####################################
-  #        deviation_type: min_max
-    z_filter:                                 # optional
+      z_filter: # optional
   ########### select one type: ###########
   # 1 ####################################
   #        type: mean
@@ -111,12 +225,61 @@ setup:
   #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
   # 5 ####################################
   #        type: nofilter
-
-  ###### select one deviation type: ######
+      rot_x_filter: # optional
+  ########### select one type: ###########
   # 1 ####################################
-  #        deviation_type: std_deviation
+  #        type: mean
+  #        window_size: 200
   # 2 ####################################
-  #        deviation_type: min_max
+  #        type: median
+  #        window_size: 200
+  # 3 ####################################
+  #        type: kmeans
+  #        window_size: 200
+  #        k_size: 10
+  # 4 ####################################
+  #        type: ewma                         # exponentially weighted moving average
+  #        window_size: 200                   # optional
+  #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+  # 5 ####################################
+  #        type: nofilter
+      rot_y_filter: # optional
+  ########### select one type: ###########
+  # 1 ####################################
+  #        type: mean
+  #        window_size: 200
+  # 2 ####################################
+  #        type: median
+  #        window_size: 200
+  # 3 ####################################
+  #        type: kmeans
+  #        window_size: 200
+  #        k_size: 10
+  # 4 ####################################
+  #        type: ewma                         # exponentially weighted moving average
+  #        window_size: 200                   # optional
+  #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+  # 5 ####################################
+  #        type: nofilter
+      rot_z_filter: # optional
+  ########### select one type: ###########
+  # 1 ####################################
+  #        type: mean
+  #        window_size: 200
+  # 2 ####################################
+  #        type: median
+  #        window_size: 200
+  # 3 ####################################
+  #        type: kmeans
+  #        window_size: 200
+  #        k_size: 10
+  # 4 ####################################
+  #        type: ewma                         # exponentially weighted moving average
+  #        window_size: 200                   # optional
+  #        decay_rate: 0.05                   # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+  # 5 ####################################
+  #        type: nofilter 
+  
     use_roll: true                            # optional
     use_pitch: true                           # optional  
     use_yaw: true                             # optional

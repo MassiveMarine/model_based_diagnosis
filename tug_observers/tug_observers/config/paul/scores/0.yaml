@@ -14,4 +14,4 @@ setup:
         type: nominal_value                   # student_t, nominal_value
         value:
           type: greather_than
-          greater_than: 0.9        
+          greater_than: 0.8        
