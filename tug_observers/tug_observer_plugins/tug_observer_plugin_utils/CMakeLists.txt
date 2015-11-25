@@ -4,12 +4,22 @@ project(tug_observer_plugin_utils)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  tug_yaml
-  roslint
-)
+if(CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+    find_package(catkin REQUIRED COMPONENTS
+            roscpp
+            rospy
+            tug_yaml
+            roslint
+            tug_testing
+            )
+else()
+    find_package(catkin REQUIRED COMPONENTS
+            roscpp
+            rospy
+            tug_yaml
+            )
+endif()
 
 ## System dependencies are found with CMake's conventions
 #find_package(Boost REQUIRED COMPONENTS thread math)
@@ -192,5 +202,34 @@ target_link_libraries(observer_plugin_utils
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-roslint_cpp()
-roslint_add_test()
+if(CATKIN_ENABLE_TESTING)
+    roslint_cpp()
+    roslint_add_test()
+
+    catkin_add_gtest(test_linear_interpolatioin test/TestLinearInterpolation.cpp)
+    target_link_libraries(test_linear_interpolatioin ${catkin_LIBRARIES} observer_plugin_utils)
+
+    catkin_add_gtest(test_single_side_differentation test/TestSingleSideDifferentiation.cpp)
+    target_link_libraries(test_single_side_differentation ${catkin_LIBRARIES} observer_plugin_utils)
+
+    catkin_add_gtest(test_two_side_differentation test/TestTwoSideDifferentiation.cpp)
+    target_link_libraries(test_two_side_differentation ${catkin_LIBRARIES} observer_plugin_utils)
+
+    catkin_add_gtest(test_simple_linear_regression test/TestSimpleLinearRegression.cpp)
+    target_link_libraries(test_simple_linear_regression ${catkin_LIBRARIES} observer_plugin_utils)
+
+    catkin_add_gtest(test_no_value_filter test/TestNoValueFilter.cpp)
+    target_link_libraries(test_no_value_filter ${catkin_LIBRARIES} observer_plugin_utils)
+
+    add_rostest_gtest(test_mean_filter test/launch/test_mean_filter.test test/TestMeanFilter.cpp)
+    target_link_libraries(test_mean_filter ${catkin_LIBRARIES} observer_plugin_utils)
+
+    add_rostest_gtest(test_median_filter test/launch/test_median_filter.test test/TestMedianFilter.cpp)
+    target_link_libraries(test_median_filter ${catkin_LIBRARIES} observer_plugin_utils)
+
+    add_rostest_gtest(test_ewma_filter test/launch/test_ewma_filter.test test/TestEWMAFilter.cpp)
+    target_link_libraries(test_ewma_filter ${catkin_LIBRARIES} observer_plugin_utils)
+
+    add_rostest_gtest(test_kmeans_filter test/launch/test_kmeans_filter.test test/TestKMeansFilter.cpp)
+    target_link_libraries(test_kmeans_filter ${catkin_LIBRARIES} observer_plugin_utils)
+endif()

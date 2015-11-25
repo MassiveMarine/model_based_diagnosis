@@ -68,7 +68,7 @@ HzSubs::HzSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* pl
   }
 }
 
-void HzSubs::cb(const ros::MessageEvent<topic_tools::ShapeShifter>& msg_event)
+void HzSubs::cb(const ros::MessageEvent<topic_tools::ShapeShifter const>& msg_event)
 {
   boost::shared_ptr<ros::M_string> connection_header = msg_event.getConnectionHeaderPtr();
   if (connection_header)

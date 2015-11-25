@@ -33,6 +33,8 @@ public:
   explicit EWMAValueFilterWithBuffer(XmlRpc::XmlRpcValue params)
   {
     decay_rate_ = ProcessYaml::getValue<double>("decay_rate", params);
+    if(decay_rate_ >= 1.0 || decay_rate_ <= 0.0)
+      throw std::invalid_argument("decay rate must be between (0, 1)");
     unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
     buffer_ = boost::circular_buffer<T>(window_size);
   }

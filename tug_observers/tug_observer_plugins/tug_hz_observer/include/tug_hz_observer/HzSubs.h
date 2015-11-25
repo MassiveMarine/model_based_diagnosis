@@ -40,7 +40,7 @@ class HzSubs
 
 public:
     HzSubs(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase* plugin_base);
-    void cb(const ros::MessageEvent<topic_tools::ShapeShifter>& msg_event);
+    void cb(const ros::MessageEvent<topic_tools::ShapeShifter const>& msg_event);
     void sendResourceInfo();
 };
 

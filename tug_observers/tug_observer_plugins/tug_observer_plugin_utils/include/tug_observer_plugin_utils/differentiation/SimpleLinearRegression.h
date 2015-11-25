@@ -63,6 +63,8 @@ class SimpleLinearRegression : public Differentiation<T>
 public:
     explicit SimpleLinearRegression(unsigned int window_size) : window_size_(window_size)
     {
+      if(window_size < 2)
+        throw std::invalid_argument("window size for linear regression must be bigger than 1");
       value_buffer_ = boost::circular_buffer<T>(window_size);
       time_buffer_ = boost::circular_buffer<ros::Time>(window_size);
     }

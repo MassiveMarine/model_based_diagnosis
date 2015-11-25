@@ -22,6 +22,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include <tug_yaml/ProcessYaml.h>
 #include <algorithm>
 #include <boost/thread/mutex.hpp>
+#include <ros/ros.h>
 
 template<class T>
 class MedianValueFilter : public ValueFilter<T>
@@ -33,6 +34,8 @@ public:
   explicit MedianValueFilter(XmlRpc::XmlRpcValue params)
   {
     unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
+    if(window_size < 3)
+      throw std::invalid_argument("windows size for a median filter must be at lest 3");
     buffer_ = boost::circular_buffer<T>(window_size);
   }
 
@@ -48,8 +51,14 @@ public:
     if (buffer_.empty())
       return static_cast<T>(0);
 
-    size_t upper_median_index = std::ceil((buffer_.size() + 1)/2) - 1;
-    size_t lower_median_index = std::floor((buffer_.size() + 1)/2) - 1;
+    size_t upper_median_index = std::ceil(static_cast<double>(buffer_.size() + 1)/2.) - 1;
+    size_t lower_median_index = std::floor(static_cast<double>(buffer_.size() + 1)/2.) - 1;
+
+    //for(typename boost::circular_buffer<T>::iterator it = buffer_.begin(); it != buffer_.end(); ++it)
+    //  ROS_DEBUG_STREAM("content in the buffer: " << *it);
+    ROS_DEBUG_STREAM("upper_median_index: " << upper_median_index << " lower_median_index:" << lower_median_index);
+    ROS_DEBUG_STREAM("value at upper_median_index: " << buffer_[upper_median_index] <<
+                             " value at lower_median_index:" << buffer_[lower_median_index]);
 
     std::sort(buffer_.begin(), buffer_.end());
     return (buffer_[upper_median_index] + buffer_[lower_median_index]) / static_cast<T>(2);

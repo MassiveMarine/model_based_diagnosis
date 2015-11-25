@@ -21,6 +21,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include <list>
 #include <stdexcept>
 #include <utility>
+#include <ros/ros.h>
 
 template<class T>
 class LinearInterpolation : public Interpolation<T>
@@ -70,10 +71,12 @@ class LinearInterpolation : public Interpolation<T>
                                                                                                    values.end(),
                                                                                           lower_limit);
 
-      size_t lower_bound;
-      for (typename std::list<std::pair<T, ros::Time> >::const_iterator it = values.begin(), lower_bound = 0;
-           it != lower_it; ++it, ++lower_bound)
-      { }
+      size_t lower_bound = 0;
+      for (typename std::list<std::pair<T, ros::Time> >::const_iterator it = values.begin();
+           it != lower_it; ++it)
+      {
+        ++lower_bound;
+      }
 
       if (lower_bound == 0)
         return;
@@ -86,15 +89,21 @@ class LinearInterpolation : public Interpolation<T>
 public:
     virtual void addFromA(const T &value, const ros::Time &value_time)
     {
+      ROS_DEBUG("add from a called");
       if (!a_values_.empty() && (value_time < a_values_.back().second))
+      {
+        ROS_DEBUG_STREAM("want to insert value " << value << " with timing: " << value_time.toSec() <<
+                                 " but last timing is " << a_values_.back().second.toSec() <<
+                                 " of elements" << a_values_.size());
         throw std::invalid_argument("given time is before last inserted time for a");
+      }
 
       a_values_.push_back(std::make_pair(value, value_time));
     }
 
     virtual void addFromB(const T &value, const ros::Time &value_time)
     {
-      if (!a_values_.empty() && (value_time < a_values_.back().second))
+      if (!b_values_.empty() && (value_time < b_values_.back().second))
         throw std::invalid_argument("given time is before last inserted time for b");
 
       b_values_.push_back(std::make_pair(value, value_time));

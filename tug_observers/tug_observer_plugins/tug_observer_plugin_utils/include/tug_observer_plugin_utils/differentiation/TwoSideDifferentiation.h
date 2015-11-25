@@ -18,6 +18,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #define TUG_OBSERVER_PLUGIN_UTILS_DIFFERENTIATION_TWOSIDEDIFFERENTIATION_H
 
 #include <tug_observer_plugin_utils/differentiation/Differentiation.h>
+#include <ros/ros.h>
 
 template <class T>
 class TwoSideDifferentiation : public Differentiation<T>
