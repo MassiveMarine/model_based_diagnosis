@@ -49,10 +49,10 @@ class ResourcesObserver(BaseObserver):
         return vars, rules, []
 
     @staticmethod
-    def decrypt_resource_info(resources_info):
-        checkInputData.str_data_valid(resources_info, forbidden_chars=[' '])
+    def decrypt_resource_info(resource_info):
+        checkInputData.str_data_valid(resource_info, forbidden_chars=[' '])
 
-        return ['resources_obs_' + resources_info]
+        return ['resources_obs_' + resource_info]
 
 picosat.SENTENCE_INTERPRETERS[ResourcesObserver] = lambda engine, pred, unused: pred.to_clause()
 OBSERVERS['resources'] = ResourcesObserver

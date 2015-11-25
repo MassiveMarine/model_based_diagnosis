@@ -69,7 +69,7 @@ class MovementObserver(BaseObserver):
             raise TypeError
 
         entries = re.findall(regex_prog, resource_info)
-        if not len(entries):
+        if not len(entries) or len(entries) > 1:
             raise ValueError
 
         [topicA_name, topicB_name] = list(re.findall(regex_prog, resource_info)[0])
@@ -288,4 +288,6 @@ class TestMovementObserver(unittest.TestCase):
             MovementObserver.decrypt_resource_info("")
         with self.assertRaises(TypeError):
             MovementObserver.decrypt_resource_info(1)
+        with self.assertRaises(ValueError):
+            MovementObserver.decrypt_resource_info("/topic_1 [] /topic_2 []")
 
