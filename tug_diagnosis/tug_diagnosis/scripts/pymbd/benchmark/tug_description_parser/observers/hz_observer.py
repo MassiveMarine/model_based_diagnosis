@@ -26,7 +26,8 @@ class HzObserver(BaseObserver):
         return [clause(all_pos([self.ab_node] + self.ab_subscribed_topics) + " " + self.observation)]
 
     @staticmethod
-    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics):
+    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
+                                 nodes_publish_topics, nodes_subscribe_topics):
         checkInputData.dict_data_valid(config, False)
         topics = config['topics']
 
