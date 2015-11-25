@@ -256,7 +256,7 @@ class TestScoreObserver(unittest.TestCase):
 
         for (error, config) in config_tests:
             with self.assertRaises(error):
-                print "'" + str(error.__name__) + "' should be raised by '" + str(topics_published_from_nodes) + "'",
+                print "'" + str(error.__name__) + "' should be raised by '" + str(config) + "'",
 
                 ScoreObserver.generate_model_parameter(config,
                                                    topics_published_from_nodes, topics_subscribed_from_nodes,
@@ -331,7 +331,7 @@ class TestScoreObserver(unittest.TestCase):
         for (error, nodes_subscribe_topics) in nodes_subscribe_topics_testes:
 
             with self.assertRaises(error):
-                print "'" + str(error.__name__) + "' should be raised by '" + str(topics_published_from_nodes) + "'",
+                print "'" + str(error.__name__) + "' should be raised by '" + str(nodes_subscribe_topics) + "'",
 
                 ScoreObserver.generate_model_parameter(config,
                                                    topics_published_from_nodes, topics_subscribed_from_nodes,
