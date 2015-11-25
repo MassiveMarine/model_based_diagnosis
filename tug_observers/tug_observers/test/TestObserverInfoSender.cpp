@@ -3,11 +3,27 @@
 //
 
 #include <gtest/gtest.h>
-#include <tug_testing/TestHelper.h>
+#include <tug_testing/PublisherTester.h>
 #include <tug_observers/ObserverInfoSender.h>
 #include <tug_observers_msgs/observer_info.h>
 
-typedef TestHelper<tug_observers_msgs::observer_info> TestHelperObserverInfo;
+class TestHelperObserverInfo : public ::testing::Test
+{
+    PublisherTester<tug_observers_msgs::observer_info> pub_tester_;
+protected:
+    TestHelperObserverInfo() : pub_tester_("/observers/info")
+    { }
+
+    virtual ~TestHelperObserverInfo()
+    { }
+
+    std::pair<tug_observers_msgs::observer_info, bool> getMessage(boost::function<void()> function_to_call,
+                                                                  double time_to_wait)
+    {
+      return pub_tester_.getMessage(function_to_call, time_to_wait);
+    };
+};
+
 
 void tmpCB(const typename tug_observers_msgs::observer_info::ConstPtr&)
 { }
@@ -26,7 +42,6 @@ void test1HelperFunction()
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test1)
 {
-  init("/observers/info");
   std::pair<tug_observers_msgs::observer_info, bool> msg_pair = getMessage(&test1HelperFunction, 1);
   EXPECT_FALSE(msg_pair.second);
 }
@@ -107,7 +122,6 @@ bool compareMsgs(tug_observers_msgs::observer_info msg_send, tug_observers_msgs:
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test2)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
 
   std::pair<tug_observers_msgs::observer_info, bool> msg_pair = getMessage(
@@ -117,7 +131,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test2)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test3)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   msg_to_send.observation_infos.push_back(observation_info);
@@ -130,7 +143,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test3)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test4)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.resource = "a";
@@ -144,7 +156,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test4)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test5)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.type = "a";
@@ -158,7 +169,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test5)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test6)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.resource = "a";
@@ -173,7 +183,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test6)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test7)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.header.stamp = ros::Time::now();
@@ -187,7 +196,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test7)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test8)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.header.stamp = ros::Time::now();
@@ -202,7 +210,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test8)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test9)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.header.stamp = ros::Time::now();
@@ -217,7 +224,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test9)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test10)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.header.stamp = ros::Time::now();
@@ -233,7 +239,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test10)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test11)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -249,7 +254,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test11)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test12)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -266,7 +270,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test12)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test13)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -283,7 +286,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test13)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test14)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -301,7 +303,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test14)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test15)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -318,7 +319,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test15)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test16)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -336,7 +336,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test16)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test17)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -354,7 +353,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test17)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test18)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -373,7 +371,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test18)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test19)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -389,7 +386,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test19)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test20)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -406,7 +402,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test20)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test21)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -423,7 +418,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test21)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test22)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -441,7 +435,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test22)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test23)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -458,7 +451,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test23)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test24)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -476,7 +468,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test24)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test25)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -494,7 +485,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test25)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test26)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -513,7 +503,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test26)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test27)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -529,7 +518,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test27)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test28)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -546,7 +534,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test28)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test29)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -563,7 +550,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test29)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test30)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -581,7 +567,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test30)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test31)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -598,7 +583,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test31)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test32)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -616,7 +600,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test32)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test33)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -634,7 +617,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test33)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test34)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -653,7 +635,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test34)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test35)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -670,7 +651,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test35)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test36)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -688,7 +668,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test36)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test37)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -706,7 +685,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test37)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test38)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -725,7 +703,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test38)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test39)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -743,7 +720,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test39)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test40)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -762,7 +738,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test40)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test41)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -781,7 +756,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test41)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test42)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -801,7 +775,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test42)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test43)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -818,7 +791,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test43)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test44)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -836,7 +808,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test44)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test45)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -854,7 +825,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test45)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test46)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -873,7 +843,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test46)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test47)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -891,7 +860,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test47)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test48)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -910,7 +878,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test48)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test49)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -929,7 +896,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test49)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test50)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -949,7 +915,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test50)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test51)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -967,7 +932,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test51)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test52)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -986,7 +950,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test52)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test53)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1005,7 +968,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test53)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test54)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1025,7 +987,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test54)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test55)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1044,7 +1005,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test55)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test56)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1064,7 +1024,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test56)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test57)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1084,7 +1043,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test57)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test58)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1105,7 +1063,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test58)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test59)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation1;
@@ -1131,7 +1088,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test59)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test60)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   msg_to_send.observation_infos.push_back(observation_info);
@@ -1144,7 +1100,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test60)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test61)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.resource = "a";
@@ -1158,7 +1113,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test61)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test62)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.type = "a";
@@ -1172,7 +1126,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test62)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test63)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.resource = "a";
@@ -1187,7 +1140,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test63)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test64)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.header.stamp = ros::Time::now();
@@ -1201,7 +1153,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test64)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test65)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.header.stamp = ros::Time::now();
@@ -1216,7 +1167,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test65)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test66)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.header.stamp = ros::Time::now();
@@ -1231,7 +1181,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test66)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test67)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   observation_info.header.stamp = ros::Time::now();
@@ -1247,7 +1196,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test67)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test68)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1263,7 +1211,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test68)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test69)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1280,7 +1227,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test69)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test70)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1297,7 +1243,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test70)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test71)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1315,7 +1260,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test71)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test72)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1332,7 +1276,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test72)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test73)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1350,7 +1293,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test73)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test74)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1368,7 +1310,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test74)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test75)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1387,7 +1328,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test75)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test76)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1403,7 +1343,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test76)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test77)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1420,7 +1359,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test77)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test78)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1437,7 +1375,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test78)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test79)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1455,7 +1392,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test79)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test80)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1472,7 +1408,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test80)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test81)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1490,7 +1425,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test81)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test82)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1508,7 +1442,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test82)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test83)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1527,7 +1460,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test83)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test84)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1543,7 +1475,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test84)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test85)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1560,7 +1491,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test85)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test86)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1577,7 +1507,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test86)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test87)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1595,7 +1524,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test87)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test88)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1612,7 +1540,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test88)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test89)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1630,7 +1557,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test89)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test90)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1648,7 +1574,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test90)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test91)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1667,7 +1592,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test91)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test92)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1684,7 +1608,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test92)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test93)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1702,7 +1625,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test93)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test94)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1720,7 +1642,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test94)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test95)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1739,7 +1660,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test95)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test96)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1757,7 +1677,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test96)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test97)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1776,7 +1695,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test97)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test98)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1795,7 +1713,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test98)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test99)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1815,7 +1732,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test99)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test100)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1832,7 +1748,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test100)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test101)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1850,7 +1765,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test101)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test102)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1868,7 +1782,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test102)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test103)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1887,7 +1800,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test103)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test104)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1905,7 +1817,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test104)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test105)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1924,7 +1835,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test105)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test106)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1943,7 +1853,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test106)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test107)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1963,7 +1872,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test107)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test108)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -1981,7 +1889,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test108)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test109)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2000,7 +1907,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test109)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test110)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2019,7 +1925,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test110)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test111)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2039,7 +1944,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test111)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test112)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2058,7 +1962,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test112)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test113)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2078,7 +1981,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test113)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test114)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2098,7 +2000,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test114)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test115)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2119,7 +2020,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test115)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test116)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation1;
@@ -2145,7 +2045,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test116)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test117)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2161,7 +2060,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test117)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test118)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2178,7 +2076,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test118)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test119)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2195,7 +2092,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test119)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test120)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2213,7 +2109,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test120)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test121)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2230,7 +2125,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test121)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test122)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2248,7 +2142,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test122)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test123)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2266,7 +2159,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test123)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test124)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2285,7 +2177,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test124)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test125)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2302,7 +2193,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test125)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test126)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2320,7 +2210,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test126)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test127)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2338,7 +2227,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test127)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test128)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2357,7 +2245,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test128)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test129)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2375,7 +2262,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test129)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test130)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2394,7 +2280,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test130)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test131)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2413,7 +2298,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test131)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test132)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2433,7 +2317,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test132)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test133)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2451,7 +2334,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test133)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test134)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2470,7 +2352,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test134)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test135)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2489,7 +2370,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test135)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test136)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2509,7 +2389,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test136)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test137)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2528,7 +2407,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test137)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test138)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2548,7 +2426,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test138)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test139)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2568,7 +2445,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test139)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test140)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation;
@@ -2589,7 +2465,6 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test140)
 
 TEST_F(TestHelperObserverInfo, send_observer_info_test141)
 {
-  init("/observers/info");
   tug_observers_msgs::observer_info msg_to_send;
   tug_observers_msgs::observation_info observation_info;
   tug_observers_msgs::observation observation1;

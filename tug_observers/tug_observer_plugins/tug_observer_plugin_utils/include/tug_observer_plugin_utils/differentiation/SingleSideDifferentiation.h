@@ -62,7 +62,7 @@ public:
         ROS_DEBUG_STREAM("time difference:" << time_difference);
         ROS_DEBUG_STREAM("value difference: " << static_cast<double>(value - past_value_));
         current_differntiation_ = static_cast<T>(static_cast<double>(value - past_value_) / time_difference);
-        current_differntiation_time_ = value_time;
+        current_differntiation_time_ = past_value_time_;
         has_current_differntiation_ = true;
         ROS_DEBUG_STREAM("calculated difference:" << current_differntiation_ << " at time:"
                          << current_differntiation_time_);

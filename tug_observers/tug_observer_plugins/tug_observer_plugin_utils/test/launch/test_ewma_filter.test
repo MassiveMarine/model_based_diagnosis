@@ -1,0 +1,4 @@
+<launch>
+    <test test-name="test_ewma_filter" pkg="tug_observer_plugin_utils" type="test_ewma_filter" >
+    </test>
+</launch>

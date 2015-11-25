@@ -34,6 +34,8 @@ public:
   explicit EWMAValueFilterWithoutBuffer(XmlRpc::XmlRpcValue params) : got_initial_value_(false), sample_size_(0)
   {
     decay_rate_ = ProcessYaml::getValue<double>("decay_rate", params);
+    if(decay_rate_ >= 1.0 || decay_rate_ <= 0.0)
+      throw std::invalid_argument("decay rate must be between (0, 1)");
   }
 
   virtual void update(const T& new_value)

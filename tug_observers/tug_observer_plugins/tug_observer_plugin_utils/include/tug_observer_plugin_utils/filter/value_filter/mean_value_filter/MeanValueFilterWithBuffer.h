@@ -34,6 +34,8 @@ public:
   explicit MeanValueFilterWithBuffer(XmlRpc::XmlRpcValue params)
   {
     unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
+    if(window_size < 2)
+      throw std::invalid_argument("mean value filter must be initialized with a window size of at least 2");
     buffer_ = boost::circular_buffer<T>(window_size);
   }
 

@@ -30,26 +30,27 @@ template<class T>
 class KMeansValueFilter : public ValueFilter<T>
 {
   boost::circular_buffer<T> buffer_;
-  unsigned int k_half_;
+  double k_half_;
   boost::mutex scope_mutex_;
 
   size_t getLowerIndex()
   {
-    size_t lower_median_index = std::floor((buffer_.size() + 1)/2) - 1;
-    if (k_half_ > lower_median_index)
+    if(buffer_.size() < 2. * k_half_)
       return 0;
 
-    return lower_median_index - k_half_;
+    size_t lower_median_index = std::ceil(static_cast<double>(buffer_.size() + 1)/2. - k_half_) - 1.;
+
+    return lower_median_index;
   }
 
   size_t getUpperIndex()
   {
-    size_t upper_median_index = std::ceil((buffer_.size() + 1)/2) - 1;
-    size_t result = upper_median_index + k_half_;
-    if (result < buffer_.size())
-      return result;
+    if(buffer_.size() < 2. * k_half_)
+      return  buffer_.size() - 1;
 
-    return  buffer_.size() - 1;
+    size_t upper_median_index = std::floor(static_cast<double>(buffer_.size() + 1)/2. + k_half_) - 1.;
+
+    return  upper_median_index;
   }
 
 public:
@@ -57,7 +58,15 @@ public:
   {
     unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
     buffer_ = boost::circular_buffer<T>(window_size);
-    k_half_ = ProcessYaml::getValue<unsigned int>("k_size", params) / 2;
+    if(window_size < 2)
+      throw std::invalid_argument("window size must be at least 2 for the k mean value filter");
+
+    k_half_ = static_cast<double>(ProcessYaml::getValue<unsigned int>("k_size", params)) / 2.;
+    if(k_half_ < 1.)
+      throw std::invalid_argument("k mean must be at least 2 for the k mean value filter");
+
+    if(k_half_ * 2. > window_size)
+      throw std::invalid_argument("window size must be at least k size for the k mean value filter");
   }
 
   virtual void update(const T& new_value)
@@ -73,15 +82,20 @@ public:
       return static_cast<T>(0);
 
     ROS_DEBUG_STREAM("get value k means");
-    size_t upper_index = getUpperIndex();
-    ROS_DEBUG_STREAM("upper index " << upper_index);
     size_t lower_index = getLowerIndex();
     ROS_DEBUG_STREAM("lower index " << lower_index);
+    size_t upper_index = getUpperIndex();
+    ROS_DEBUG_STREAM("upper index " << upper_index);
     std::sort(buffer_.begin(), buffer_.end());
     ROS_DEBUG("sorted");
-    T result = std::accumulate(buffer_.begin() + lower_index, buffer_.begin() + upper_index, static_cast<T>(0));
+    if(upper_index + 1 - lower_index < 2. * k_half_)
+      upper_index = std::min(buffer_.size() - 1, upper_index + 1);
+    if(upper_index + 1 - lower_index > 2. * k_half_)
+      lower_index = std::min(upper_index, lower_index + 1);
 
-    return result / static_cast<T>(upper_index - lower_index);
+    T result = std::accumulate(buffer_.begin() + lower_index, buffer_.begin() + upper_index + 1, static_cast<T>(0));
+
+    return result / static_cast<T>(upper_index - lower_index + 1);
   }
 
   virtual void reset()
