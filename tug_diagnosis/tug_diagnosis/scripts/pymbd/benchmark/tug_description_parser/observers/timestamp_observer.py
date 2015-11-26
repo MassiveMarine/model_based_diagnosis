@@ -53,6 +53,9 @@ class TimestampObserver(BaseObserver):
                 subscribed_topics = nodes_subscribe_topics.get(callerid, [])
                 rules.append(TimestampObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
 
+                if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+                    raise ValueError
+
             new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("timestamp", topic, topics_published_from_nodes[topic])
             vars.update(new_vars)
             rules += new_rules
@@ -328,6 +331,7 @@ class TestTimestampObserver(unittest.TestCase):
              (ValueError, {'node1': ['/topic1'], 'node2': ['/']}),
              (ValueError, {'node1': ['/topic1'], 'node2': ['']}),
              (TypeError, {'node1': ['/topic1'], 'node2': [1]}),
+             (ValueError, {'node1': ['/wrong_topic_name'], 'node2': ['/topic2']}),
              ]
 
         for (error, nodes_subscribe_topics) in nodes_subscribe_topics_testes:
