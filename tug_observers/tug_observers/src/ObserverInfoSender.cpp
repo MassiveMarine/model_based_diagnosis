@@ -1,6 +1,6 @@
 /*
-This file is part of the software provided by the tug ais groupe
-Copyright (c) 2015, Clemens Muehlbacher, Stefan Loige
+This file is part of the software provided by the tug ais group
+Copyright (c) 2015, Clemens Muehlbacher, Stefan Loigge
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

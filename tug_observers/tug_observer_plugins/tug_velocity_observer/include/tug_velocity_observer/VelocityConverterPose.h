@@ -1,6 +1,6 @@
 /*
 This file is part of the tug model based diagnosis software for robots
-Copyright (c) 2015, Clemens Muehlbacher, Stefan Loige
+Copyright (c) 2015, Clemens Muehlbacher, Stefan Loigge
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
