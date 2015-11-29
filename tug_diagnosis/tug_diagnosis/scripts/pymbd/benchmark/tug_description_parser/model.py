@@ -32,11 +32,12 @@ class Model(object):
         nodes_publish_topics = dict()
         nodes_subscribe_topics = dict()
         nodes = []
+        self.real_nodes = []
         topics = set()
 
         for node in configs['nodes']:
             node_name = node['name']
-            nodes.append(node_name)
+            self.real_nodes.append(node_name)
             vars[node_name] = Variable(node_name, Variable.BOOLEAN, None)
             vars[ab_pred(node_name)] = Variable(ab_pred(node_name), Variable.BOOLEAN, None)
 
@@ -64,7 +65,7 @@ class Model(object):
 
         self.temp_vars = vars
         self.temp_rules = rules
-        self.temp_nodes = nodes
+        self.temp_nodes = self.real_nodes + nodes
 
     def set_observations(self, observations):
         # pass
@@ -73,6 +74,11 @@ class Model(object):
 
     def set_options(self, **options):
         self.options.update(options)
+
+    def is_real_node(self, node_name):
+        if node_name in self.real_nodes:
+            return True
+        return False
 
     def check_consistency(self, h):
         """

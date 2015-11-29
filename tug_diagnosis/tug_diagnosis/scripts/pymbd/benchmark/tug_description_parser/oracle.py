@@ -29,6 +29,9 @@ class TUGDescriptionOracle(Description):
         super(TUGDescriptionOracle, self).set_options(**options)
         if self.net is not None:
             self.net.set_options(**options)
+
+    def is_real_node(self, node_name):
+        return self.net.is_real_node(node_name)
     
     def get_num_nodes(self):
         self.setup_system_model()
