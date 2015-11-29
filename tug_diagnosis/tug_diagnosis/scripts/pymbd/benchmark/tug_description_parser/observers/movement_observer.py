@@ -117,6 +117,7 @@ class TestMovementObserver(unittest.TestCase):
                          (ValueError, [ab_pred("/")]),
                          (ValueError, [""]),
                          (ValueError, ["/"]),
+                         (ValueError, []),
                          (TypeError, [1]),
                          (TypeError, ""),
                          (TypeError, "/"),
@@ -254,9 +255,9 @@ class TestMovementObserver(unittest.TestCase):
 
         rules_req_str = [str(x) for x in rules_req]
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
-        self.assertEqual(len(rules), len(rules_req), "Hz added wrong number of rules!")
+        self.assertEqual(len(rules), len(rules_req), "movement added wrong number of rules!")
 
-        self.assertEqual(len(nodes), 1, "Hz should not add nodes!")
+        self.assertEqual(len(nodes), 1, "movement should not add nodes!")
         self.assertEqual(str(nodes[0]), 'movement', "'movement' not added to nodes!")
 
     def test_generate_model_parameter_errors_1(self):
@@ -271,18 +272,18 @@ class TestMovementObserver(unittest.TestCase):
                         (KeyError, {}),
                         (TypeError, "not_a_dict"),
                         (TypeError, 1),
-                        (ValueError, {'topics': [[]], 'type': 'hz'}),
-                        (ValueError, {'topics': [['']], 'type': 'hz'}),
-                        (TypeError, {'topics': [[1]], 'type': 'hz'}),
-                        (TypeError, {'topics': ["no_list_list"], 'type': 'hz'}),
-                        (TypeError, {'topics': [1], 'type': 'hz'}),
-                        (ValueError, {'topics': [['/wrong_topic_name', '/topic2', '/topic3']], 'type': 'hz'}),
-                        (ValueError, {'topics': [], 'type': 'hz'}),
-                        (TypeError, {'topics': [''], 'type': 'hz'}),
-                        (TypeError, {'topics': [1], 'type': 'hz'}),
-                        (TypeError, {'topics': "no_list", 'type': 'hz'}),
-                        (TypeError, {'topics': 1, 'type': 'hz'}),
-                        (TypeError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'hz'})
+                        (ValueError, {'topics': [[]], 'type': 'movement'}),
+                        (ValueError, {'topics': [['']], 'type': 'movement'}),
+                        (TypeError, {'topics': [[1]], 'type': 'movement'}),
+                        (TypeError, {'topics': ["no_list_list"], 'type': 'movement'}),
+                        (TypeError, {'topics': [1], 'type': 'movement'}),
+                        (ValueError, {'topics': [['/wrong_topic_name', '/topic2', '/topic3']], 'type': 'movement'}),
+                        (ValueError, {'topics': [], 'type': 'movement'}),
+                        (TypeError, {'topics': [''], 'type': 'movement'}),
+                        (TypeError, {'topics': [1], 'type': 'movement'}),
+                        (TypeError, {'topics': "no_list", 'type': 'movement'}),
+                        (TypeError, {'topics': 1, 'type': 'movement'}),
+                        (TypeError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'movement'})
                         ]
 
         for (error, config) in config_tests:

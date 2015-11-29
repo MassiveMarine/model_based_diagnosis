@@ -237,7 +237,6 @@ class TestHzObserver(unittest.TestCase):
         self.assertEqual(len(nodes), 0, "Hz should not add nodes!")
 
     def test_generate_model_parameter_errors_1(self):
-        # test different arguments for the config-parameter which all should raise exeptions
         config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'hz'}
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
