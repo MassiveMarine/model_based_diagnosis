@@ -28,8 +28,8 @@ class TimingState():
         """
         self.name = Config.get_param(config, 'state')
         self.number = Config.get_param(config, 'number')
-        frequency = Config.get_param(config, 'delay')
-        self.hypothesis_check = SingleValueHypothesisCheckFactory.create_single_value_hypothesis_check(frequency)
+        delay = Config.get_param(config, 'delay')
+        self.hypothesis_check = SingleValueHypothesisCheckFactory.create_single_value_hypothesis_check(delay)
 
     def check_hypothesis(self, value, deviation, sample_size):
         """
@@ -107,7 +107,7 @@ class TimingBase():
         if self._first_topic_time_a:
             delay = time - self._first_topic_time_a
             self._filter.update(delay)
-            # print delay
+            print delay
 
         self._first_topic_time_a = 0
         self._first_topic_time_a_lock.release()
@@ -197,6 +197,7 @@ class TimingTopicGroup():
         Callback method that is called by the subscriber of topic a.
         :param msg: message from publisher
         """
+        print "topicA", str(msg._connection_header['topic'])
         self._base.set_topic_a(rospy.get_rostime().to_sec())
 
     def _cb_b_with_callerid(self, msg):
@@ -214,6 +215,7 @@ class TimingTopicGroup():
         Callback method that is called by the subscriber of topic b.
         :param msg: message from publisher
         """
+        print "topicB", str(msg._connection_header['topic'])
         self._base.set_topic_b(rospy.get_rostime().to_sec())
 
     def get_observation_info(self):

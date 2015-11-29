@@ -47,7 +47,7 @@ class DeviationFilterFactory():
         :param config: Configuration from yaml file
         :return: New instance of a corresponding deviation
         """
-        deviation_filter_type = Config.get_param(config, 'deviation_type')
+        deviation_filter_type = Config.get_param_with_default(config, 'deviation_type', 'unknown')
         if deviation_filter_type == "min_max":
             return MinMaxDeviationFilter(config)
         elif deviation_filter_type == "std_deviation":

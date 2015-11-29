@@ -113,7 +113,7 @@ class SubscripberManager():
 if __name__ == "__main__":
     rospy.init_node('tug_observer', anonymous=False)
 
-    configs = rospy.get_param('/tug_observer_node/setup')
+    configs = rospy.get_param('/tug_observers_python_node/setup')
 
     try:
         rospy.loginfo("starting " + rospy.get_name())

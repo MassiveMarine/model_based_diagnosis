@@ -2,7 +2,7 @@
 
 import rospy
 
-from hypothesis_check.single_value_hypothesis_check.nominal_value import NominalValueFactory
+from nominal_value import NominalValueFactory
 from student_t_test import StudentTTest
 from tug_python_utils import YamlHelper as Config
 
@@ -43,7 +43,7 @@ class SingleValueHypothesisCheckFactory():
         """
         hypothesis_type = Config.get_param(config, 'type')
 
-        if hypothesis_type == 'nominal_value':
+        if hypothesis_type in ['gauss', 'exact', 'not', 'greather_than', 'less_than', 'in_between', 'not_in_between']:
             return NominalValueHypothesis(config)
         elif hypothesis_type == 'student_t':
             return StudentTTest(config)
@@ -63,8 +63,12 @@ class NominalValueHypothesis(SingleValueHypothesisCheck):
         :param config: Configuration from yaml file
         """
         SingleValueHypothesisCheck.__init__(self)
-        self._value_check = NominalValueFactory.create_nominal_value(Config.get_param(config, 'value'))
+        self._value_check = NominalValueFactory.create_nominal_value(config)
         self._deviation_checks = []
+        
+        if not Config.has_key(config, 'deviation'):
+            return
+
         for deviation_config in Config.get_param(config, 'deviation'):
             self._deviation_checks.append(NominalValueFactory.create_nominal_value(deviation_config))
 

@@ -193,7 +193,7 @@ setup:
           type: student_t
           true_mean: 0.052
           std_deviation: 0.0084            # optional
-          significance_level: 0.05  
+          significance_level: 0.05
 # 13 # /robot_41/lam_button_states #####################################################
   - name: /robot_41/lam_button_states
     callerids:
@@ -420,7 +420,6 @@ setup:
           significance_level: 0.05  
 - type: scores
   main_loop_rate: 1.0
-  use_global_subscriber: true
   topics:
 # 1 # /robot_41/localization_score ############################################################
   - name: /robot_41/localization_score
