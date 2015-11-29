@@ -13,25 +13,29 @@ class TimingObserver(BaseObserver):
     The implication ab_predicate -> gate_function  
     """
     
-    def __init__(self, ab_nodes, topic):
+    def __init__(self, ab_nodes, topic, ab_subscribed_topics):
         super(TimingObserver, self).__init__()
         checkInputData.list_data_valid(ab_nodes, check_entries=True)
         checkInputData.str_data_valid(topic)
+        checkInputData.list_data_valid(ab_subscribed_topics, allow_empty=True)
 
         self.ab_nodes = ab_nodes
         self.topic = topic
+        self.ab_subscribed_topics = ab_subscribed_topics
 
     def __repr__(self):
-        return "(!%s => %s)" % (self.ab_nodes, self.topic)
+        return "timing: %s, %s, %s" % (self.ab_nodes, self.topic, self.ab_subscribed_topics)
 
     def to_clause(self):
-        return [clause(all_pos(self.ab_nodes) + " " + self.topic)]
+        return [clause(all_pos(self.ab_nodes + self.ab_subscribed_topics ) + " " + self.topic)]
 
     @staticmethod
-    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes):
+    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
+                                 nodes_publish_topics, nodes_subscribe_topics):
         checkInputData.dict_data_valid(config, check_entries=False)
         checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=False)
         checkInputData.dict_data_valid(topics_subscribed_from_nodes, check_entries=False, allow_empty=True)
+        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=False, allow_empty=True)
         topics = config['topics']
 
         vars = {}
@@ -45,30 +49,46 @@ class TimingObserver(BaseObserver):
             topicA = topic_pair[0]
             topicB = topic_pair[1]
 
+            if not set(topic_pair).issubset(topics_published_from_nodes.keys()):
+                raise ValueError
+
             nodes_list = []
-            checkInputData.list_data_valid(topics_published_from_nodes[topicB], check_entries=True)
-            for node in topics_published_from_nodes[topicB]:
-                if node in topics_subscribed_from_nodes.get(topicA, []):
-                    nodes_list += topics_published_from_nodes[topicB]
+            nodes_a = topics_published_from_nodes.get(topicA, [])
+            checkInputData.list_data_valid(nodes_a, check_entries=True, allow_empty=False)
+            nodes_b = topics_published_from_nodes.get(topicB, [])
+            checkInputData.list_data_valid(nodes_b, check_entries=True, allow_empty=False)
+            topics_to_node_a = topics_subscribed_from_nodes.get(topicA, [])
+            checkInputData.list_data_valid(topics_to_node_a, check_entries=True, allow_empty=True)
+            topics_to_node_b = topics_subscribed_from_nodes.get(topicB, [])
+            checkInputData.list_data_valid(topics_to_node_b, check_entries=True, allow_empty=True)
+
+            for node in nodes_b:
+                if node in topics_to_node_a:
+                    nodes_list += nodes_b
                     break
 
-            checkInputData.list_data_valid(topics_published_from_nodes[topicA], check_entries=True)
-            for node in topics_published_from_nodes[topicA]:
-                if node in topics_subscribed_from_nodes.get(topicB, []):
-                    nodes_list += topics_published_from_nodes[topicA]
+            for node in nodes_a:
+                if node in topics_to_node_b:
+                    nodes_list += nodes_a
 
             if not nodes_list:
-                nodes_list = topics_published_from_nodes[topicA] + topics_published_from_nodes[topicB]
+                nodes_list = nodes_a + nodes_b
 
-            for calleridA in topics_published_from_nodes[topicA]:
-                for calleridB in topics_published_from_nodes[topicB]:
+            for calleridA in nodes_a:
+                for calleridB in nodes_b:
 
                     observation = "timing_obs_" + topicA + "_" + calleridA + "_" + topicB + "_" + calleridB
                     vars[observation] = Variable(observation, Variable.BOOLEAN, None)
 
-                    rules.append(TimingObserver(all_ab_pred(nodes_list), observation))
+                    subscribed_topics = nodes_subscribe_topics.get(calleridB, [])
+                    checkInputData.list_data_valid(subscribed_topics, allow_empty=True)
 
-            new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter_2("timing", topicA, topics_published_from_nodes[topicA], topicB, topics_published_from_nodes[topicB] )
+                    rules.append(TimingObserver(all_ab_pred(nodes_list), observation, all_ab_pred(subscribed_topics) ))
+
+                    if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+                        raise ValueError
+
+            new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter_2("timing", topicA, topics_published_from_nodes[topicA], topicB, topics_published_from_nodes[topicB])
             vars.update(new_vars)
             rules += new_rules
             nodes += new_nodes
@@ -105,7 +125,6 @@ class TimingObserver(BaseObserver):
                 checkInputData.str_data_valid(calleridB)
                 infos.append('timing_obs_' + str(topicA_name) + "_" + str(calleridA) + "_" + str(topicB_name) + "_" + str(calleridB))
 
-        print infos
         return infos
 
 
@@ -120,81 +139,126 @@ class TestTimingObserver(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_timing_observer(self):
-        with self.assertRaises(ValueError):
-            TimingObserver([ab_pred("")], "/topic")
-        with self.assertRaises(ValueError):
-            TimingObserver([ab_pred("/")], "/topic")
-        with self.assertRaises(ValueError):
-            TimingObserver([""], "/topic")
-        with self.assertRaises(ValueError):
-            TimingObserver(["/"], "/topic")
-        with self.assertRaises(TypeError):
-            TimingObserver([1], "/topic")
-        with self.assertRaises(TypeError):
-            TimingObserver(ab_pred(""), "/topic")
-        with self.assertRaises(TypeError):
-            TimingObserver(ab_pred("/"), "/topic")
-        with self.assertRaises(TypeError):
-            TimingObserver("", "/topic")
-        with self.assertRaises(TypeError):
-            TimingObserver("/", "/topic")
-        with self.assertRaises(TypeError):
-            TimingObserver(1, "/topic")
-        with self.assertRaises(TypeError):
-            TimingObserver([["/node1"]], "/topic")
+    def test_timing_observer1(self):
+        ab_nodes = [ab_pred("/node1")]
+        observation = "movement_obs_node1_node2"
+        ab_subscribed_topics = []
 
+        ab_nodes_tests = [(ValueError, [ab_pred("")]),
+                          (ValueError, [ab_pred("/")]),
+                          (ValueError, [""]),
+                          (ValueError, ["/"]),
+                          (ValueError, []),
+                          (TypeError, [1]),
+                          (TypeError, ""),
+                          (TypeError, "/"),
+                          (TypeError, "node1"),
+                          (TypeError, 1)]
 
-        with self.assertRaises(ValueError):
-            TimingObserver([ab_pred("name")], "")
-        with self.assertRaises(ValueError):
-            TimingObserver([ab_pred("")], "")
-        with self.assertRaises(ValueError):
-            TimingObserver([""], "")
-        with self.assertRaises(TypeError):
-            TimingObserver([ab_pred("name")], 1)
-        with self.assertRaises(ValueError):
-            TimingObserver([ab_pred("name")], "/")
+        for (error, ab_nodes) in ab_nodes_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(ab_nodes) + "'",
+                TimingObserver(ab_nodes, observation, ab_subscribed_topics)
+            print "... DONE"
 
-    def test_clause(self):
-        observer = TimingObserver([ab_pred("name1")], "/topic")
+    def test_timing_observe2(self):
+        ab_nodes = [ab_pred("/node1")]
+        observation = "movement_obs_node1_node2"
+        ab_subscribed_topics = []
+
+        observation_tests = [
+            (ValueError, ""),
+            (ValueError, "/"),
+            (TypeError, 1),
+        ]
+
+        for (error, observation) in observation_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(observation) + "'",
+                TimingObserver(ab_nodes, observation, ab_subscribed_topics)
+            print "... DONE"
+
+    def test_timing_observe3(self):
+        ab_nodes = [ab_pred("/node1")]
+        observation = "movement_obs_node1_node2"
+        ab_subscribed_topics = []
+
+        ab_subscribed_topics_tests = [(ValueError, [ab_pred("")]),
+                          (ValueError, [ab_pred("/")]),
+                          (ValueError, [""]),
+                          (ValueError, ["/"]),
+                          (TypeError, [1]),
+                          (TypeError, ""),
+                          (TypeError, "/"),
+                          (TypeError, "node1"),
+                          (TypeError, 1)]
+
+        for (error, ab_subscribed_topics) in ab_subscribed_topics_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(ab_subscribed_topics) + "'",
+                TimingObserver(ab_nodes, observation, ab_subscribed_topics)
+            print "... DONE"
+
+    def test_clause1(self):
+        observer = TimingObserver([ab_pred("name1")], "/topic", all_ab_pred([]))
         new_clause = observer.to_clause()[0]
         self.assertEqual(len(new_clause.literals), 2, "Number of 'literals' in clause does not match!")
-        self.assertEqual(str(new_clause.literals[0]), ab_pred("name1"), "First literal in clause does not match! ")
-        self.assertEqual(str(new_clause.literals[1]), "/topic", "Second literal in clause does not match!")
+        self.assertEqual(str(new_clause.literals[0]), ab_pred("name1"), "A literal in clause does not match! ")
+        self.assertEqual(str(new_clause.literals[1]), "/topic", "A literal in clause does not match!")
 
-        observer = TimingObserver([ab_pred("name1"), ab_pred("name2")], "/topic")
+    def test_clause2(self):
+        observer = TimingObserver([ab_pred("name1")], "/topic", all_ab_pred(["/topic_pre"]))
         new_clause = observer.to_clause()[0]
         self.assertEqual(len(new_clause.literals), 3, "Number of 'literals' in clause does not match!")
-        self.assertEqual(str(new_clause.literals[0]), ab_pred("name1"), "First literal in clause does not match! ")
-        self.assertEqual(str(new_clause.literals[1]), ab_pred("name2"), "Second literal in clause does not match!")
-        self.assertEqual(str(new_clause.literals[2]), "/topic", "Third literal in clause does not match!")
+        self.assertEqual(str(new_clause.literals[0]), ab_pred("name1"), "A literal in clause does not match! ")
+        self.assertEqual(str(new_clause.literals[1]), ab_pred("/topic_pre"), "A literal in clause does not match! ")
+        self.assertEqual(str(new_clause.literals[2]), "/topic", "A literal in clause does not match!")
 
-    def test_generate_model_parameter(self):
+    def test_clause3(self):
+        observer = TimingObserver([ab_pred("name1"), ab_pred("name2")], "/topic", all_ab_pred([]))
+        new_clause = observer.to_clause()[0]
+        self.assertEqual(len(new_clause.literals), 3, "Number of 'literals' in clause does not match!")
+        self.assertEqual(str(new_clause.literals[0]), ab_pred("name1"), "A literal in clause does not match! ")
+        self.assertEqual(str(new_clause.literals[1]), ab_pred("name2"), "A literal in clause does not match!")
+        self.assertEqual(str(new_clause.literals[2]), "/topic", "A literal in clause does not match!")
+
+    def test_clause4(self):
+        observer = TimingObserver([ab_pred("name1"), ab_pred("name2")], "/topic", all_ab_pred(["/topic_pre"]))
+        new_clause = observer.to_clause()[0]
+        self.assertEqual(len(new_clause.literals), 4, "Number of 'literals' in clause does not match!")
+        self.assertEqual(str(new_clause.literals[0]), ab_pred("name1"), "A literal in clause does not match! ")
+        self.assertEqual(str(new_clause.literals[1]), ab_pred("name2"), "A literal in clause does not match!")
+        self.assertEqual(str(new_clause.literals[2]), ab_pred("/topic_pre"), "A literal in clause does not match! ")
+        self.assertEqual(str(new_clause.literals[3]), "/topic", "A literal in clause does not match!")
+
+    def test_generate_model_parameter1(self):
 
         # +----------+ /topicA  +---------+ /topicB
         # | starter1 |--------->| timing1 |------->
         # +----------+          +---------+
         config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
-        topics_published_from_nodes = {'/topicB': ['timing1'], '/topicA': ['starter1']}
-        topics_subscribed_from_nodes = {'/topicA': ['timing1']}
-        vars, rules, nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes)
+        topics_published_from_nodes = {'/topicA': ['node1'], '/topicB': ['node2']}
+        topics_subscribed_from_nodes = {'/topicA': ['node2']}
+        nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB']}
+        nodes_subscribe_topics = {'node2': ['/topicA']}
+        vars, rules, nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'timing_obs_/topicA_all_/topicB_all': Variable('timing_obs_/topicA_all_/topicB_all', 1, None),
-                    'timing_obs_/topicA_all_/topicB_timing1': Variable('timing_obs_/topicA_all_/topicB_timing1', 1, None),
-                    'timing_obs_/topicA_starter1_/topicB_all': Variable('timing_obs_/topicA_starter1_/topicB_all', 1, None),
-                    'timing_obs_/topicA_starter1_/topicB_timing1': Variable('timing_obs_/topicA_starter1_/topicB_timing1', 1, None)}
+                    'timing_obs_/topicA_all_/topicB_node2': Variable('timing_obs_/topicA_all_/topicB_node2', 1, None),
+                    'timing_obs_/topicA_node1_/topicB_all': Variable('timing_obs_/topicA_node1_/topicB_all', 1, None),
+                    'timing_obs_/topicA_node1_/topicB_node2': Variable('timing_obs_/topicA_node1_/topicB_node2', 1, None)}
 
-
+        subscribed_topics = nodes_subscribe_topics.get('node2', [])
         self.assertEqual(len(vars), len(vars_req), "Timing added wrong number of variables!")
         for i, obj in vars.items():
             self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
             self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
-        rules_req = [TimingObserver(all_ab_pred(['timing1']), 'timing_obs_/topicA_starter1_/topicB_timing1'),
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_all_/topicB_timing1']),
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_starter1_/topicB_all']),
-                     CalleridsObserver('timing_obs_/topicA_starter1_/topicB_all', ['timing_obs_/topicA_starter1_/topicB_timing1']),
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_timing1', ['timing_obs_/topicA_starter1_/topicB_timing1']),
+
+        rules_req = [TimingObserver(all_ab_pred(['node2']), 'timing_obs_/topicA_node1_/topicB_node2', all_ab_pred(subscribed_topics)),
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_all_/topicB_node2']),
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_node1_/topicB_all']),
+                     CalleridsObserver('timing_obs_/topicA_node1_/topicB_all', ['timing_obs_/topicA_node1_/topicB_node2']),
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_node2', ['timing_obs_/topicA_node1_/topicB_node2']),
                      ]
 
         rules_req_str = [str(x) for x in rules_req]
@@ -202,6 +266,7 @@ class TestTimingObserver(unittest.TestCase):
         self.assertEqual(len(rules), len(rules_req), "Timing added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "Timing should not add nodes!")
 
+    def test_generate_model_parameter2(self):
         # +----------+ /topicA
         # | starter1 |--------->
         # +----------+
@@ -210,26 +275,28 @@ class TestTimingObserver(unittest.TestCase):
         # | starter2 |--------->
         # +----------+
         config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
-        topics_published_from_nodes = {'/topicB': ['starter2'], '/topicA': ['starter1']}
+        topics_published_from_nodes = {'/topicA': ['node1'], '/topicB': ['node2']}
         topics_subscribed_from_nodes = {}
-        vars, rules, nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes)
+        nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB']}
+        nodes_subscribe_topics = {}
+        vars, rules, nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
-        vars_req = {}
         vars_req = {'timing_obs_/topicA_all_/topicB_all': Variable('timing_obs_/topicA_all_/topicB_all', 1, None),
-                    'timing_obs_/topicA_all_/topicB_starter2': Variable('timing_obs_/topicA_all_/topicB_starter2', 1, None),
-                    'timing_obs_/topicA_starter1_/topicB_all': Variable('timing_obs_/topicA_starter1_/topicB_all', 1, None),
-                    'timing_obs_/topicA_starter1_/topicB_starter2': Variable('timing_obs_/topicA_starter1_/topicB_starter2', 1, None)}
+                    'timing_obs_/topicA_all_/topicB_node2': Variable('timing_obs_/topicA_all_/topicB_node2', 1, None),
+                    'timing_obs_/topicA_node1_/topicB_all': Variable('timing_obs_/topicA_node1_/topicB_all', 1, None),
+                    'timing_obs_/topicA_node1_/topicB_node2': Variable('timing_obs_/topicA_node1_/topicB_node2', 1, None)}
 
-
+        subscribed_topics = nodes_subscribe_topics.get('node2', [])
         self.assertEqual(len(vars), len(vars_req), "Timing added wrong number of variables!")
         for i, obj in vars.items():
             self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
             self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
-        rules_req = [TimingObserver(all_ab_pred(['starter1', 'starter2']), 'timing_obs_/topicA_starter1_/topicB_starter2'),
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_all_/topicB_starter2']),
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_starter1_/topicB_all']),
-                     CalleridsObserver('timing_obs_/topicA_starter1_/topicB_all', ['timing_obs_/topicA_starter1_/topicB_starter2']),
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_starter2', ['timing_obs_/topicA_starter1_/topicB_starter2']),
+
+        rules_req = [TimingObserver(all_ab_pred(['node1', 'node2']), 'timing_obs_/topicA_node1_/topicB_node2', all_ab_pred(subscribed_topics)),
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_all_/topicB_node2']),
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_node1_/topicB_all']),
+                     CalleridsObserver('timing_obs_/topicA_node1_/topicB_all', ['timing_obs_/topicA_node1_/topicB_node2']),
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_node2', ['timing_obs_/topicA_node1_/topicB_node2']),
                      ]
 
         rules_req_str = [str(x) for x in rules_req]
@@ -237,6 +304,7 @@ class TestTimingObserver(unittest.TestCase):
         self.assertEqual(len(rules), len(rules_req), "Timing added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "Timing should not add nodes!")
 
+    def test_generate_model_parameter3(self):
         # +----------+ /topicA         +---------+ /topicB
         # | starter1 |----------+  +-->| timing1 |----------+
         # +----------+          |  |   +---------+          |
@@ -245,20 +313,22 @@ class TestTimingObserver(unittest.TestCase):
         # | starter2 |---------->  +-->| timing2 |----------+
         # +----------+                 +---------+
         config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
-        topics_published_from_nodes = {'/topicB': ['timing1', 'timing2'], '/topicA': ['starter1', 'starter2']}
-        topics_subscribed_from_nodes = {'/topicA': ['timing1', 'timing2']}
-        vars, rules, nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes)
+        topics_published_from_nodes = {'/topicA': ['node1', 'node3'], '/topicB': ['node2', 'node4']}
+        topics_subscribed_from_nodes = {'/topicA': ['node2', 'node4']}
+        nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB'], 'node3': ['/topicA'], 'node4': ['/topicB']}
+        nodes_subscribe_topics = {'node2': ['/topicA'], 'node4': ['/topicA']}
+        vars, rules, nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {}
-        vars_req = {'timing_obs_/topicA_starter1_/topicB_all': Variable('timing_obs_/topicA_starter1_/topicB_all', 1, None),
-                    'timing_obs_/topicA_starter2_/topicB_timing2': Variable('timing_obs_/topicA_starter2_/topicB_timing2', 1, None),
-                    'timing_obs_/topicA_starter2_/topicB_all': Variable('timing_obs_/topicA_starter2_/topicB_all', 1, None),
-                    'timing_obs_/topicA_starter2_/topicB_timing1': Variable('timing_obs_/topicA_starter2_/topicB_timing1', 1, None),
+        vars_req = {'timing_obs_/topicA_node1_/topicB_all': Variable('timing_obs_/topicA_node1_/topicB_all', 1, None),
+                    'timing_obs_/topicA_node3_/topicB_node4': Variable('timing_obs_/topicA_node3_/topicB_node4', 1, None),
+                    'timing_obs_/topicA_node3_/topicB_all': Variable('timing_obs_/topicA_node3_/topicB_all', 1, None),
+                    'timing_obs_/topicA_node3_/topicB_node2': Variable('timing_obs_/topicA_node3_/topicB_node2', 1, None),
                     'timing_obs_/topicA_all_/topicB_all': Variable('timing_obs_/topicA_all_/topicB_all', 1, None),
-                    'timing_obs_/topicA_all_/topicB_timing2': Variable('timing_obs_/topicA_all_/topicB_timing2', 1, None),
-                    'timing_obs_/topicA_all_/topicB_timing1': Variable('timing_obs_/topicA_all_/topicB_timing1', 1, None),
-                    'timing_obs_/topicA_starter1_/topicB_timing1': Variable('timing_obs_/topicA_starter1_/topicB_timing1', 1, None),
-                    'timing_obs_/topicA_starter1_/topicB_timing2': Variable('timing_obs_/topicA_starter1_/topicB_timing2', 1, None),
+                    'timing_obs_/topicA_all_/topicB_node4': Variable('timing_obs_/topicA_all_/topicB_node4', 1, None),
+                    'timing_obs_/topicA_all_/topicB_node2': Variable('timing_obs_/topicA_all_/topicB_node2', 1, None),
+                    'timing_obs_/topicA_node1_/topicB_node2': Variable('timing_obs_/topicA_node1_/topicB_node2', 1, None),
+                    'timing_obs_/topicA_node1_/topicB_node4': Variable('timing_obs_/topicA_node1_/topicB_node4', 1, None),
                     }
 
 
@@ -266,19 +336,20 @@ class TestTimingObserver(unittest.TestCase):
         for i, obj in vars.items():
             self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
             self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
-        rules_req = [TimingObserver(all_ab_pred(['timing1', 'timing2']), 'timing_obs_/topicA_starter1_/topicB_timing1'),
-                     TimingObserver(all_ab_pred(['timing1', 'timing2']), 'timing_obs_/topicA_starter1_/topicB_timing2'),
-                     TimingObserver(all_ab_pred(['timing1', 'timing2']), 'timing_obs_/topicA_starter2_/topicB_timing1'),
-                     TimingObserver(all_ab_pred(['timing1', 'timing2']), 'timing_obs_/topicA_starter2_/topicB_timing2'),
 
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_all_/topicB_timing1', 'timing_obs_/topicA_all_/topicB_timing2']),
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_starter1_/topicB_all', 'timing_obs_/topicA_starter2_/topicB_all']),
+        rules_req = [TimingObserver(all_ab_pred(['node2', 'node4']), 'timing_obs_/topicA_node1_/topicB_node2', all_ab_pred(nodes_subscribe_topics.get('node2', []))),
+                     TimingObserver(all_ab_pred(['node2', 'node4']), 'timing_obs_/topicA_node1_/topicB_node4', all_ab_pred(nodes_subscribe_topics.get('node4', []))),
+                     TimingObserver(all_ab_pred(['node2', 'node4']), 'timing_obs_/topicA_node3_/topicB_node2', all_ab_pred(nodes_subscribe_topics.get('node2', []))),
+                     TimingObserver(all_ab_pred(['node2', 'node4']), 'timing_obs_/topicA_node3_/topicB_node4', all_ab_pred(nodes_subscribe_topics.get('node4', []))),
 
-                     CalleridsObserver('timing_obs_/topicA_starter1_/topicB_all', ['timing_obs_/topicA_starter1_/topicB_timing1', 'timing_obs_/topicA_starter1_/topicB_timing2']),
-                     CalleridsObserver('timing_obs_/topicA_starter2_/topicB_all', ['timing_obs_/topicA_starter2_/topicB_timing1', 'timing_obs_/topicA_starter2_/topicB_timing2']),
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_all_/topicB_node2', 'timing_obs_/topicA_all_/topicB_node4']),
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_all', ['timing_obs_/topicA_node1_/topicB_all', 'timing_obs_/topicA_node3_/topicB_all']),
 
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_timing1', ['timing_obs_/topicA_starter1_/topicB_timing1', 'timing_obs_/topicA_starter2_/topicB_timing1']),
-                     CalleridsObserver('timing_obs_/topicA_all_/topicB_timing2', ['timing_obs_/topicA_starter1_/topicB_timing2', 'timing_obs_/topicA_starter2_/topicB_timing2']),
+                     CalleridsObserver('timing_obs_/topicA_node1_/topicB_all', ['timing_obs_/topicA_node1_/topicB_node2', 'timing_obs_/topicA_node1_/topicB_node4']),
+                     CalleridsObserver('timing_obs_/topicA_node3_/topicB_all', ['timing_obs_/topicA_node3_/topicB_node2', 'timing_obs_/topicA_node3_/topicB_node4']),
+
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_node2', ['timing_obs_/topicA_node1_/topicB_node2', 'timing_obs_/topicA_node3_/topicB_node2']),
+                     CalleridsObserver('timing_obs_/topicA_all_/topicB_node4', ['timing_obs_/topicA_node1_/topicB_node4', 'timing_obs_/topicA_node3_/topicB_node4']),
                      ]
 
         rules_req_str = [str(x) for x in rules_req]
@@ -286,79 +357,123 @@ class TestTimingObserver(unittest.TestCase):
         self.assertEqual(len(rules), len(rules_req), "Timing added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "Timing should not add nodes!")
 
-        # test different arguments for the config-parameter which all should raise exeptions
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
-        topics_published_from_nodes = {'/topicB': ['timing1'], '/topicA': ['starter1']}
-        topics_subscribed_from_nodes = {'/topicA': ['timing1']}
-        with self.assertRaises(KeyError):
-            TimingObserver.generate_model_parameter({'topics_wrong_name': [['/topicA', '/topicB']], 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(KeyError):
-            TimingObserver.generate_model_parameter({'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(KeyError):
-            TimingObserver.generate_model_parameter({}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter("not_a_dict", topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter(1, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter({'topics': [1], 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter({'topics': [""], 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter({'topics': ["/"], 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter({'topics': ["no_list"], 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter({'topics': [], 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter({'topics': [[]], 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter({'topics': [['']], 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter({'topics': [[1]], 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter({'topics': "no_list_list", 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter({'topics': 1, 'type': 'timing'}, topics_published_from_nodes, topics_subscribed_from_nodes)
 
-        # test different arguments for the topics_from_nodes-parameter which all should raise exeptions
+    def test_generate_model_parameter_errors_1(self):
         config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
-        # topics_published_from_nodes = {'/topicB': ['timing1'], '/topicA': ['starter1']}
-        topics_subscribed_from_nodes = {'/topicA': ['timing1']}
-        with self.assertRaises(KeyError):
-            TimingObserver.generate_model_parameter(config, {'/topic_wrong_name': ['/node1', '/node2']}, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': []}, topics_subscribed_from_nodes)
-        with self.assertRaises(KeyError):
-            TimingObserver.generate_model_parameter(config, {}, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter(config, "no_dict", topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter(config, 1, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/', '/node2']}, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['', '/node2']}, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': [1, '/node2']}, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/node1', '/']}, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/node1', '']}, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/node1', 1]}, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/node2'], '/topicA': ['/', '/node1']}, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/node2'], '/topicA': ['', '/node1']}, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/node2'], '/topicA': [1, '/node1']}, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/node2'], '/topicA': ['/node1', '/']}, topics_subscribed_from_nodes)
-        with self.assertRaises(ValueError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/node2'], '/topicA': ['/node1', '']}, topics_subscribed_from_nodes)
-        with self.assertRaises(TypeError):
-            TimingObserver.generate_model_parameter(config, {'/topicB': ['/node2'], '/topicA': ['/node1', 1]}, topics_subscribed_from_nodes)
+        topics_published_from_nodes = {'/topicA': ['/node1'], '/topicB': ['/node2']}
+        topics_subscribed_from_nodes = {}
+        nodes_publish_topics = {'/node1': ['/topicA'], '/node2': ['/topicB']}
+        nodes_subscribe_topics = {}
+
+        config_tests = [(KeyError, {'topics_wrong_name': [['/topicA', '/topicB']], 'type': 'timing'}),
+                        (KeyError, {'type': 'timing'}),
+                        (KeyError, {}),
+                        (TypeError, "not_a_dict"),
+                        (TypeError, 1),
+                        (ValueError, {'topics': [], 'type': 'timing'}),
+                        (ValueError, {'topics': [[]], 'type': 'timing'}),
+                        (ValueError, {'topics': [['']], 'type': 'timing'}),
+                        (TypeError, {'topics': [[1]], 'type': 'timing'}),
+                        (TypeError, {'topics': ["no_list_list"], 'type': 'timing'}),
+                        (TypeError, {'topics': [1], 'type': 'timing'}),
+                        (ValueError, {'topics': [['/wrong_topic_name', '/topicB']], 'type': 'timing'}),
+                        (ValueError, {'topics': [], 'type': 'timing'}),
+                        (TypeError, {'topics': [''], 'type': 'timing'}),
+                        (TypeError, {'topics': [1], 'type': 'timing'}),
+                        (TypeError, {'topics': "no_list", 'type': 'timing'}),
+                        (TypeError, {'topics': 1, 'type': 'timing'}),
+                        (TypeError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'timing'})
+                        ]
+
+        for (error, config) in config_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(config) + "'",
+
+                TimingObserver.generate_model_parameter(config,
+                                                        topics_published_from_nodes, topics_subscribed_from_nodes,
+                                                        nodes_publish_topics, nodes_subscribe_topics)
+            print "... DONE"
+
+    def test_generate_model_parameter_errors_2(self):
+
+        config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        topics_published_from_nodes = {'/topicA': ['/node1'], '/topicB': ['/node2']}
+        topics_subscribed_from_nodes = {}
+        nodes_publish_topics = {'/node1': ['/topicA'], '/node2': ['/topicB']}
+        nodes_subscribe_topics = {}
+
+        topics_published_from_nodes_tests = [(ValueError, {'/topic_wrong_name': ['/node1', '/node2']}),
+                                             (ValueError, {'/topicB': []}),
+                                             (KeyError, {}),
+                                             (TypeError, "no_dict"),
+                                             (TypeError, 1),
+                                             (ValueError, {'/topicB': ['/', '/node2']}),
+                                             (ValueError, {'/topicB': ['', '/node2']}),
+                                             (ValueError, {'/topicB': [1, '/node2']}),
+                                             (ValueError, {'/topicB': ['/node1', '/']}),
+                                             (ValueError, {'/topicB': ['/node1', '']}),
+                                             (ValueError, {'/topicB': ['/node1', 1]}),
+                                             (ValueError, {'/topicB': ['/', '/node2'], '/topicA': ['/nodeA1']}),
+                                             (ValueError, {'/topicB': ['', '/node2'], '/topicA': ['/nodeA1']}),
+                                             (TypeError, {'/topicB': [1, '/node2'], '/topicA': ['/nodeA1']}),
+                                             (ValueError, {'/topicB': ['/node1', '/'], '/topicA': ['/nodeA1']}),
+                                             (ValueError, {'/topicB': ['/node1', ''], '/topicA': ['/nodeA1']}),
+                                             (TypeError, {'/topicB': ['/node1', 1], '/topicA': ['/nodeA1']}),
+                                             (ValueError, {'/topicB': ['/node2'], '/topicA': ['/', '/node1']}),
+                                             (ValueError, {'/topicB': ['/node2'], '/topicA': ['', '/node1']}),
+                                             (TypeError, {'/topicB': ['/node2'], '/topicA': [1, '/node1']}),
+                                             (ValueError, {'/topicB': ['/node2'], '/topicA': ['/node1', '/']}),
+                                             (ValueError, {'/topicB': ['/node2'], '/topicA': ['/node1', '']}),
+                                             (TypeError, {'/topicB': ['/node2'], '/topicA': ['/node1', 1]})]
+
+        for (error, topics_published_from_nodes) in topics_published_from_nodes_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(topics_published_from_nodes) + "'",
+
+                TimingObserver.generate_model_parameter(config,
+                                                        topics_published_from_nodes, topics_subscribed_from_nodes,
+                                                        nodes_publish_topics, nodes_subscribe_topics)
+            print "... DONE"
+
+    def test_generate_model_parameter_errors_3(self):
+
+        config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        topics_published_from_nodes = {'/topicA': ['node1'], '/topicB': ['node2']}
+        topics_subscribed_from_nodes = {}
+        nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB']}
+        nodes_subscribe_topics = {}
+
+        topics_subscribed_from_nodes_tests = \
+            [
+             # (ValueError, {'/topicA': ['node2']}, {'/node2': ['/topicA']}),
+                (ValueError, {'/topicA': ['node2']},    {'node2': ['/']}),
+                (ValueError, {'/topicA': ['node2']},    {'node2': ['']}),
+                (TypeError, {'/topicA': ['node2']},     {'node2': [1]}),
+                (ValueError, {'/topicA': ['node2']},    {'node2': ['/topicA', '/']}),
+                (ValueError, {'/topicA': ['node2']},    {'node2': ['/topicA', '']}),
+                (TypeError, {'/topicA': ['node2']},     {'node2': ['/topicA', 1]}),
+                (TypeError, {'/topicA': ['node2']},     {'node2': 'not_a_list'}),
+                (TypeError, {'/topicA': ['node2']},     {'node2': 1}),
+
+                (ValueError, {'/topicA': ['/']},            {'node2': ['/topicA']}),
+                (ValueError, {'/topicA': ['']},             {'node2': ['/topicA']}),
+                (TypeError, {'/topicA': [1]},               {'node2': ['/topicA']}),
+                (ValueError, {'/topicA': ['node2', '/']},   {'node2': ['/topicA']}),
+                (ValueError, {'/topicA': ['node2', '']},    {'node2': ['/topicA']}),
+                (TypeError, {'/topicA': ['node2', 1]},      {'node2': ['/topicA']}),
+                (TypeError, {'/topicA': 'not_a_list'},      {'node2': ['/topicA']}),
+                (TypeError, {'/topicA': 1},                 {'node2': ['/topicA']}),
+             ]
+
+        for (error, topics_subscribed_from_nodes, nodes_subscribe_topics) in topics_subscribed_from_nodes_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(topics_subscribed_from_nodes) + "' + '" + str(nodes_subscribe_topics) + "'",
+
+                TimingObserver.generate_model_parameter(config,
+                                                        topics_published_from_nodes, topics_subscribed_from_nodes,
+                                                        nodes_publish_topics, nodes_subscribe_topics)
+            print "... DONE"
+
 
     def test_decrypt_resource_info(self):
         self.assertEqual(TimingObserver.decrypt_resource_info("/topicA [nodeA1, nodeA2] /topicB [nodeB1, nodeB2]"),
@@ -374,117 +489,72 @@ class TestTimingObserver(unittest.TestCase):
                          ['timing_obs_/topicA_node1_/topicB_all',
                           'timing_obs_/topicA_node2_/topicB_all',
                           'timing_obs_/topicA_node3_/topicB_all'], "Topic name decryption not correct!")
+        resource_info_tests = [
+        (ValueError, "/ [nodeA1, nodeA2] /topicB []"),
+        (ValueError, "/ [nodeA1, nodeA2] /topicB [nodeB1]"),
+        (ValueError, "/ [nodeA1, nodeA2] /topicB [nodeB1, nodeB2]"),
+        (ValueError, "/ [nodeA1, ] /topicB []"),
+        (ValueError, "/ [nodeA1, ] /topicB [nodeB1]"),
+        (ValueError, "/ [nodeA1, ] /topicB [nodeB1, nodeB2]"),
+        (ValueError, "/ [] /topicB []"),
+        (ValueError, "/ [] /topicB [nodeB1]"),
+        (ValueError, "/ [] /topicB [nodeB1, nodeB2]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1, nodeA2] /topicB []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1, nodeA2] /topicB [nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1, nodeA2] /topicB [nodeB1, nodeB2]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1, ] /topicB []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1, ] /topicB [nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1, ] /topicB [nodeB1, nodeB2]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [] /topicB []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [] /topicB [nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [] /topicB [nodeB1, nodeB2]")
+        (ValueError, "/topicA [] / []"),
+        (ValueError, "/topicA [] / [nodeB1]"),
+        (ValueError, "/topicA [] / [nodeB1, nodeB2]"),
+        (ValueError, "/topicA [nodeA1] / []"),
+        (ValueError, "/topicA [nodeA1] / [nodeB1]"),
+        (ValueError, "/topicA [nodeA1] / [nodeB1, nodeB2]"),
+        (ValueError, "/topicA [nodeA1, nodeA2] / []"),
+        (ValueError, "/topicA [nodeA1, nodeA2] / [nodeB1]"),
+        (ValueError, "/topicA [nodeA1, nodeA2] / [nodeB1, nodeB2]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [] / []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [] / [nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [] / [nodeB1, nodeB2]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [nodeA1] / []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [nodeA1] / [nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [nodeA1] / [nodeB1, nodeB2]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [nodeA1, nodeA2] / []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [nodeA1, nodeA2] / [nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [nodeA1, nodeA2] / [nodeB1, nodeB2]")
+        (ValueError, "/ [] / []"),
+        (ValueError, "/ [] / [nodeB1]"),
+        (ValueError, "/ [] / [nodeB1, nodeB2]"),
+        (ValueError, "/ [nodeA1] / []"),
+        (ValueError, "/ [nodeA1] / [nodeB1]"),
+        (ValueError, "/ [nodeA1] / [nodeB1, nodeB2]"),
+        (ValueError, "/ [nodeA1, nodeA2] / []"),
+        (ValueError, "/ [nodeA1, nodeA2] / [nodeB1]"),
+        (ValueError, "/ [nodeA1, nodeA2] / [nodeB1, nodeB2]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [] / []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [] / [nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [] / [nodeB1, nodeB2]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1] / []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1] / [nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1] / [nodeB1, nodeB2]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1, nodeA2] / []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1, nodeA2] / [nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/ [nodeA1, nodeA2] / [nodeB1, nodeB2]")
+        (ValueError, "/[]/[]"),
+        (ValueError, "/[]/topicB[nodeB1]"),
+        (ValueError, "/[]/topicB[nodeB1, nodeB2]"),
+        (ValueError, "/topicA[]/[nodeB1]"),
+        (ValueError, "/topicA[]/[nodeB1, nodeB2]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/[]/[]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/[]/topicB[nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/[]/topicB[nodeB1, nodeB2]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA[]/[nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA[]/[nodeB1, nodeB2]")
+        (ValueError, "/topicA [/] /topicB []"),
+        (ValueError, "/topicA [/] /topicB [/nodeB1]"),
+        (ValueError, "/topicA [/] /topicB [/nodeB1, nodeB2]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/] /topicB []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/] /topicB [/nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/] /topicB [/nodeB1, nodeB2]")
+        (ValueError, "/topicA [/nodeA1,] /topicB []"),
+        (ValueError, "/topicA [/nodeA1,] /topicB [/nodeB1]"),
+        (ValueError, "/topicA [/nodeA1,] /topicB [/nodeB1, nodeB2]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1,] /topicB []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1,] /topicB [/nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1,] /topicB [/nodeB1, nodeB2]")
+        (ValueError, "/topicA [/nodeA1, /] /topicB []"),
+        (ValueError, "/topicA [/nodeA1, /] /topicB [/nodeB1]"),
+        (ValueError, "/topicA [/nodeA1, /] /topicB [/nodeB1, nodeB2]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1, /] /topicB []")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1, /] /topicB [/nodeB1]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1, /] /topicB [/nodeB1, nodeB2]")
+        (ValueError, "/topicA [] /topicB [/]"),
+        (ValueError, "/topicA [nodeA1] /topicB [/]"),
+        (ValueError, "/topicA [nodeA1,nodeA2] /topicB [/]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [] /topicB [/]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [nodeA1] /topicB [/]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [nodeA1,nodeA2] /topicB [/]")
+        (ValueError, "/topicA [] /topicB [/nodeB1,]"),
+        (ValueError, "/topicA [/nodeA1] /topicB [/nodeB1,]"),
+        (ValueError, "/topicA [/nodeA1,nodeA2] /topicB [/nodeB1,]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [] /topicB [/nodeB1,]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1] /topicB [/nodeB1,]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1,nodeA2] /topicB [/nodeB1,]")
+        (ValueError, "/topicA [/] /topicB [/]"),
+        (ValueError, "/topicA [/nodeA1, /] /topicB [/nodeB1, /]"),
+        (ValueError, "/topicA [/nodeA1, ] /topicB [/nodeB1, ]"),
 
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/] /topicB [/]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1, /] /topicB [/nodeB1, /]")
-        with self.assertRaises(ValueError):
-            TimingObserver.decrypt_resource_info("/topicA [/nodeA1, ] /topicB [/nodeB1, ]")
+        (TypeError, 1),
+        ]
 
-        with self.assertRaises(TypeError):
-            TimingObserver.decrypt_resource_info(1)
-
+        for (error, resource_info) in resource_info_tests:
+            with self.assertRaises(error):
+                print "'" + str(error.__name__) + "' should be raised by '" + str(resource_info) + "'",
+                TimingObserver.decrypt_resource_info(resource_info)
+            print "... DONE"
