@@ -49,7 +49,7 @@ class ResourcesObserver(BaseObserver):
             if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
                 raise ValueError
 
-        return vars, rules, []
+        return vars, rules, [], []
 
     @staticmethod
     def decrypt_resource_info(resource_info):
@@ -151,7 +151,7 @@ class TestResourcesObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
         nodes_subscribe_topics = {}
-        vars, rules, nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'resources_obs_/node1': Variable('resources_obs_/node1', 1, None),
                     'resources_obs_/node2': Variable('resources_obs_/node2', 1, None),
@@ -171,6 +171,7 @@ class TestResourcesObserver(unittest.TestCase):
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
         self.assertEqual(len(rules), len(rules_req), "resources added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "resources should not add nodes!")
+        self.assertEqual(len(real_nodes), 0, "resources should not add real nodes!")
 
     def test_generate_model_parameter2(self):
         config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'resources'}
@@ -178,7 +179,7 @@ class TestResourcesObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
-        vars, rules, nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'resources_obs_node1': Variable('resources_obs_node1', 1, None),
                     'resources_obs_node2': Variable('resources_obs_node2', 1, None),
@@ -198,6 +199,7 @@ class TestResourcesObserver(unittest.TestCase):
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
         self.assertEqual(len(rules), len(rules_req), "resources added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "resources should not add nodes!")
+        self.assertEqual(len(real_nodes), 0, "resources should not add real nodes!")
 
     def test_generate_model_parameter_errors_1(self):
         config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'resources'}

@@ -93,7 +93,7 @@ class TimingObserver(BaseObserver):
             rules += new_rules
             nodes += new_nodes
 
-        return vars, rules, nodes
+        return vars, rules, nodes, []
 
     @staticmethod
     def decrypt_resource_info(resource_info):
@@ -241,7 +241,7 @@ class TestTimingObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {'/topicA': ['node2']}
         nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB']}
         nodes_subscribe_topics = {'node2': ['/topicA']}
-        vars, rules, nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'timing_obs_/topicA_all_/topicB_all': Variable('timing_obs_/topicA_all_/topicB_all', 1, None),
                     'timing_obs_/topicA_all_/topicB_node2': Variable('timing_obs_/topicA_all_/topicB_node2', 1, None),
@@ -265,6 +265,7 @@ class TestTimingObserver(unittest.TestCase):
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
         self.assertEqual(len(rules), len(rules_req), "Timing added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "Timing should not add nodes!")
+        self.assertEqual(len(real_nodes), 0, "Timing should not add real nodes!")
 
     def test_generate_model_parameter2(self):
         # +----------+ /topicA
@@ -279,7 +280,7 @@ class TestTimingObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB']}
         nodes_subscribe_topics = {}
-        vars, rules, nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'timing_obs_/topicA_all_/topicB_all': Variable('timing_obs_/topicA_all_/topicB_all', 1, None),
                     'timing_obs_/topicA_all_/topicB_node2': Variable('timing_obs_/topicA_all_/topicB_node2', 1, None),
@@ -303,6 +304,7 @@ class TestTimingObserver(unittest.TestCase):
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
         self.assertEqual(len(rules), len(rules_req), "Timing added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "Timing should not add nodes!")
+        self.assertEqual(len(real_nodes), 0, "Timing should not add real nodes!")
 
     def test_generate_model_parameter3(self):
         # +----------+ /topicA         +---------+ /topicB
@@ -317,7 +319,7 @@ class TestTimingObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {'/topicA': ['node2', 'node4']}
         nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB'], 'node3': ['/topicA'], 'node4': ['/topicB']}
         nodes_subscribe_topics = {'node2': ['/topicA'], 'node4': ['/topicA']}
-        vars, rules, nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = TimingObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {}
         vars_req = {'timing_obs_/topicA_node1_/topicB_all': Variable('timing_obs_/topicA_node1_/topicB_all', 1, None),
@@ -356,6 +358,7 @@ class TestTimingObserver(unittest.TestCase):
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
         self.assertEqual(len(rules), len(rules_req), "Timing added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "Timing should not add nodes!")
+        self.assertEqual(len(real_nodes), 0, "Timing should not add real nodes!")
 
 
     def test_generate_model_parameter_errors_1(self):
