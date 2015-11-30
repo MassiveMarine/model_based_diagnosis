@@ -36,7 +36,7 @@ protected:
 public:
     VelocityChecker();
 
-    void init(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase *plugin_base);
+    void init(XmlRpc::XmlRpcValue params, SubscriberFacade *plugin_base);
 
     std::map<std::string, bool> getValidInputs();
 };
