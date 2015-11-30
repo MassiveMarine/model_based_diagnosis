@@ -19,53 +19,53 @@ setup:
           std_deviation: 0.001            # optional
           significance_level: 0.05        
 # 2 # /multi_position_share #######################################################
-  - name: /multi_position_share
-    callerids:
-    - callerid: []
-      filter:      
-        type: mean
-        window_size: 5
-        deviation_type: std_deviation
-      states:
-      - state: 'ok'
-        number: 0
-        frequenzy:
-          type: student_t
-          true_mean: 1.0
-          std_deviation: 0.02            # optional
-          significance_level: 0.05  
+#  - name: /multi_position_share
+#    callerids:
+#    - callerid: []
+#      filter:      
+#        type: mean
+#        window_size: 5
+#        deviation_type: std_deviation
+#      states:
+#      - state: 'ok'
+#        number: 0
+#        frequenzy:
+#          type: student_t
+#          true_mean: 1.0
+#          std_deviation: 0.02            # optional
+#          significance_level: 0.05  
 # 3 # /multi_robot_status #######################################################
-  - name: /multi_robot_status
-    callerids:
-    - callerid: []
-      filter:      
-        type: mean
-        window_size: 5
-        deviation_type: std_deviation
-      states:
-      - state: 'ok'
-        number: 0
-        frequenzy:
-          type: student_t
-          true_mean: 1.0
-          std_deviation: 0.005            # optional
-          significance_level: 0.05        
+#  - name: /multi_robot_status
+#    callerids:
+#    - callerid: []
+#      filter:      
+#        type: mean
+#        window_size: 5
+#        deviation_type: std_deviation
+#      states:
+#      - state: 'ok'
+#        number: 0
+#        frequenzy:
+#          type: student_t
+#          true_mean: 1.0
+#          std_deviation: 0.005            # optional
+#          significance_level: 0.05        
 # 4 # /position_share #######################################################
-  - name: /position_share
-    callerids:
-    - callerid: []
-      filter:      
-        type: mean
-        window_size: 6
-        deviation_type: std_deviation
-      states:
-      - state: 'ok'
-        number: 0
-        frequenzy:
-          type: student_t
-          true_mean: 0.20
-          std_deviation: 0.055           # optional
-          significance_level: 0.05  
+#  - name: /position_share
+#    callerids:
+#    - callerid: []
+#      filter:      
+#        type: mean
+#        window_size: 6
+#        deviation_type: std_deviation
+#      states:
+#      - state: 'ok'
+#        number: 0
+#        frequenzy:
+#          type: student_t
+#          true_mean: 0.20
+#          std_deviation: 0.055           # optional
+#          significance_level: 0.05  
 # 5 # /reserved_areas #######################################################
   - name: /reserved_areas
     callerids:
@@ -168,15 +168,22 @@ setup:
     - callerid: []
       filter:      
         type: mean
-        window_size: 11
+        window_size: 3
         deviation_type: std_deviation
       states:
-      - state: 'ok'
+      - state: 'ok_moving'
         number: 0
         frequenzy:
           type: student_t
           true_mean: 0.13
           std_deviation: 0.062           # optional
+          significance_level: 0.05  
+      - state: 'ok_standing'
+        number: 1
+        frequenzy:
+          type: student_t
+          true_mean: 5.0
+          std_deviation: 2.0           # optional
           significance_level: 0.05  
 # 12 # /robot_41/hardware_status #####################################################
   - name: /robot_41/hardware_status
@@ -272,7 +279,7 @@ setup:
         frequenzy:
           type: student_t
           true_mean: 1.0
-          std_deviation: 0.004            # optional
+          std_deviation: 0.04            # optional
           significance_level: 0.05  
 # 18 # /robot_41/odom #####################################################
   - name: /robot_41/odom
@@ -423,8 +430,9 @@ setup:
   topics:
 # 1 # /robot_41/localization_score ############################################################
   - name: /robot_41/localization_score
-    filter:
-      type: nofilter                          # mean, median, kmeans, ewma, nofilter
+    filter:      
+      type: mean
+      window_size: 3
     states:
     - state: 'ok'
       number: 1
@@ -443,23 +451,23 @@ setup:
       timeout: 2.0
       max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
 # 2 # /multi_position_share #######################################################
-  - name: /multi_position_share
-    callerids:
-    - callerid: []
-      timeout: 2.0
-      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+#  - name: /multi_position_share
+#    callerids:
+#    - callerid: []
+#      timeout: 2.0
+#      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
 # 3 # /multi_robot_status #######################################################
-  - name: /multi_robot_status
-    callerids:
-    - callerid: []
-      timeout: 2.0
-      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined          
+#  - name: /multi_robot_status
+#    callerids:
+#    - callerid: []
+#      timeout: 2.0
+#      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined          
 # 4 # /position_share #######################################################
-  - name: /position_share
-    callerids:
-    - callerid: []
-      timeout: 1.0
-      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+#  - name: /position_share
+#    callerids:
+#    - callerid: []
+#      timeout: 1.0
+#      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
 # 5 # /reserved_areas #######################################################
   - name: /reserved_areas
     callerids:
@@ -500,7 +508,7 @@ setup:
   - name: /robot_41/corrected_odometry_pose
     callerids:
     - callerid: []
-      timeout: 1.0
+      timeout: 6.0
       max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
 # 12 # /robot_41/hardware_status #####################################################
   - name: /robot_41/hardware_status
@@ -651,3 +659,696 @@ setup:
         true_mean: 0.0                   # @ student_t
         std_deviation: 0.002            # @ student_t(optional)
         significance_level: 0.05          # @ student_t
+- type: resources
+  resource_topic: /diag/node_infos
+  nodes:
+  - name: /robot_41/master_discovery
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 38785024
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/localization_scoring
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 11.5
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 7720960
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/triangle_extraction
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 2.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 6479872
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/robot_state_publisher
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 6606848
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/fine_positioning
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 3956736
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/nav_watchdog
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 0.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 3162112
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/sicks300
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 0.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 4005888
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/localize_to_target
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 3534848
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/positioning
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 0.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 4702208
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/parameter_listener
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 0.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 26054656
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/map_talker
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 77152256
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/move_base
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 34.5
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 24465408
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/ose800_can_driver
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 6.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 14233600
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/master_sync_robot
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 36638720
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/state_of_charge_node
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 0.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 53841920
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/reverse_fine_positioning_node
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 0.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 4345856
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/laser_scan_matching
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 2.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 75325440
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/agent
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 8.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 167563264
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/amcl
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 2.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 9707520
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/imu_calibration
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 2.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 2613248
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/gmapping
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 3.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 9285632
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/target_filter
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 3301376
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/triangle_localization
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 3.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 6455296
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/laser_calibration
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 0.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 6209536
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/battery_lights
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 24961024
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/battery_status_logger_test_node
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 2.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 75415552
+          std_deviation: 100            # optional
+          significance_level: 0.05
+  - name: /robot_41/cmd_vel_mux
+    cpu_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+    mem_filter:
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+    states:
+    - state: 'ok'
+      number: 1
+      cpu:
+          type: student_t
+          true_mean: 0.0
+          std_deviation: 0.1            # optional
+          significance_level: 0.05
+      memory:
+          type: student_t
+          true_mean: 2371584
+          std_deviation: 100            # optional
+          significance_level: 0.05
+#  - name: /robot_41/map_to_local_map_pub
+#    cpu_filter:
+#        type: mean
+#        window_size: 5
+#        deviation_type: std_deviation
+#    mem_filter:
+#        type: mean
+#        window_size: 5
+#        deviation_type: std_deviation
+#    states:
+#    - state: 'ok'
+#      number: 1
+#      cpu:
+#          type: student_t
+#          true_mean: 1.0
+#          std_deviation: 0.1            # optional
+#          significance_level: 0.05
+#      memory:
+#          type: student_t
+#          true_mean: 5926912
+#          std_deviation: 100            # optional
+#          significance_level: 0.05
+#  - name: /robot_41/system_monitor
+#    cpu_filter:
+#        type: mean
+#        window_size: 5
+#        deviation_type: std_deviation
+#    mem_filter:
+#        type: mean
+#        window_size: 5
+#        deviation_type: std_deviation
+#    states:
+#    - state: 'ok'
+#      number: 1
+#      cpu:
+#          type: student_t
+#          true_mean: 1.0
+#          std_deviation: 0.1            # optional
+#          significance_level: 0.05
+#      memory:
+#          type: student_t
+#          true_mean: 5275648
+#          std_deviation: 100            # optional
+#          significance_level: 0.05
