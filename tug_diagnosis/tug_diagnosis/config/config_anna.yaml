@@ -1,488 +1,123 @@
 nodes:
-nodes:
   - name: '/robot_166/agent'
-      sub_topic: ['/robot_166/fine_positioning/feedback',
-                  '/robot_166/positioning_server/result',
-                  '/robot_166/recover_from_target/result',
-                  '/robot_166/battery_status',
-                  '/robot_166/cmd_vel',
-                  '/robot_166/map_hash',
-                  '/robot_166/core_status',
-                  '/robot_166/recover_from_target/feedback',
-                  '/robot_166/map_goals',
-                  '/robot_166/map_meta_data',
-                  '/robot_166/hardware_status',
-                  '/robot_166/localization_score',
-                  '/robot_166/move_base/result',
-                  '/robot_166/lam_button_states',
-                  '/robot_166/move_base/TrajectoryPlannerROS/complete_global_plan',
-                  '/robot_166/positioning_server/feedback',
-                  '/robot_166/move_base/goal',
-                  '/robot_166/fine_positioning/result',
-                  '/robot_166/emergency_stop',
-                  '/robot_166/move_base/feedback',
-                  '/robot_166/fine_positioning/status',
-                  '/robot_166/map_regions',
-                  '/robot_166/recover_from_target/status',
-                  '/robot_166/amcl_pose',
-                  '/robot_166/parameters_hash',
-                  '/robot_166/positioning_server/status',
-                  '/robot_166/move_base/status']
-      pub_topic: ['/robot_status0',
-                  '/robot_166/order_status_update',
-                  '/robot_166/play_sound',
-                  '/robot_docking_config',
-                  '/robot_166/robot_command_status',
-                  '/robot_166/recover_from_target/cancel',
-                  '/robot_166/eta_current_order_estimation',
-                  '/robot_166/cmd_vel_agent',
-                  '/robot_166/cmd_lam',
-                  '/robot_166/positioning_server/goal',
-                  '/robot_166/goal_id',
-                  '/robot_166/move_base/goal',
-                  '/robot_166/recover_from_target/goal',
-                  '/robot_166/fine_positioning/cancel',
-                  '/robot_166/light_pattern',
-                  '/robot_166/positioning_server/cancel',
-                  '/robot_166/emergency_stop',
-                  '/robot_166/horn',
-                  '/robot_166/move_base/cancel',
-                  '/robot_166/fine_positioning/goal',
-                  '/robot_166/eta_estimations']
+    sub_topic: ['/robot_166/fine_positioning/feedback', '/robot_166/positioning_server/result', '/robot_166/recover_from_target/result', '/robot_166/battery_status', '/robot_166/cmd_vel', '/robot_166/map_hash', '/robot_166/core_status', '/robot_166/recover_from_target/feedback', '/robot_166/map_goals', '/robot_166/map_meta_data', '/robot_166/hardware_status', '/robot_166/localization_score', '/robot_166/move_base/result', '/robot_166/lam_button_states', '/robot_166/move_base/TrajectoryPlannerROS/complete_global_plan', '/robot_166/positioning_server/feedback', '/robot_166/move_base/goal', '/robot_166/fine_positioning/result', '/robot_166/emergency_stop', '/robot_166/move_base/feedback', '/robot_166/fine_positioning/status', '/robot_166/map_regions', '/robot_166/recover_from_target/status', '/robot_166/amcl_pose', '/robot_166/parameters_hash', '/robot_166/positioning_server/status', '/robot_166/move_base/status']
+    pub_topic:: ['/robot_status0', '/robot_166/order_status_update', '/robot_166/play_sound', '/robot_docking_config', '/robot_166/robot_command_status', '/robot_166/recover_from_target/cancel', '/robot_166/eta_current_order_estimation', '/robot_166/cmd_vel_agent', '/robot_166/cmd_lam', '/robot_166/positioning_server/goal', '/robot_166/goal_id', '/robot_166/move_base/goal', '/robot_166/recover_from_target/goal', '/robot_166/fine_positioning/cancel', '/robot_166/light_pattern', '/robot_166/positioning_server/cancel', '/robot_166/emergency_stop', '/robot_166/horn', '/robot_166/move_base/cancel', '/robot_166/fine_positioning/goal', '/robot_166/eta_estimations']
 
   - name: '/robot_166/amcl'
-      sub_topic: ['/tf',
-                  '/robot_166/map',
-                  '/tf_static',
-                  '/robot_166/initialpose',
-                  '/robot_166/map_regions',
-                  '/robot_166/scan']
-      pub_topic: ['/tf',
-                  '/robot_166/amcl_beam_model_samples',
-                  '/robot_166/amcl_likelihood_samples',
-                  '/robot_166/amcl_particlecloud',
-                  '/robot_166/distanceMap',
-                  '/robot_166/localization_score',
-                  '/robot_166/amcl_pose',
-                  '/robot_166/amcl_weight',
-                  '/robot_166/visualization_marker']
+    sub_topic: ['/tf', '/robot_166/map', '/tf_static', '/robot_166/initialpose', '/robot_166/map_regions', '/robot_166/scan']
+    pub_topic:: ['/tf', '/robot_166/amcl_beam_model_samples', '/robot_166/amcl_likelihood_samples', '/robot_166/amcl_particlecloud', '/robot_166/distanceMap', '/robot_166/localization_score', '/robot_166/amcl_pose', '/robot_166/amcl_weight', '/robot_166/visualization_marker']
 
   - name: '/robot_166/battery_lights'
-      sub_topic: ['/robot_166/battery_status',
-                  '/robot_166/dynamic_obstacle_polygons',
-                  '/robot_166/light_pattern']
-      pub_topic: ['/robot_166/lam_light_states']
+    sub_topic: ['/robot_166/battery_status', '/robot_166/dynamic_obstacle_polygons', '/robot_166/light_pattern']
+    pub_topic:: ['/robot_166/lam_light_states']
 
   - name: '/robot_166/battery_status_logger_test_node'
-      sub_topic: ['/robot_166/odom',
-                  '/robot_166/battery_status']
-      pub_topic: []
+    sub_topic: ['/robot_166/odom', '/robot_166/battery_status']
+    pub_topic:: []
 
   - name: '/robot_166/cmd_vel_mux'
-      sub_topic: ['/robot_166/cmd_vel_teleop',
-                  '/robot_166/cmd_vel_agent',
-                  '/robot_166/cmd_vel_fine_positioning',
-                  '/robot_166/cmd_vel_watchdog',
-                  '/robot_166/cmd_vel_imu']
-      pub_topic: ['/robot_166/cmd_vel',
-                  '/robot_166/cmd_vel_mux/active']
+    sub_topic: ['/robot_166/cmd_vel_teleop', '/robot_166/cmd_vel_agent', '/robot_166/cmd_vel_fine_positioning', '/robot_166/cmd_vel_watchdog', '/robot_166/cmd_vel_imu']
+    pub_topic:: ['/robot_166/cmd_vel', '/robot_166/cmd_vel_mux/active']
 
   - name: '/robot_166/fine_positioning'
-      sub_topic: ['/robot_166/target_filter/best_target_in_world',
-                  '/robot_166/odom',
-                  '/robot_166/map_goals',
-                  '/robot_166/target_filter/averaged_best_target',
-                  '/robot_166/move_base/result',
-                  '/robot_166/target_filter/best_target_in_base_link',
-                  '/robot_166/fine_positioning/cancel',
-                  '/robot_166/target_filter/best_target_age',
-                  '/robot_166/emergency_stop',
-                  '/robot_166/move_base/feedback',
-                  '/robot_166/fine_positioning/goal',
-                  '/robot_166/move_base/status',
-                  '/robot_166/motor_stalled']
-      pub_topic: ['/robot_166/fine_positioning/feedback',
-                  '/robot_166/resulting_target_pose',
-                  '/robot_166/finepos_simulated_footprint',
-                  '/robot_166/finepos_poses',
-                  '/robot_166/finepos_possible',
-                  '/robot_166/cmd_vel_fine_positioning',
-                  '/robot_166/move_base/goal',
-                  '/robot_166/fine_positioning/result',
-                  '/robot_166/approach_pose_as_ps',
-                  '/robot_166/resulting_twist_as_pose',
-                  '/robot_166/use_finepos_current_limit',
-                  '/robot_166/finepos_markers',
-                  '/robot_166/fine_positioning/status',
-                  '/robot_166/move_target_as_ps',
-                  '/robot_166/move_base/cancel',
-                  '/robot_166/cmd_vel_to_check_lax']
+    sub_topic: ['/robot_166/target_filter/best_target_in_world', '/robot_166/odom', '/robot_166/map_goals', '/robot_166/target_filter/averaged_best_target', '/robot_166/move_base/result', '/robot_166/target_filter/best_target_in_base_link', '/robot_166/fine_positioning/cancel', '/robot_166/target_filter/best_target_age', '/robot_166/emergency_stop', '/robot_166/move_base/feedback', '/robot_166/fine_positioning/goal', '/robot_166/move_base/status', '/robot_166/motor_stalled']
+    pub_topic:: ['/robot_166/fine_positioning/feedback', '/robot_166/resulting_target_pose', '/robot_166/finepos_simulated_footprint', '/robot_166/finepos_poses', '/robot_166/finepos_possible', '/robot_166/cmd_vel_fine_positioning', '/robot_166/move_base/goal', '/robot_166/fine_positioning/result', '/robot_166/approach_pose_as_ps', '/robot_166/resulting_twist_as_pose', '/robot_166/use_finepos_current_limit', '/robot_166/finepos_markers', '/robot_166/fine_positioning/status', '/robot_166/move_target_as_ps', '/robot_166/move_base/cancel', '/robot_166/cmd_vel_to_check_lax']
 
   - name: '/robot_166/gmapping'
-      sub_topic: ['/tf',
-                  '/tf_static',
-                  '/robot_166/scan',
-                  '/robot_166/mapping_cmd']
-      pub_topic: ['/robot_166/map_in_construction_metadata',
-                  '/robot_166/gmapping/map_in_construction_entropy',
-                  '/tf ',
-                  '/robot_166/map_in_construction']
+    sub_topic: ['/tf', '/tf_static', '/robot_166/scan', '/robot_166/mapping_cmd']
+    pub_topic:: ['/robot_166/map_in_construction_metadata', '/robot_166/gmapping/map_in_construction_entropy', '/tf ', '/robot_166/map_in_construction']
 
   - name: '/robot_166/imu_calibration'
-      sub_topic: ['/robot_166/imu_calibration_server/goal',
-                  '/robot_166/target_filter/averaged_best_target',
-                  '/robot_166/imu_calibration_server/cancel',
-                  '/robot_166/emergency_stop']
-      pub_topic: ['/robot_166/imu_calibration_server/status',
-                  '/robot_166/imu_calibration_server/feedback',
-                  '/robot_166/imu_calibration_server/result',
-                  '/robot_166/cmd_vel_imu']
+    sub_topic: ['/robot_166/imu_calibration_server/goal', '/robot_166/target_filter/averaged_best_target', '/robot_166/imu_calibration_server/cancel', '/robot_166/emergency_stop']
+    pub_topic:: ['/robot_166/imu_calibration_server/status', '/robot_166/imu_calibration_server/feedback', '/robot_166/imu_calibration_server/result', '/robot_166/cmd_vel_imu']
 
   - name: '/robot_166/joystick'
-      sub_topic: ['/robot_166/joy']
-      pub_topic: []
+    sub_topic: ['/robot_166/joy']
+    pub_topic:: []
 
   - name: '/robot_166/laser_calibration'
-      sub_topic: ['/robot_166/positioning_server/result',
-                  '/robot_166/triangle_extraction/triangles',
-                  '/robot_166/scan']
-      pub_topic: ['/robot_166/laser_calibration',
-                  '/robot_166/positioning_server/goal']
+    sub_topic: ['/robot_166/positioning_server/result', '/robot_166/triangle_extraction/triangles', '/robot_166/scan']
+    pub_topic:: ['/robot_166/laser_calibration', '/robot_166/positioning_server/goal']
 
   - name: '/robot_166/laser_scan_matching'
-      sub_topic: ['/robot_166/odom',
-                  '/tf',
-                  '/tf_static',
-                  '/robot_166/scan']
-      pub_topic: ['/robot_166/corrected_odometry_pose',
-                  '/tf',
-                  '/robot_166/slam_grid',
-                  '/robot_166/corrected_odometry',
-                  '/robot_166/raw_odometry',
-                  '/robot_166/raw_odometry_pose',
-                  '/robot_166/slam_grid_convolved']
+    sub_topic: ['/robot_166/odom', '/tf', '/tf_static', '/robot_166/scan']
+    pub_topic:: ['/robot_166/corrected_odometry_pose', '/tf', '/robot_166/slam_grid', '/robot_166/corrected_odometry', '/robot_166/raw_odometry', '/robot_166/raw_odometry_pose', '/robot_166/slam_grid_convolved']
 
   - name: '/robot_166/localization_scoring'
-      sub_topic: ['/tf',
-                  '/robot_166/map',
-                  '/tf_static',
-                  '/robot_166/map_regions',
-                  '/robot_166/triangle_extraction/triangle',
-                  '/robot_166/scan']
-      pub_topic: ['/robot_166/localization_scoring/scores',
-                  '/robot_166/localization_scoring/map',
-                  '/robot_166/localization_score',
-                  '/robot_166/localization_scoring/scoring_angle',
-                  '/robot_166/localization_scoring/distances',
-                  '/robot_166/localization_scoring/ignored_areas']
+    sub_topic: ['/tf', '/robot_166/map', '/tf_static', '/robot_166/map_regions', '/robot_166/triangle_extraction/triangle', '/robot_166/scan']
+    pub_topic:: ['/robot_166/localization_scoring/scores', '/robot_166/localization_scoring/map', '/robot_166/localization_score', '/robot_166/localization_scoring/scoring_angle', '/robot_166/localization_scoring/distances', '/robot_166/localization_scoring/ignored_areas']
 
   - name: '/robot_166/localize_to_target'
-      sub_topic: ['/robot_166/target_filter/averaged_best_target',
-                  '/tf',
-                  '/tf_static',
-                  '/robot_166/target_filter/best_target_age']
-      pub_topic: ['/robot_166/initialpose']
+    sub_topic: ['/robot_166/target_filter/averaged_best_target', '/tf', '/tf_static', '/robot_166/target_filter/best_target_age']
+    pub_topic:: ['/robot_166/initialpose']
 
   - name: '/robot_166/map_talker'
-      sub_topic: []
-      pub_topic: ['/robot_166/map_meta_data',
-                  '/robot_166/map_hash',
-                  '/robot_166/map_regions',
-                  '/robot_166/landmarks',
-                  '/robot_166/map_goals',
-                  '/robot_166/map_point_cloud',
-                  '/robot_166/continuous_map',
-                  '/robot_166/map']
+    sub_topic: []
+    pub_topic:: ['/robot_166/map_meta_data', '/robot_166/map_hash', '/robot_166/map_regions', '/robot_166/landmarks', '/robot_166/map_goals', '/robot_166/map_point_cloud', '/robot_166/continuous_map', '/robot_166/map']
 
   - name: '/robot_166/map_to_local_map_pub'
-      sub_topic: []
-      pub_topic: ['/tf']
+    sub_topic: []
+    pub_topic:: ['/tf']
 
   - name: '/robot_166/master_discovery'
-      sub_topic: ['']
-      pub_topic: ['/robot_166/master_discovery/changes',
-                  '/robot_166/master_discovery/linkstats']
+    sub_topic: ['']
+    pub_topic:: ['/robot_166/master_discovery/changes', '/robot_166/master_discovery/linkstats']
 
   - name: '/robot_166/master_sync_robot'
-      sub_topic: ['/robot_166/master_discovery/changes']
-      pub_topic: []
+    sub_topic: ['/robot_166/master_discovery/changes']
+    pub_topic:: []
 
   - name: '/robot_166/move_base'
-      sub_topic: ['/robot_166/move_base/local_costmap/footprint_layer/footprint_stamped',
-                  '/robot_166/move_base/global_plan',
-                  '/robot_166/odom',
-                  '/robot_166/speed_limit',
-                  '/robot_166/move_base/current_goal',
-                  '/robot_166/cmd_vel_to_check',
-                  '/robot_166/checked_motion_ping',
-                  '/robot_166/cmd_vel_to_check_front',
-                  '/robot_166/move_base/local_costmap/save_layers',
-                  '/robot_166/target_filter/averaged_best_target',
-                  '/robot_166/cmd_vel_to_check_back',
-                  '/robot_166/hardware_status',
-                  '/robot_166/localization_score',
-                  '/priority_queue',
-                  '/robot_166/recover_from_target/cancel',
-                  '/robot_166/cmd_vel_scan',
-                  '/tf',
-                  '/robot_166/map',
-                  '/robot_166/move_base/goal',
-                  '/tf_static',
-                  '/robot_166/recover_from_target/goal',
-                  '/robot_166/move_base/global_costmap/save_layers',
-                  '/robot_166/n_robot_area_polygons',
-                  '/robot_166/emergency_stop',
-                  '/robot_166/map_regions',
-                  '/robot_166/amcl_pose',
-                  '/robot_166/move_base_simple/goal',
-                  '/robot_166/move_base/TrajectoryPlannerROS/footprint_index',
-                  '/robot_166/scan',
-                  '/robot_166/move_base/cancel',
-                  '/robot_166/cmd_vel_to_check_lax']
-      pub_topic: ['/robot_166/move_base/local_costmap/footprint_layer/footprint_stamped',
-                  '/robot_166/move_base/local_costmap/caution_layer/grid_cells',
-                  '/robot_166/move_base/local_costmap/greyscale_map',
-                  '/robot_166/move_base/local_costmap/obstacle_layer/grid_cells',
-                  '/robot_166/move_base/TrajectoryPlannerROS/trajectory_cloud',
-                  '/robot_166/move_base/window_plan_unchanged',
-                  '/robot_166/recover_from_target/result',
-                  '/robot_166/move_base/local_costmap/forbidden_layer/point_cloud',
-                  '/robot_166/move_base/local_costmap/caution_layer/bounding_boxes',
-                  '/robot_166/move_base/global_costmap/inflation_layer/narrow_corridor/bounding_boxes',
-                  '/robot_166/speed_limit',
-                  '/robot_166/move_base/local_costmap/flow_down',
-                  '/robot_166/move_base/current_goal',
-                  '/robot_166/move_base/local_costmap/inflation_layer/narrow_corridor/grid_cells',
-                  '/robot_166/move_base/TrajectoryPlannerROS/final_dynamic_footprint',
-                  '/robot_166/cmd_vel_to_check',
-                  '/robot_166/move_base/local_costmap/forbidden_layer/grid_cells',
-                  '/robot_166/traffic_controller/areas',
-                  '/robot_166/move_base/global_costmap/unknown',
-                  '/robot_166/move_base/GlobalPlanner/incomplete_goal',
-                  '/robot_166/move_base/global_costmap/flow_left',
-                  '/robot_166/move_base/local_costmap/inflation_layer/narrow_corridor/point_cloud',
-                  '/robot_166/dynamic_footprints',
-                  '/robot_166/move_base/global_costmap/robot_layer/bounding_boxes',
-                  '/robot_166/move_base/local_costmap/n_robot_layer/grid_cells',
-                  '/robot_166/move_base/global_costmap/n_robot_layer/bounding_boxes',
-                  '/robot_166/move_base/global_costmap/robot_layer/point_cloud',
-                  '/robot_166/move_base/TrajectoryPlannerROS/inplace_cloud',
-                  '/robot_166/move_base/status',
-                  '/robot_166/move_base/global_costmap/bounding_boxes',
-                  '/robot_166/checked_motion_pong',
-                  '/robot_166/move_base/local_costmap/point_cloud',
-                  '/robot_166/traffic_controller/neighbor_relations',
-                  '/robot_166/move_base/local_costmap/bounding_boxes',
-                  '/robot_166/cmd_vel_to_check_front',
-                  '/robot_166/move_base/recovery_behavior_poses',
-                  '/robot_166/problems',
-                  '/robot_166/move_base/global_costmap/static_layer/grid_cells',
-                  '/robot_166/move_base/RightHandPathConstraint/smooth_points',
-                  '/robot_166/move_base/global_costmap/footprint_layer/footprint_stamped',
-                  '/robot_166/move_base/local_costmap/robot_layer/point_cloud',
-                  '/robot_166/move_base/global_costmap/footprint_layer/bounding_boxes',
-                  '/robot_166/move_base/global_costmap/caution_layer/bounding_boxes',
-                  '/robot_166/move_base/result',
-                  '/robot_166/move_base/TrajectoryPlannerROS/best_trajectory',
-                  '/robot_166/move_base/global_costmap/forbidden_layer/bounding_boxes',
-                  '/robot_166/move_base/local_costmap/robot_layer/bounding_boxes',
-                  '/robot_166/move_base/global_costmap/n_robot_layer/grid_cells',
-                  '/robot_166/move_base/window_plan_changed',
-                  '/robot_166/move_base/RightHandPathConstraint/waypoints',
-                  '/robot_166/move_base/TrajectoryPlannerROS/local_plan',
-                  '/robot_166/move_base/local_costmap/obstacles',
-                  '/robot_166/move_base/global_costmap/obstacle_layer/bounding_boxes',
-                  '/robot_166/move_base/TrajectoryPlannerROS/min_speed_footprint',
-                  '/robot_166/move_base/global_costmap/static_map',
-                  '/robot_166/move_base/global_costmap/flow_right',
-                  '/robot_166/move_base/goal',
-                  '/robot_166/move_base/global_costmap/caution_layer/point_cloud',
-                  '/robot_166/move_base/local_costmap/obstacle_layer/bounding_boxes',
-                  '/robot_166/move_base/local_costmap/flow_right',
-                  '/robot_166/move_base/global_costmap/flow_up',
-                  '/robot_166/move_base/global_costmap/greyscale_map',
-                  '/robot_166/move_base/global_costmap/caution_layer/grid_cells',
-                  '/robot_166/move_base/local_costmap/footprint_layer/bounding_boxes',
-                  '/robot_166/checked_motion_simulated_footprint',
-                  '/robot_166/move_base/TrajectoryPlannerROS/transformed_plan',
-                  '/robot_166/n_robot_area_polygons',
-                  '/robot_166/move_base/local_costmap/unknown',
-                  '/robot_166/traffic_controller/plan_distances',
-                  '/robot_166/move_base/GlobalPlanner/potential',
-                  '/robot_166/move_base/local_costmap/caution_layer/point_cloud',
-                  '/robot_166/move_base/global_plan',
-                  '/robot_166/move_base/GlobalPlanner/plan',
-                  '/robot_166/move_base/local_costmap/inflation_layer/narrow_corridor/bounding_boxes',
-                  '/robot_166/move_base/local_costmap/flow_left',
-                  '/robot_166/move_base/local_costmap/n_robot_layer/point_cloud',
-                  '/robot_166/move_base/global_costmap/inflation_layer/narrow_corridor/point_cloud',
-                  '/robot_166/move_base/global_costmap/obstacle_layer/grid_cells',
-                  '/robot_166/recover_from_target/feedback',
-                  '/robot_166/move_base/TrajectoryPlannerROS/dynamic_footprint',
-                  '/robot_166/move_base/global_costmap/forbidden_layer/point_cloud',
-                  '/robot_166/move_base/local_costmap/forbidden_layer/bounding_boxes',
-                  '/robot_166/move_base/potential',
-                  '/robot_166/move_base/feedback',
-                  '/robot_166/move_base/global_costmap/forbidden_layer/grid_cells',
-                  '/robot_166/cmd_vel_to_check_back',
-                  '/robot_166/recover_from_target/status',
-                  '/robot_166/move_base/global_costmap/inflation_layer/narrow_corridor/grid_cells',
-                  '/robot_166/move_base/local_costmap/n_robot_layer/bounding_boxes',
-                  '/robot_166/move_base/global_costmap/inflation',
-                  '/robot_166/move_base/local_costmap/inflation',
-                  '/robot_166/move_base/local_costmap/flow_up',
-                  '/robot_166/nav_cmd_vel',
-                  '/robot_166/move_base/global_costmap/n_robot_layer/point_cloud',
-                  '/robot_166/move_base/TrajectoryPlannerROS/footprint_index',
-                  '/robot_166/path_constraint_marker_array',
-                  '/robot_166/move_base/global_costmap/obstacles',
-                  '/robot_166/move_base/global_costmap/flow_down',
-                  '/robot_166/move_base/TrajectoryPlannerROS/cost_cloud',
-                  '/robot_166/move_base/global_costmap/point_cloud',
-                  '/robot_166/move_base/RightHandPathConstraint/path_constraint']
+    sub_topic: ['/robot_166/move_base/local_costmap/footprint_layer/footprint_stamped', '/robot_166/move_base/global_plan', '/robot_166/odom', '/robot_166/speed_limit', '/robot_166/move_base/current_goal', '/robot_166/cmd_vel_to_check', '/robot_166/checked_motion_ping', '/robot_166/cmd_vel_to_check_front', '/robot_166/move_base/local_costmap/save_layers', '/robot_166/target_filter/averaged_best_target', '/robot_166/cmd_vel_to_check_back', '/robot_166/hardware_status', '/robot_166/localization_score', '/priority_queue', '/robot_166/recover_from_target/cancel', '/robot_166/cmd_vel_scan', '/tf', '/robot_166/map', '/robot_166/move_base/goal', '/tf_static', '/robot_166/recover_from_target/goal', '/robot_166/move_base/global_costmap/save_layers', '/robot_166/n_robot_area_polygons', '/robot_166/emergency_stop', '/robot_166/map_regions', '/robot_166/amcl_pose', '/robot_166/move_base_simple/goal', '/robot_166/move_base/TrajectoryPlannerROS/footprint_index', '/robot_166/scan', '/robot_166/move_base/cancel', '/robot_166/cmd_vel_to_check_lax']
+    pub_topic:: ['/robot_166/move_base/local_costmap/footprint_layer/footprint_stamped', '/robot_166/move_base/local_costmap/caution_layer/grid_cells', '/robot_166/move_base/local_costmap/greyscale_map', '/robot_166/move_base/local_costmap/obstacle_layer/grid_cells', '/robot_166/move_base/TrajectoryPlannerROS/trajectory_cloud', '/robot_166/move_base/window_plan_unchanged', '/robot_166/recover_from_target/result', '/robot_166/move_base/local_costmap/forbidden_layer/point_cloud', '/robot_166/move_base/local_costmap/caution_layer/bounding_boxes', '/robot_166/move_base/global_costmap/inflation_layer/narrow_corridor/bounding_boxes', '/robot_166/speed_limit', '/robot_166/move_base/local_costmap/flow_down', '/robot_166/move_base/current_goal', '/robot_166/move_base/local_costmap/inflation_layer/narrow_corridor/grid_cells', '/robot_166/move_base/TrajectoryPlannerROS/final_dynamic_footprint', '/robot_166/cmd_vel_to_check', '/robot_166/move_base/local_costmap/forbidden_layer/grid_cells', '/robot_166/traffic_controller/areas', '/robot_166/move_base/global_costmap/unknown', '/robot_166/move_base/GlobalPlanner/incomplete_goal', '/robot_166/move_base/global_costmap/flow_left', '/robot_166/move_base/local_costmap/inflation_layer/narrow_corridor/point_cloud', '/robot_166/dynamic_footprints', '/robot_166/move_base/global_costmap/robot_layer/bounding_boxes', '/robot_166/move_base/local_costmap/n_robot_layer/grid_cells', '/robot_166/move_base/global_costmap/n_robot_layer/bounding_boxes', '/robot_166/move_base/global_costmap/robot_layer/point_cloud', '/robot_166/move_base/TrajectoryPlannerROS/inplace_cloud', '/robot_166/move_base/status', '/robot_166/move_base/global_costmap/bounding_boxes', '/robot_166/checked_motion_pong', '/robot_166/move_base/local_costmap/point_cloud', '/robot_166/traffic_controller/neighbor_relations', '/robot_166/move_base/local_costmap/bounding_boxes', '/robot_166/cmd_vel_to_check_front', '/robot_166/move_base/recovery_behavior_poses', '/robot_166/problems', '/robot_166/move_base/global_costmap/static_layer/grid_cells', '/robot_166/move_base/RightHandPathConstraint/smooth_points', '/robot_166/move_base/global_costmap/footprint_layer/footprint_stamped', '/robot_166/move_base/local_costmap/robot_layer/point_cloud', '/robot_166/move_base/global_costmap/footprint_layer/bounding_boxes', '/robot_166/move_base/global_costmap/caution_layer/bounding_boxes', '/robot_166/move_base/result', '/robot_166/move_base/TrajectoryPlannerROS/best_trajectory', '/robot_166/move_base/global_costmap/forbidden_layer/bounding_boxes', '/robot_166/move_base/local_costmap/robot_layer/bounding_boxes', '/robot_166/move_base/global_costmap/n_robot_layer/grid_cells', '/robot_166/move_base/window_plan_changed', '/robot_166/move_base/RightHandPathConstraint/waypoints', '/robot_166/move_base/TrajectoryPlannerROS/local_plan', '/robot_166/move_base/local_costmap/obstacles', '/robot_166/move_base/global_costmap/obstacle_layer/bounding_boxes', '/robot_166/move_base/TrajectoryPlannerROS/min_speed_footprint', '/robot_166/move_base/global_costmap/static_map', '/robot_166/move_base/global_costmap/flow_right', '/robot_166/move_base/goal', '/robot_166/move_base/global_costmap/caution_layer/point_cloud', '/robot_166/move_base/local_costmap/obstacle_layer/bounding_boxes', '/robot_166/move_base/local_costmap/flow_right', '/robot_166/move_base/global_costmap/flow_up', '/robot_166/move_base/global_costmap/greyscale_map', '/robot_166/move_base/global_costmap/caution_layer/grid_cells', '/robot_166/move_base/local_costmap/footprint_layer/bounding_boxes', '/robot_166/checked_motion_simulated_footprint', '/robot_166/move_base/TrajectoryPlannerROS/transformed_plan', '/robot_166/n_robot_area_polygons', '/robot_166/move_base/local_costmap/unknown', '/robot_166/traffic_controller/plan_distances', '/robot_166/move_base/GlobalPlanner/potential', '/robot_166/move_base/local_costmap/caution_layer/point_cloud', '/robot_166/move_base/global_plan', '/robot_166/move_base/GlobalPlanner/plan', '/robot_166/move_base/local_costmap/inflation_layer/narrow_corridor/bounding_boxes', '/robot_166/move_base/local_costmap/flow_left', '/robot_166/move_base/local_costmap/n_robot_layer/point_cloud', '/robot_166/move_base/global_costmap/inflation_layer/narrow_corridor/point_cloud', '/robot_166/move_base/global_costmap/obstacle_layer/grid_cells', '/robot_166/recover_from_target/feedback', '/robot_166/move_base/TrajectoryPlannerROS/dynamic_footprint', '/robot_166/move_base/global_costmap/forbidden_layer/point_cloud', '/robot_166/move_base/local_costmap/forbidden_layer/bounding_boxes', '/robot_166/move_base/potential', '/robot_166/move_base/feedback', '/robot_166/move_base/global_costmap/forbidden_layer/grid_cells', '/robot_166/cmd_vel_to_check_back', '/robot_166/recover_from_target/status', '/robot_166/move_base/global_costmap/inflation_layer/narrow_corridor/grid_cells', '/robot_166/move_base/local_costmap/n_robot_layer/bounding_boxes', '/robot_166/move_base/global_costmap/inflation', '/robot_166/move_base/local_costmap/inflation', '/robot_166/move_base/local_costmap/flow_up', '/robot_166/nav_cmd_vel', '/robot_166/move_base/global_costmap/n_robot_layer/point_cloud', '/robot_166/move_base/TrajectoryPlannerROS/footprint_index', '/robot_166/path_constraint_marker_array', '/robot_166/move_base/global_costmap/obstacles', '/robot_166/move_base/global_costmap/flow_down', '/robot_166/move_base/TrajectoryPlannerROS/cost_cloud', '/robot_166/move_base/global_costmap/point_cloud', '/robot_166/move_base/RightHandPathConstraint/path_constraint']
 
   - name: '/robot_166/nav_watchdog'
-      sub_topic: ['/robot_166/localization_score',
-                  '/robot_166/nav_cmd_vel']
-      pub_topic: ['/robot_166/speed_limit',
-                  '/robot_166/system_error',
-                  '/robot_166/cmd_vel_watchdog']
+    sub_topic: ['/robot_166/localization_score', '/robot_166/nav_cmd_vel']
+    pub_topic:: ['/robot_166/speed_limit', '/robot_166/system_error', '/robot_166/cmd_vel_watchdog']
 
   - name: '/robot_166/ose800_can_driver'
-      sub_topic: ['/robot_166/positioning_server/result',
-                  '/robot_166/play_sound',
-                  '/robot_166/cmd_vel',
-                  '/robot_166/event_logger_trigger',
-                  '/robot_166/horn',
-                  '/robot_166/corrected_odometry_pose',
-                  '/robot_166/lam_light_states',
-                  '/robot_166/cmd_lam',
-                  '/tf',
-                  '/tf_static',
-                  '/robot_166/use_finepos_current_limit',
-                  '/robot_166/system_error']
-      pub_topic: ['/robot_166/odom',
-                  '/robot_166/battery_status',
-                  '/robot_166/wheel_vels',
-                  '/tf',
-                  '/robot_166/rear_sensor',
-                  '/robot_166/imu/data',
-                  '/robot_166/acceleration_ramp_status',
-                  '/robot_166/odom_theta_vel',
-                  '/robot_166/left_acc_wheel_vel_rpm',
-                  '/robot_166/hardware_status',
-                  '/robot_166/odom_theta',
-                  '/robot_166/right_acc_wheel_vel_rpm',
-                  '/robot_166/only_odom_theta_vel',
-                  '/robot_166/lam_button_states',
-                  '/robot_166/wheel_dists',
-                  '/robot_166/positioning_server/goal',
-                  '/robot_166/lam_status',
-                  '/robot_166/wheel_rpm',
-                  '/robot_166/event_logger_trigger',
-                  '/robot_166/contact_with_station',
-                  '/rosout',
-                  '/robot_166/motor_stalled']
+    sub_topic: ['/robot_166/positioning_server/result', '/robot_166/play_sound', '/robot_166/cmd_vel', '/robot_166/event_logger_trigger', '/robot_166/horn', '/robot_166/corrected_odometry_pose', '/robot_166/lam_light_states', '/robot_166/cmd_lam', '/tf', '/tf_static', '/robot_166/use_finepos_current_limit', '/robot_166/system_error']
+    pub_topic:: ['/robot_166/odom', '/robot_166/battery_status', '/robot_166/wheel_vels', '/tf', '/robot_166/rear_sensor', '/robot_166/imu/data', '/robot_166/acceleration_ramp_status', '/robot_166/odom_theta_vel', '/robot_166/left_acc_wheel_vel_rpm', '/robot_166/hardware_status', '/robot_166/odom_theta', '/robot_166/right_acc_wheel_vel_rpm', '/robot_166/only_odom_theta_vel', '/robot_166/lam_button_states', '/robot_166/wheel_dists', '/robot_166/positioning_server/goal', '/robot_166/lam_status', '/robot_166/wheel_rpm', '/robot_166/event_logger_trigger', '/robot_166/contact_with_station', '/rosout', '/robot_166/motor_stalled']
 
   - name: '/robot_166/parameter_listener'
-      sub_topic: []
-      pub_topic: ['/robot_166/parameters_hash']
+    sub_topic: []
+    pub_topic:: ['/robot_166/parameters_hash']
 
   - name: '/robot_166/positioning'
-      sub_topic: ['/robot_166/odom',
-                  '/robot_166/hardware_status',
-                  '/robot_166/only_odom_theta_vel',
-                  '/robot_166/positioning_server/goal',
-                  '/robot_166/done_condition',
-                  '/robot_166/positioning_server/cancel',
-                  '/robot_166/emergency_stop']
-      pub_topic: ['/robot_166/cmd_vel_to_check',
-                  '/robot_166/positioning_server/feedback',
-                  '/robot_166/positioning_server/result',
-                  '/robot_166/positioning_server/status',
-                  '/rosout',
-                  '/robot_166/cmd_vel_to_check_lax']
+    sub_topic: ['/robot_166/odom', '/robot_166/hardware_status', '/robot_166/only_odom_theta_vel', '/robot_166/positioning_server/goal', '/robot_166/done_condition', '/robot_166/positioning_server/cancel', '/robot_166/emergency_stop']
+    pub_topic:: ['/robot_166/cmd_vel_to_check', '/robot_166/positioning_server/feedback', '/robot_166/positioning_server/result', '/robot_166/positioning_server/status', '/rosout', '/robot_166/cmd_vel_to_check_lax']
 
   - name: '/robot_166/reverse_fine_positioning_node'
-      sub_topic: ['/robot_166/fine_positioning/feedback',
-                  '/robot_166/reverse_fine_positioning_node/goal',
-                  '/robot_166/positioning_server/result',
-                  '/robot_166/positioning_server/feedback',
-                  '/robot_166/fine_positioning/result',
-                  '/robot_166/emergency_stop',
-                  '/robot_166/fine_positioning/status',
-                  '/robot_166/reverse_fine_positioning_node/cancel',
-                  '/robot_166/positioning_server/status']
-      pub_topic: ['/robot_166/reverse_fine_positioning_node/feedback',
-                  '/robot_166/positioning_server/goal',
-                  '/robot_166/reverse_fine_positioning_node/status',
-                  '/robot_166/fine_positioning/cancel',
-                  '/robot_166/positioning_server/cancel',
-                  '/robot_166/reverse_fine_positioning_node/result',
-                  '/robot_166/fine_positioning/goal']
+    sub_topic: ['/robot_166/fine_positioning/feedback', '/robot_166/reverse_fine_positioning_node/goal', '/robot_166/positioning_server/result', '/robot_166/positioning_server/feedback', '/robot_166/fine_positioning/result', '/robot_166/emergency_stop', '/robot_166/fine_positioning/status', '/robot_166/reverse_fine_positioning_node/cancel', '/robot_166/positioning_server/status']
+    pub_topic:: ['/robot_166/reverse_fine_positioning_node/feedback', '/robot_166/positioning_server/goal', '/robot_166/reverse_fine_positioning_node/status', '/robot_166/fine_positioning/cancel', '/robot_166/positioning_server/cancel', '/robot_166/reverse_fine_positioning_node/result', '/robot_166/fine_positioning/goal']
 
   - name: '/robot_166/robot_state_publisher'
-      sub_topic: []
-      pub_topic: ['/tf']
+    sub_topic: []
+    pub_topic:: ['/tf']
 
   - name: '/robot_166/sicks300'
-      sub_topic: []
-      pub_topic: ['/tf',
-                  '/robot_166/problems',
-                  '/robot_166/interpolated_scan',
-                  '/robot_166/sicks300/visualization',
-                  '/robot_166/scan']
+    sub_topic: []
+    pub_topic:: ['/tf', '/robot_166/problems', '/robot_166/interpolated_scan', '/robot_166/sicks300/visualization', '/robot_166/scan']
 
   - name: '/robot_166/state_of_charge_node'
-      sub_topic: ['/robot_166/battery_status']
-      pub_topic: ['/robot_166/state_of_charge']
+    sub_topic: ['/robot_166/battery_status']
+    pub_topic:: ['/robot_166/state_of_charge']
 
   - name: '/robot_166/system_monitor'
-      sub_topic: []
-      pub_topic: ['/robot_166/core_status']
+    sub_topic: []
+    pub_topic:: ['/robot_166/core_status']
 
   - name: '/robot_166/target_filter'
-      sub_topic: ['/robot_166/odom',
-                  '/robot_166/map_goals',
-                  '/tf',
-                  '/robot_166/triangle_extraction/triangle_extraction_result',
-                  '/robot_166/goal_id',
-                  '/robot_166/move_base/goal',
-                  '/tf_static']
-      pub_topic: ['/robot_166/target_filter/best_target_in_world',
-                  '/robot_166/target_filter/visualized_events',
-                  '/robot_166/target_filter/averaged_best_target',
-                  '/robot_166/target_filter/expected_target',
-                  '/robot_166/target_filter/best_target_in_base_link',
-                  '/robot_166/target_filter/search_area',
-                  '/robot_166/target_filter/target_candidates',
-                  '/robot_166/target_filter/best_target_age',
-                  '/robot_166/target_filter/visualized_targets',
-                  '/robot_166/target_filter/best_target_history']
+    sub_topic: ['/robot_166/odom', '/robot_166/map_goals', '/tf', '/robot_166/triangle_extraction/triangle_extraction_result', '/robot_166/goal_id', '/robot_166/move_base/goal', '/tf_static']
+    pub_topic:: ['/robot_166/target_filter/best_target_in_world', '/robot_166/target_filter/visualized_events', '/robot_166/target_filter/averaged_best_target', '/robot_166/target_filter/expected_target', '/robot_166/target_filter/best_target_in_base_link', '/robot_166/target_filter/search_area', '/robot_166/target_filter/target_candidates', '/robot_166/target_filter/best_target_age', '/robot_166/target_filter/visualized_targets', '/robot_166/target_filter/best_target_history']
 
   - name: '/robot_166/triangle_extraction'
-      sub_topic: ['/tf',
-                  '/tf_static',
-                  '/robot_166/scan']
-      pub_topic: ['/robot_166/triangle_extraction/optitrack_point',
-                  '/robot_166/triangle_extraction/triangle_lines',
-                  '/robot_166/scan_without_robots',
-                  '/robot_166/triangle_extraction/candidates_markers',
-                  '/robot_166/triangle_extraction/triangle_extraction_result',
-                  '/robot_166/triangle_extraction/triangles',
-                  '/robot_166/triangle_extraction/line_markers']
+    sub_topic: ['/tf', '/tf_static', '/robot_166/scan']
+    pub_topic:: ['/robot_166/triangle_extraction/optitrack_point', '/robot_166/triangle_extraction/triangle_lines', '/robot_166/scan_without_robots', '/robot_166/triangle_extraction/candidates_markers', '/robot_166/triangle_extraction/triangle_extraction_result', '/robot_166/triangle_extraction/triangles', '/robot_166/triangle_extraction/line_markers']
 
   - name: '/robot_166/triangle_localization'
-      sub_topic: ['/robot_166/landmarks',
-                  '/tf',
-                  '/tf_static',
-                  '/robot_166/scan']
-      pub_topic: ['/robot_166/triangle_localization/marker_array',
-                  '/robot_166/dynamic_obstacle_polygons',
-                  '/robot_166/initialpose',
-                  '/robot_166/triangle_localization/pose_estimate',
-                  '/robot_166/triangle_localization/locations',
-                  '/robot_166/triangle_localization/lasermarker']
+    sub_topic: ['/robot_166/landmarks', '/tf', '/tf_static', '/robot_166/scan']
+    pub_topic:: ['/robot_166/triangle_localization/marker_array', '/robot_166/dynamic_obstacle_polygons', '/robot_166/initialpose', '/robot_166/triangle_localization/pose_estimate', '/robot_166/triangle_localization/locations', '/robot_166/triangle_localization/lasermarker']
 
 observations:
 #    - type: "activated"
