@@ -46,9 +46,9 @@ class MovementObserver(BaseObserver):
 
         vars = {}
         rules = []
-        nodes = []
+        real_nodes = []
 
-        nodes.append("movement")
+        real_nodes.append("movement")
         vars["movement"] = Variable("movement", Variable.BOOLEAN, None)
         vars[ab_pred("movement")] = Variable(ab_pred("movement"), Variable.BOOLEAN, None)
 
@@ -68,13 +68,12 @@ class MovementObserver(BaseObserver):
             subscribed_topics = []
             [subscribed_topics.extend(nodes_subscribe_topics.get(node, [])) for node in nodes_a + nodes_b]
 
-
             rules.append(MovementObserver(all_ab_pred(nodes_a), all_ab_pred(nodes_b), ab_pred("movement"), observation, all_ab_pred(subscribed_topics)))
 
             if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
                 raise ValueError
 
-        return vars, rules, nodes
+        return vars, rules, [], real_nodes
 
     @staticmethod
     def decrypt_resource_info(resource_info):
@@ -238,7 +237,7 @@ class TestMovementObserver(unittest.TestCase):
         nodes_publish_topics = {'/node1': ['/topicA'], '/node2': ['/topicB']}
         nodes_subscribe_topics = {}
 
-        vars, rules, nodes = MovementObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = MovementObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'movement': Variable("movement", Variable.BOOLEAN, None),
                     ab_pred("movement"): Variable(ab_pred("movement"), Variable.BOOLEAN, None),
@@ -257,8 +256,9 @@ class TestMovementObserver(unittest.TestCase):
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
         self.assertEqual(len(rules), len(rules_req), "movement added wrong number of rules!")
 
-        self.assertEqual(len(nodes), 1, "movement should not add nodes!")
-        self.assertEqual(str(nodes[0]), 'movement', "'movement' not added to nodes!")
+        self.assertEqual(len(nodes), 0, "movement should not add nodes!")
+        self.assertEqual(len(real_nodes), 1, "movement should add one real node!")
+        self.assertEqual(str(real_nodes[0]), 'movement', "'movement' not added to real nodes!")
 
     def test_generate_model_parameter_errors_1(self):
         config = {'topics': [['/topicA', '/topicB']], 'type': 'movement'}

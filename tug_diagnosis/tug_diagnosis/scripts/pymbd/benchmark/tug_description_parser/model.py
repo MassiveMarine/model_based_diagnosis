@@ -58,10 +58,11 @@ class Model(object):
         configs['observations'].append(config_for_general)
 
         for config in configs['observations']:
-            new_vars, new_rules, new_nodes = generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+            new_vars, new_rules, new_nodes, new_real_nodes = generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
             vars.update(new_vars)
             rules += new_rules
             nodes += new_nodes
+            self.real_nodes += new_real_nodes
 
         self.temp_vars = vars
         self.temp_rules = rules

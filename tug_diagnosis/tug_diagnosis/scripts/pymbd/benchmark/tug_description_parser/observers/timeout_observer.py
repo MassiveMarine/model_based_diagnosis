@@ -59,7 +59,7 @@ class TimeoutObserver(BaseObserver):
             rules += new_rules
             nodes += new_nodes
 
-        return vars, rules, nodes
+        return vars, rules, nodes, []
 
     @staticmethod
     def decrypt_resource_info(resource_info):
@@ -179,7 +179,7 @@ class TestTimeoutObserver(unittest.TestCase):
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
         nodes_subscribe_topics = {}
 
-        vars, rules, nodes = TimeoutObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = TimeoutObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'timeout_obs_/topic_all': Variable('timeout_obs_/topic_all', 1, None),
                     'timeout_obs_/topic_/node1': Variable('timeout_obs_/topic_/node1', 1, None),
@@ -199,6 +199,7 @@ class TestTimeoutObserver(unittest.TestCase):
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
         self.assertEqual(len(rules), len(rules_req), "timeout added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "timeout should not add nodes!")
+        self.assertEqual(len(real_nodes), 0, "timeout should not add real nodes!")
 
     def test_generate_model_parameter2(self):
         config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'timeout'}
@@ -206,7 +207,7 @@ class TestTimeoutObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
-        vars, rules, nodes = TimeoutObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = TimeoutObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'timeout_obs_/topic1_all': Variable('timeout_obs_/topic1_all', 1, None),
                     'timeout_obs_/topic1_node1': Variable('timeout_obs_/topic1_node1', 1, None),
@@ -233,6 +234,7 @@ class TestTimeoutObserver(unittest.TestCase):
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
         self.assertEqual(len(rules), len(rules_req), "timeout added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "timeout should not add nodes!")
+        self.assertEqual(len(real_nodes), 0, "timeout should not add real nodes!")
 
     def test_generate_model_parameter_errors_1(self):
         # test different arguments for the config-parameter which all should raise exeptions

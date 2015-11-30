@@ -39,7 +39,7 @@ class ActivatedObserver(BaseObserver):
             vars[observation] = Variable(observation, Variable.BOOLEAN, None)
             rules.append(ActivatedObserver(ab_pred(str(node)), observation))
 
-        return vars, rules, []
+        return vars, rules, [], []
 
     @staticmethod
     def decrypt_resource_info(resource_info):
@@ -105,7 +105,7 @@ class TestActivatedObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
         nodes_subscribe_topics = {}
-        vars, rules, nodes = ActivatedObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = ActivatedObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'activated_obs_/node1': Variable('activated_obs_/node1', 1, None),
                     'activated_obs_/node2': Variable('activated_obs_/node2', 1, None),
@@ -124,6 +124,7 @@ class TestActivatedObserver(unittest.TestCase):
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
         self.assertEqual(len(rules), len(rules_req), "Activated added wrong number of rules!")
         self.assertEqual(len(nodes), 0, "Activated should not add nodes!")
+        self.assertEqual(len(real_nodes), 0, "Activated should not add real nodes!")
 
     def test_generate_model_parameter_errors_1(self):
         config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'activated'}

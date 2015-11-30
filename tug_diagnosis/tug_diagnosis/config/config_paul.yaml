@@ -1,0 +1,44 @@
+  nodes:
+#    - name: "starter1"
+#      sub_topic: []
+#      pub_topic: ["/topicA"]
+
+  observations:
+#    - type: "activated"
+#      nodes: ["node1", "node2", "node3", "node4"]
+#    - type: "resources"
+#      nodes: ["node1", "node2", "node3", "node4"]
+    - type: "hz"
+      topics: ['/diagnostics', '/multi_position_share', '/multi_robot_status', '/position_share', '/reserved_areas',
+               '/robot_41/amcl_pose', '/robot_41/battery_status', '/robot_41/cmd_vel_watchdog',
+               '/robot_41/contact_with_station', '/robot_41/core_status', '/robot_41/corrected_odometry_pose',
+               '/robot_41/hardware_status', '/robot_41/lam_button_states', '/robot_41/lam_light_states',
+               '/robot_41/left_acc_wheel_vel_rpm', '/robot_41/localization_score',
+               '/robot_41/master_discovery/linkstats', '/robot_41/odom', '/robot_41/parameters_hash',
+               '/robot_41/right_acc_wheel_vel_rpm', '/robot_41/scan',
+               '/robot_41/state_of_charge,/robot_41/wheel_dists,/robot_41/wheel_rpm', '/robot_41/wheel_vels', '/tf']
+
+    - type: "timeout"
+      topics: ['/diagnostics', '/multi_position_share', '/multi_robot_status', '/position_share', '/reserved_areas',
+               '/robot_41/amcl_pose', '/robot_41/battery_status', '/robot_41/cmd_vel_watchdog',
+               '/robot_41/contact_with_station', '/robot_41/core_status', '/robot_41/corrected_odometry_pose',
+               '/robot_41/hardware_status', '/robot_41/lam_button_states', '/robot_41/lam_light_states',
+               '/robot_41/left_acc_wheel_vel_rpm', '/robot_41/localization_score',
+               '/robot_41/master_discovery/linkstats', '/robot_41/odom', '/robot_41/parameters_hash',
+               '/robot_41/right_acc_wheel_vel_rpm', '/robot_41/scan', '/robot_41/state_of_charge',
+               '/robot_41/wheel_dists', '/robot_41/wheel_rpm', '/robot_41/wheel_vels', '/tf']
+
+    - type: "score"
+      topics: ['/robot_41/localization_score']
+
+#    - type: "timing"
+#      topics: [["/topic1", "/topic2"]]
+
+  #  - type: "timestamp"
+  #    topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic"]
+
+#    - type: "timing"
+#      topics: [["/topicA", "/topicB"]]
+
+    - type: "movement"
+      topics: [['/robot_41/corrected_odometry_pose', '/robot_41/odom']]
