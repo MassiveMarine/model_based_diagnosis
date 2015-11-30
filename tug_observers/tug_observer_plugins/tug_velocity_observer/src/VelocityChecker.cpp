@@ -25,7 +25,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 VelocityChecker::VelocityChecker()
 { }
 
-void VelocityChecker::init(XmlRpc::XmlRpcValue params, tug_observers::ObserverPluginBase *plugin_base)
+void VelocityChecker::init(XmlRpc::XmlRpcValue params, SubscriberFacade *plugin_base)
 {
   ROS_DEBUG("VelocityChecker::init 1");
   if (!params.hasMember("correlations"))
@@ -122,7 +122,7 @@ std::map<std::string, bool> VelocityChecker::getValidInputs()
   }
 
   return result;
-};
+}
 
 void VelocityChecker::updateFaultCount(std::string name, unsigned int increment,
                                        std::map<std::string, unsigned int> *fault_count)
