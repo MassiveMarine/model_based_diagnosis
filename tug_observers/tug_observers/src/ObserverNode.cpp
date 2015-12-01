@@ -16,6 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 #include <tug_observers/ObserverNode.h>
 #include <string>
+#include <tug_yaml/ProcessYaml.h>
 
 namespace tug_observers
 {
@@ -43,6 +44,17 @@ namespace tug_observers
 
         std::string type = static_cast<std::string>(param["type"]);
         ObserverPluginBasePtr new_plugin = plugin_manager_.loadPlugin(type, type);
+
+        if (param.hasMember("start_up_time"))
+        {
+          ROS_DEBUG_STREAM("has start up time will used it to wait");
+          double start_up_time = ProcessYaml::getValue<double>("start_up_time", param);
+          if (start_up_time <= 0.)
+            throw std::runtime_error("start up time for /" + static_cast<std::string>(param) +" must be posive time in seconds");
+
+          new_plugin->setStartUpTime(start_up_time);
+        }
+
         new_plugin->initialize(params[i]);
       }
     }

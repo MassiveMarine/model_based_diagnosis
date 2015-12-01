@@ -63,6 +63,9 @@ void TimeoutBase::update()
 
 bool TimeoutBase::timeout_callback()
 {
+  if(!plugin_base_->isStartedUp())
+    return true;
+
   if (has_max_timeouts_in_a_row_)
   {
     if (remaining_timeouts_ <= 0)

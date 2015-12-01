@@ -54,6 +54,9 @@ namespace tug_observer_plugins_cpp
 
     void ScoresPlugin::run()
     {
+      if(!isStartedUp())
+      return;
+
       for (std::vector<boost::shared_ptr<ScoreBase> >::iterator it = bases_.begin(); it != bases_.end(); ++it)
       {
         ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 3.3");
