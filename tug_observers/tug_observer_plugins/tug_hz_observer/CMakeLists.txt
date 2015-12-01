@@ -5,9 +5,7 @@ project(tug_hz_observer)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  rospy
   tug_observer_plugin_utils
-  tug_python_utils
   tug_observers
   roscpp
   pluginlib
