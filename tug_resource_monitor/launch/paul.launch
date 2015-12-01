@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="tug_resource_monitor_node" pkg="tug_resource_monitor" type="tug_resource_monitor_node.py" output="screen">
+    <rosparam command="load" file="$(find tug_resource_monitor)/config/paul.yaml" />
+  </node>
+</launch>

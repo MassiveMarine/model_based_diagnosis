@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="node_name" value="tug_observers_node" />
+  
+  <node name="$(arg node_name)" pkg="tug_observers" type="tug_observers_node" output="screen">
+
+    <rosparam command="load" file="$(find tug_observers)/config/wowbagger/observers.yaml" />
+  
+  </node>
+
+</launch>
