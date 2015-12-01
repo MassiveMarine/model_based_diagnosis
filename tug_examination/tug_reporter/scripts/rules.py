@@ -14,16 +14,22 @@ __author__ = 'clemens'
 class Rule(object):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
-                 negative_possible_faulty_resources, recall_duration):
+                 negative_possible_faulty_resources, recall_duration, is_single_shot):
         self._positive_observations = positive_observations
         self._negative_observations = negative_observations
         self._positive_possible_faulty_resources = positive_possible_faulty_resources
         self._negative_possible_faulty_resources = negative_possible_faulty_resources
         self._last_called = None
         self._recall_duration = recall_duration
+        self._is_single_shot = is_single_shot
+        self._was_triggered = False
 
     def can_trigger(self, observation_store, diagnosis_store):
-        if self._last_called is not None and self._last_called + self._recall_duration > rospy.Time.now():
+        if self._is_single_shot and self._was_triggered:
+            return False
+
+        if self._last_called is not None and self._recall_duration is not None\
+                and self._last_called + self._recall_duration > rospy.Time.now():
             return False
 
         for p_obs in self._positive_observations:
@@ -45,16 +51,17 @@ class Rule(object):
         return True
 
     def trigger_intern(self):
+        self._was_triggered = True
         self._last_called = rospy.Time.now()
 
 
 class PrintRule(Rule):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
-                 negative_possible_faulty_resources, recall_duration, message):
+                 negative_possible_faulty_resources, recall_duration, is_single_shot, message):
         super(PrintRule, self).__init__(positive_observations, negative_observations,
                                         positive_possible_faulty_resources,
-                                        negative_possible_faulty_resources, recall_duration)
+                                        negative_possible_faulty_resources, recall_duration, is_single_shot)
         self._message = message
 
     def trigger(self):
@@ -65,10 +72,10 @@ class PrintRule(Rule):
 class ProcessRule(Rule):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
-                 negative_possible_faulty_resources, recall_duration, process):
+                 negative_possible_faulty_resources, recall_duration, is_single_shot, process):
         super(ProcessRule, self).__init__(positive_observations, negative_observations,
                                           positive_possible_faulty_resources,
-                                          negative_possible_faulty_resources, recall_duration)
+                                          negative_possible_faulty_resources, recall_duration, is_single_shot)
         self._process = process
 
     def trigger(self):
@@ -79,11 +86,11 @@ class ProcessRule(Rule):
 class EMailRule(Rule):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
-                 negative_possible_faulty_resources, recall_duration, host, port, username, password, subject,
+                 negative_possible_faulty_resources, recall_duration, is_single_shot, host, port, username, password, subject,
                  to_address, from_address, content):
         super(EMailRule, self).__init__(positive_observations, negative_observations,
                                         positive_possible_faulty_resources,
-                                        negative_possible_faulty_resources, recall_duration)
+                                        negative_possible_faulty_resources, recall_duration, is_single_shot)
         self._server = smtplib.SMTP(host, port)
         self._subject = subject
         self._to_address = to_address
@@ -165,36 +172,49 @@ class PrintRuleFactory(RuleFactory):
 
     @staticmethod
     def instantiate_rule(config):
+        is_single_shot = False
+        if YamlHelper.has_param(config, 'single_shot'):
+            is_single_shot = YamlHelper.get_param(config, 'single_shot')
         message = YamlHelper.get_param(config, 'message')
         positive_observations = RuleFactory.pars_positive_observations(config)
         negative_observations = RuleFactory.pars_negative_observations(config)
         positive_possible_faulty_resources = RuleFactory.pars_positive_possible_faulty_resources(config)
         negative_possible_faulty_resources = RuleFactory.pars_negative_possible_faulty_resources(config)
-        recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
+        recall_duration = None
+        if YamlHelper.has_param(config, 'recall_duration'):
+            recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
 
         return PrintRule(positive_observations, negative_observations, positive_possible_faulty_resources,
-                         negative_possible_faulty_resources, recall_duration, message)
+                         negative_possible_faulty_resources, recall_duration, is_single_shot, message)
 
 
 class ProcessRuleFactory(RuleFactory):
 
     @staticmethod
     def instantiate_rule(config):
+        is_single_shot = False
+        if YamlHelper.has_param(config, 'single_shot'):
+            is_single_shot = YamlHelper.get_param(config, 'single_shot')
         process = YamlHelper.get_param(config, 'process')
         positive_observations = RuleFactory.pars_positive_observations(config)
         negative_observations = RuleFactory.pars_negative_observations(config)
         positive_possible_faulty_resources = RuleFactory.pars_positive_possible_faulty_resources(config)
         negative_possible_faulty_resources = RuleFactory.pars_negative_possible_faulty_resources(config)
-        recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
+        recall_duration = None
+        if YamlHelper.has_param(config, 'recall_duration'):
+            recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
 
         return ProcessRule(positive_observations, negative_observations, positive_possible_faulty_resources,
-                           negative_possible_faulty_resources, recall_duration, process)
+                           negative_possible_faulty_resources, recall_duration, is_single_shot, process)
 
 
 class EMailRuleFactory(RuleFactory):
 
     @staticmethod
     def instantiate_rule(config):
+        is_single_shot = False
+        if YamlHelper.has_param(config, 'single_shot'):
+            is_single_shot = YamlHelper.get_param(config, 'single_shot')
         host = YamlHelper.get_param(config, 'host')
         port = YamlHelper.get_param(config, 'port')
         username = YamlHelper.get_param(config, 'username')
@@ -207,8 +227,10 @@ class EMailRuleFactory(RuleFactory):
         negative_observations = RuleFactory.pars_negative_observations(config)
         positive_possible_faulty_resources = RuleFactory.pars_positive_possible_faulty_resources(config)
         negative_possible_faulty_resources = RuleFactory.pars_negative_possible_faulty_resources(config)
-        recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
+        recall_duration = None
+        if YamlHelper.has_param(config, 'recall_duration'):
+            recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
 
         return EMailRule(positive_observations, negative_observations, positive_possible_faulty_resources,
-                         negative_possible_faulty_resources, recall_duration, host, port, username, password, subject,
-                         to_address, from_address, content)
+                         negative_possible_faulty_resources, recall_duration, is_single_shot, host, port,
+                         username, password, subject, to_address, from_address, content)
