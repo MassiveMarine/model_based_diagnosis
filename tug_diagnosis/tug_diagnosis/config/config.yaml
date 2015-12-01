@@ -53,7 +53,7 @@ nodes:
     pub_topic: ["/topic1"]
 
   - name: "node2"
-    sub_topic: ["/topic1"]
+    sub_topic: []
     pub_topic: ["/topic2"]
 
   - name: "node3"
@@ -84,8 +84,9 @@ observations:
     topics: ["/topic1", "/topic2", "/topic3"]
 
 #      topics: ["/topic1", "/topic2", "/topic3", "/topic4"]
-#    - type: "movement"
-#      topics: [["/topic1", "/topic2"]]
+  - type: "velocity"
+    topics: [["/topic1", "/topic2"]]
+
   - type: "timing"
     topics: [["/topic1", "/topic2"]]
 
@@ -100,7 +101,7 @@ observations:
 #
 #    - type: "timing"
 #      topics: [["/topicA", "/topicB"]]
-#    - type: "movement"
+#    - type: "velocity"
 #      topics: [["/imu_topic", "/loam_topic"],
 #               ["/imu_topic", "/odom_topic"],
 #               ["/imu_topic", "/cmd_topic"],

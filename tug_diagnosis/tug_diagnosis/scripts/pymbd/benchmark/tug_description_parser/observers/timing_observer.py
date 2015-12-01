@@ -141,7 +141,7 @@ class TestTimingObserver(unittest.TestCase):
 
     def test_timing_observer1(self):
         ab_nodes = [ab_pred("/node1")]
-        observation = "movement_obs_node1_node2"
+        observation = "timing_obs_node1_node2"
         ab_subscribed_topics = []
 
         ab_nodes_tests = [(ValueError, [ab_pred("")]),
@@ -163,7 +163,7 @@ class TestTimingObserver(unittest.TestCase):
 
     def test_timing_observe2(self):
         ab_nodes = [ab_pred("/node1")]
-        observation = "movement_obs_node1_node2"
+        observation = "timing_obs_node1_node2"
         ab_subscribed_topics = []
 
         observation_tests = [
@@ -180,7 +180,7 @@ class TestTimingObserver(unittest.TestCase):
 
     def test_timing_observe3(self):
         ab_nodes = [ab_pred("/node1")]
-        observation = "movement_obs_node1_node2"
+        observation = "timing_obs_node1_node2"
         ab_subscribed_topics = []
 
         ab_subscribed_topics_tests = [(ValueError, [ab_pred("")]),

@@ -156,5 +156,5 @@ observations:
 #    - type: "timing"
 #      topics: [["/topicA", "/topicB"]]
 
-    - type: "movement"
+    - type: "velocity"
       topics: [['/robot_166/corrected_odometry_pose', '/robot_166/odom']]
