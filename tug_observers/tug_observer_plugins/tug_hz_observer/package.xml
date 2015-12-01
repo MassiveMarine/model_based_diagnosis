@@ -44,7 +44,6 @@
   <build_depend>pluginlib</build_depend>
   <build_depend>tug_observer_plugin_utils</build_depend>
   <build_depend>tug_observers</build_depend>
-  <build_depend>tug_python_utils</build_depend>
   <build_depend>tug_observers_msgs</build_depend>
   <build_depend>topic_tools</build_depend>
   <build_depend>tug_time</build_depend>
@@ -54,7 +53,6 @@
   <run_depend>pluginlib</run_depend>
   <run_depend>tug_observer_plugin_utils</run_depend>
   <run_depend>tug_observers</run_depend>
-  <run_depend>tug_python_utils</run_depend>
   <run_depend>tug_observers_msgs</run_depend>
   <run_depend>topic_tools</run_depend>
   <run_depend>tug_time</run_depend>
