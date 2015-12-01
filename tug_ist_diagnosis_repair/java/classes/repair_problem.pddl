@@ -1,1 +1,0 @@
-(define (problem light_problem)	(:domain light_domain)	(:requirements :strips :equality :typing :negative-preconditions)	(:objects left_light right_light - light)	(:init  (good right_light)(on right_light)(on left_light)(bad left_light))	(:goal (and (good left_light)(good right_light))	))

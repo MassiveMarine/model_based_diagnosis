@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-   <node pkg="tug_ist_diagnosis_observers" type="laser.py" name="laser_node" output="screen" >
-   </node>
-</launch>

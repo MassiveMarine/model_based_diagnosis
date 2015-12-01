@@ -1,2 +1,0 @@
-string[] good
-string[] bad

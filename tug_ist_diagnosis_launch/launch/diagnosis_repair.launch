@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<launch>
- <node pkg="tug_ist_diagnosis_repair" type="diagnosis_planner.sh" name="diagnosis_planner" args="$(find tug_ist_diagnosis_repair)/light_domain.pddl" />
- <!--node pkg="tug_ist_diagnosis_repair" type="diagnosis_planner.sh" name="diagnosis_planner" args="$(find tug_ist_diagnosis_repair)/domain_truck.pddl" /-->
- <node pkg="tug_ist_diagnosis_repair" type="diagnosis_repairDomProbFiles" name="diagnosis_repairDomProbFiles" output="screen"/>
-</launch>

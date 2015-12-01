@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-   <node pkg="tug_ist_diagnosis_observers" type="aria_node.py" name="aria_node" >
-   </node>
-</launch>

@@ -1,6 +1,0 @@
-Tue Mar  5 10:33:26 Could not connect to simulator, connecting to robot through serial port /dev/ttyUSB0.
-Tue Mar  5 10:33:26 ArSerialConnection::open: Connecting to serial port '/dev/ttyUSB0'
-Tue Mar  5 10:33:26 ArSerialConnection::open: Could not open serial port '/dev/ttyUSB0'
-Tue Mar  5 10:33:26 Could not connect, because open on the device connection failed.
-Tue Mar  5 10:33:26 Failed to connect to robot.
-Tue Mar  5 10:33:26 rotate: Could not connect to robot! Exiting.
