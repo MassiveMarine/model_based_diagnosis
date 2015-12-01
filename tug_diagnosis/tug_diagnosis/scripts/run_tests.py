@@ -15,7 +15,7 @@ from pymbd.benchmark.tug_description_parser.observers.timeout_observer import Te
 from pymbd.benchmark.tug_description_parser.observers.resources_observer import TestResourcesObserver
 from pymbd.benchmark.tug_description_parser.observers.timing_observer import TestTimingObserver
 from pymbd.benchmark.tug_description_parser.observers.movement_observer import TestMovementObserver
-from pymbd.benchmark.tug_description_parser.observers.score_observer import TestScoreObserver
+from pymbd.benchmark.tug_description_parser.observers.scores_observer import TestScoresObserver
 from pymbd.benchmark.tug_description_parser.observers.activated_observer import TestActivatedObserver
 
 
@@ -30,5 +30,5 @@ if __name__ == '__main__':
     rostest.rosrun(PKG, 'test_resources_observer', TestResourcesObserver)
     rostest.rosrun(PKG, 'test_timing_observer', TestTimingObserver)
     rostest.rosrun(PKG, 'test_movement_observer', TestMovementObserver)
-    rostest.rosrun(PKG, 'test_score_observer', TestScoreObserver)
+    rostest.rosrun(PKG, 'test_scores_observer', TestScoresObserver)
     rostest.rosrun(PKG, 'test_activated_observer', TestActivatedObserver)
