@@ -1,0 +1,238 @@
+#setup:
+- type: timeout
+  use_global_subscriber: true
+  topics:
+# 1 # /calculate_observation_pose/goal ########################################
+  - name: /calculate_observation_pose/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 2 # /calculate_observation_pose/result ######################################
+  - name: /calculate_observation_pose/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 3 # /change/goal ############################################################
+  - name: /change/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 4 # /change/result ##########################################################
+  - name: /change/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 5 # /cmd_vel ################################################################
+  - name: /cmd_vel
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 6 # /costmap_add_obstacle/goal ##############################################
+  - name: /costmap_add_obstacle/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 7 # /costmap_add_obstacle/result ############################################
+  - name: /costmap_add_obstacle/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 8 # /costmap_dynamic_obstacles/goal #########################################
+  - name: /costmap_dynamic_obstacles/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 9 # /costmap_dynamic_obstacles/result #######################################
+  - name: /costmap_dynamic_obstacles/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 10 # /dynament/co2 ##########################################################
+  - name: /dynament/co2
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 11 # /dynament/methane ######################################################
+  - name: /dynament/methane
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 12 # /dynament/propane ######################################################
+  - name: /dynament/propane
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 13 # /elevation_pose ########################################################
+  - name: /elevation_pose
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 14 # /exploration_path/goal #################################################
+  - name: /exploration_path/goal
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 15 # /exploration_path/result ###############################################
+  - name: /exploration_path/result
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 16 # /features ##############################################################
+  - name: /features
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 17 # /imu_data ##############################################################
+  - name: /imu_data
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 18 # /joint_states ##########################################################
+  - name: /joint_states
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 19 # /la_pitch_controller/state #############################################
+  - name: /la_pitch_controller/state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 20 # /la_roll_controller/state ##############################################
+  - name: /la_roll_controller/state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 21 # /map ###################################################################
+  - name: /map
+    callerids:
+    - callerid: []
+      timeout: 3.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 22 # /navigation_context ####################################################
+  - name: /navigation_context
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 23 # /non_filtered_scan #####################################################
+  - name: /non_filtered_scan
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 24 # /odom ##################################################################
+  - name: /odom
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 25 # /poseupdate ############################################################
+  - name: /poseupdate
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 26 # /robot_pose ############################################################
+  - name: /robot_pose
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 27 # /robot_pose_simple #####################################################
+  - name: /robot_pose_simple
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 28 # /scan ##################################################################
+  - name: /scan
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 29 # /scan_matcher_pose_2d ##################################################
+  - name: /scan_matcher_pose_2d
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 30 # /scan_matcher_pose_stamped_2d ##########################################
+  - name: /scan_matcher_pose_stamped_2d
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 31 # /sh_joint_state #######################################################
+  - name: /sh_joint_state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 32 # /sh_kinect/depth/camera_info ###########################################
+  - name: /sh_kinect/depth/camera_info
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 33 # /sh_kinect/depth/image/compressed ######################################
+#  - name: /sh_kinect/depth/image/compressed
+#    callerids:
+#    - callerid: []
+#      timeout: 1.0
+#      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 34 # /sh_kinect/rgb/camera_info #############################################
+  - name: /sh_kinect/rgb/camera_info
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 35 # /sh_kinect/rgb/image_raw/compressed ####################################
+  - name: /sh_kinect/rgb/image_raw/compressed
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 36 # /sh_pitch_controller/state #############################################
+  - name: /sh_pitch_controller/state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 37 # /sh_yaw_controller/state ###############################################
+  - name: /sh_yaw_controller/state
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 38 # /tf ####################################################################
+  - name: /tf
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 39 # /tim_160_thermal_camera/thermal_image/compressed #######################
+  - name: /tim_160_thermal_camera/thermal_image/compressed
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined

@@ -1,0 +1,47 @@
+setup:
+- type: timing
+  main_loop_rate: 1.0
+  use_global_subscriber: false
+  topics:
+# 1 # /robot_41/fine_positioning/* ###########################################
+  - topicA: /robot_41/fine_positioning/goal
+    calleridA: []
+    topicB: /robot_41/fine_positioning/result
+    calleridB: []
+    single_shot_mode: true
+    filter:
+      type: nofilter                          # mean, median, kmeans, ewma, nofilter
+    states:
+    - state: 'ok'
+      number: 1
+      delay:
+        type: less_than
+        less_than: 4.2
+# 2 # /robot_41/move_base/* ###############################################################
+  - topicA: /robot_41/move_base/goal
+    calleridA: []
+    topicB: /robot_41/move_base/result
+    calleridB: []
+    single_shot_mode: true
+    filter:
+      type: nofilter                          # mean, median, kmeans, ewma, nofilter
+    states:
+    - state: 'ok'
+      number: 1
+      delay:
+        type: less_than
+        less_than: 4.2
+# 3 # /robot_41/positioning_server/* #################################################
+  - topicA: /robot_41/positioning_server/goal
+    calleridA: []
+    topicB: /robot_41/positioning_server/result
+    calleridB: []
+    single_shot_mode: true
+    filter:
+      type: nofilter                          # mean, median, kmeans, ewma, nofilter
+    states:
+    - state: 'ok'
+      number: 1
+      delay:
+        type: less_than
+        less_than: 4.2

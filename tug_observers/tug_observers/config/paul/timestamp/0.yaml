@@ -1,0 +1,243 @@
+setup:
+- type: timestamp
+  main_loop_rate: 1.0
+  use_global_subscriber: false
+  topics:
+# 1 # /imu_data ###############################################################
+  - name: /imu_data
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 2000 #window_size: 150                    # @ mean, median, kmeans, ewma(optional)
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'ok'
+        number: 1
+        age:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.01                   # @ student_t
+          std_deviation: 0.005            # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+## 2 # /joint_states ###########################################################
+#  - name: /joint_states
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 25                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.02                   # @ student_t
+#          std_deviation: 0.004              # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 3 # /la_joint_states ########################################################
+#  - name: /la_joint_states
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 25                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.02                   # @ student_t
+#          std_deviation: 0.004              # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 4 # /odom ###################################################################
+#  - name: /odom
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size:  5                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.1                    # @ student_t
+#          std_deviation: 0.02               # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 5 # /poseupdate #############################################################
+#  - name: /poseupdate
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 15                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.037                  # @ student_t
+#          std_deviation: 0.02               # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 6 # /robot_pose #############################################################
+#  - name: /robot_pose
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 25                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.025                  # @ student_t
+#          std_deviation: 0.006              # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 7 # /robot_pose_simple ######################################################
+#  - name: /robot_pose_simple
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 25                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.025                    # @ student_t
+#          std_deviation: 0.006              # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 8 # /scan ###################################################################
+#  - name: /scan
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 25                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.03                   # @ student_t
+#          std_deviation: 0.015              # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 9 # /scan_matcher_pose_2d ###################################################
+#  - name: /scan_matcher_pose_2d
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 25                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.032                  # @ student_t
+#          std_deviation: 0.02               # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 10 # /scan_matcher_pose_stamped_2d ##########################################
+#  - name: /scan_matcher_pose_stamped_2d
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 25                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.032                  # @ student_t
+#          std_deviation: 0.02               # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 11 # /sh_joint_state ########################################################
+#  - name: /sh_joint_state
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 15                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.04                   # @ student_t
+#          std_deviation: 0.003              # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 12 # /sh_kinect/depth/image/compressed ######################################
+##  - name: /sh_kinect/depth/image/compressed
+##    callerids:
+##    - callerid: []
+##      filter:
+##        type: mean                          # mean, median, kmeans, ewma, nofilter
+##        window_size: 2000 #window_size: 25                     # @ mean, median, kmeans, ewma(optional)
+##        deviation_type: std_deviation       # std_deviation, min_max
+##      states:
+##      - state: 'ok'
+##        age:
+##          type: student_t                   # student_t, nominal_value
+##          true_mean: 0.034                  # @ student_t
+##          std_deviation: 0.035              # @ student_t(optional)
+##          significance_level: 0.05          # @ student_t
+## 13 # /sh_kinect/rgb/image_raw/compressed ####################################
+#  - name: /sh_kinect/rgb/image_raw/compressed
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 60                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.034                 # @ student_t
+#          std_deviation: 0.035               # @ student_t(optional)
+#          significance_level: 0.05          # @ student_t
+## 14 # /tf ####################################################################
+#  - name: /tf
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 200                    # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.01                   # @ student_t
+#          std_deviation: 0.03               # @ student_t(optional)
+#          significance_level: 0.04          # @ student_t
+## 15 # /tim_160_thermal_camera/thermal_image/compressed #######################
+#  - name: /tim_160_thermal_camera/thermal_image/compressed
+#    callerids:
+#    - callerid: []
+#      filter:
+#        type: mean                          # mean, median, kmeans, ewma, nofilter
+#        window_size: 2000 #window_size: 50                     # @ mean, median, kmeans, ewma(optional)
+#        deviation_type: std_deviation       # std_deviation, min_max
+#      states:
+#      - state: 'ok'
+#        age:
+#          type: student_t                   # student_t, nominal_value
+#          true_mean: 0.028                  # @ student_t
+#          std_deviation: 0.02               # @ student_t(optional)
+#          significance_level: 0.04          # @ student_t
+
+#/imu_data (-0.0033999230861663818, [0.0034144132536147987], 2000)
+#/joint_states (-0.0038961505889892577, [0.0033743587317674644], 2000)
+#/odom (-0.003974831181187783, [0.0032165171512445077], 775)
+#/poseupdate (0.1821708205938339, [0.015973677704182943], 2000)
+#/robot_pose (-0.003263849139213562, [0.003366915727200678], 2000)
+#/robot_pose_simple (-0.0032983517646789553, [0.00335780610959528], 2000)
+#/scan (0.050815119862556456, [0.01619798281189887], 2000)
+#/scan_matcher_pose_stamped_2d (0.04492898833751678, [0.010935597689641191], 2000)
+#/sh_joint_state (-0.0043786634206771854, [0.003312585888630288], 2000)
+#/sh_kinect/rgb/image_raw/compressed (0.04449685621261597, [0.014475640369225122], 2000)
+#/tim_160_thermal_camera/thermal_image/compressed (0.01894492530822754, [0.01488480870902339], 2000)

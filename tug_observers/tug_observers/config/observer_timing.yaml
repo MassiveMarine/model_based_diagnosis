@@ -1,0 +1,30 @@
+########## node1 ##########
+setup:
+- type: timing
+  main_loop_rate: 1.0
+  use_global_subscriber: true
+  topics:
+  - topicA: /topicA
+    calleridA: []
+    topicB: /topicB
+    calleridB: []
+    single_shot_mode: true
+    filter:
+      type: ewma                      #exponentially weighted moving average
+      window_size: 10
+      # x = old_x * (1.0 - decay_rate) + new_x * decay_rate
+      decay_rate: 0.05
+      deviation_type: std_deviation   # std_deviation, min_max
+    states:
+    - state: '1'
+      number: 1
+      delay:
+        type: nominal_value
+        value:
+          type: gauss
+          mean: 1.5            # delay in s from A to B
+          std_deviation: 0.25
+        deviation:
+          - type: in_between
+            lower_bound: 0.0
+            upper_bound: 0.5

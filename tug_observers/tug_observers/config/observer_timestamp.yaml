@@ -1,0 +1,23 @@
+########## node1 ##########
+setup:
+- type: timestamp
+  main_loop_rate: 1.0
+  use_global_subscriber: true
+  topics:
+  - name: /topicA
+    callerids:
+    - callerid: []
+      filter:
+        #type: ewma                      #exponentially weighted moving average
+        #decay_rate: 0.05
+        type: mean
+        window_size: 20
+        deviation_type: std_deviation   # std_deviation, min_max
+      states:
+      - state: 'state 1'
+        number: 1
+        age:
+          type: student_t
+          true_mean: 0.0006
+          std_deviation: 0.0003
+          significance_level: 0.15

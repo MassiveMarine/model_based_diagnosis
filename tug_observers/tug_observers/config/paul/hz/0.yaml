@@ -1,0 +1,420 @@
+setup:
+- type: hz
+  main_loop_rate: 1.0
+  topics:
+# 1 # /diagnostics #######################################################
+  - name: /diagnostics
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.001            # optional
+          significance_level: 0.05        
+# 2 # /multi_position_share #######################################################
+  - name: /multi_position_share
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.02            # optional
+          significance_level: 0.05  
+# 3 # /multi_robot_status #######################################################
+  - name: /multi_robot_status
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.005            # optional
+          significance_level: 0.05        
+# 4 # /position_share #######################################################
+  - name: /position_share
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 6
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.20
+          std_deviation: 0.055           # optional
+          significance_level: 0.05  
+# 5 # /reserved_areas #######################################################
+  - name: /reserved_areas
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 11
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.1
+          std_deviation: 0.02            # optional
+          significance_level: 0.05  
+# 6 # /robot_41/amcl_pose ###############################################################
+  - name: /robot_41/amcl_pose
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 11
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.12
+          std_deviation: 0.047            # optional
+          significance_level: 0.05  
+# 7 # /robot_41/battery_status ###########################################################
+  - name: /robot_41/battery_status
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.05            # optional
+          significance_level: 0.05  
+# 8 # /robot_41/cmd_vel_watchdog ###############################################
+  - name: /robot_41/cmd_vel_watchdog
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 11
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.14
+          std_deviation: 0.06            # optional
+          significance_level: 0.05  
+# 9 # /robot_41/contact_with_station ###############################################
+  - name: /robot_41/contact_with_station
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 22
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.052
+          std_deviation: 0.0084           # optional
+          significance_level: 0.05  
+# 10 # /robot_41/core_status ###################################################################
+  - name: /robot_41/core_status
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 2.0
+          std_deviation: 0.008            # optional
+          significance_level: 0.05  
+# 11 # /robot_41/corrected_odometry_pose ####################################################
+  - name: /robot_41/corrected_odometry_pose
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 11
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.13
+          std_deviation: 0.062           # optional
+          significance_level: 0.05  
+# 12 # /robot_41/hardware_status #####################################################
+  - name: /robot_41/hardware_status
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 22
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.052
+          std_deviation: 0.0084            # optional
+          significance_level: 0.05  
+# 13 # /robot_41/lam_button_states #####################################################
+  - name: /robot_41/lam_button_states
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 22
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.052
+          std_deviation: 0.0084            # optional
+          significance_level: 0.05  
+# 14 # /robot_41/lam_light_states #####################################################
+  - name: /robot_41/lam_light_states
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 11
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.10
+          std_deviation: 0.0003            # optional
+          significance_level: 0.05  
+# 15 # /robot_41/left_acc_wheel_vel_rpm ############################################################
+  - name: /robot_41/left_acc_wheel_vel_rpm
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 22
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.052
+          std_deviation: 0.0084            # optional
+          significance_level: 0.05  
+# 16 # /robot_41/localization_score ############################################################
+  - name: /robot_41/localization_score
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 11
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.12
+          std_deviation: 0.045            # optional
+          significance_level: 0.05  
+# 17 # /robot_41/master_discovery/linkstats ############################################################
+  - name: /robot_41/master_discovery/linkstats
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.004            # optional
+          significance_level: 0.05  
+# 18 # /robot_41/odom #####################################################
+  - name: /robot_41/odom
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 22
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.052
+          std_deviation: 0.0084            # optional
+          significance_level: 0.05  
+# 19 # /robot_41/parameters_hash #####################################################
+  - name: /robot_41/parameters_hash
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.0025            # optional
+          significance_level: 0.05  
+# 20 # /robot_41/right_acc_wheel_vel_rpm ##################################################################
+  - name: /robot_41/right_acc_wheel_vel_rpm
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 22
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.052
+          std_deviation: 0.0084            # optional
+          significance_level: 0.05  
+# 21 # /robot_41/scan ##################################################
+  - name: /robot_41/scan
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 11
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.12
+          std_deviation: 0.024            # optional
+          significance_level: 0.05  
+# 22 # /robot_41/state_of_charge ##########################################
+  - name: /robot_41/state_of_charge
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 5
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 1.0
+          std_deviation: 0.05           # optional
+          significance_level: 0.05  
+# 23 # /robot_41/wheel_dists ########################################################
+  - name: /robot_41/wheel_dists
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 22
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.052
+          std_deviation: 0.0084            # optional
+          significance_level: 0.05  
+# 24 # /robot_41/wheel_rpm ###########################################
+  - name: /robot_41/wheel_rpm
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 22
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.052
+          std_deviation: 0.0084            # optional
+          significance_level: 0.05  
+# 25 # /robot_41/wheel_vels ######################################
+  - name: /robot_41/wheel_vels
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 22
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.051
+          std_deviation: 0.0084            # optional
+          significance_level: 0.05  
+# 26 # /tf #############################################
+  - name: /tf
+    callerids:
+    - callerid: []
+      filter:      
+        type: mean
+        window_size: 110
+        deviation_type: std_deviation
+      states:
+      - state: 'ok'
+        number: 0
+        frequenzy:
+          type: student_t
+          true_mean: 0.011
+          std_deviation: 0.015            # optional
+          significance_level: 0.05  

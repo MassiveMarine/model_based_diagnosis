@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node name="tug_diagnosis_node" pkg="tug_diagnosis" type="diagnosis_node.py" output="screen">
+
+    <rosparam command="load" file="$(find tug_diagnosis)/config/config_anna.yaml" />
+  
+  </node>
+
+</launch>

@@ -1,0 +1,44 @@
+setup:
+- type: timestamp
+  main_loop_rate: 1.0
+  topics:
+# 1 # /dynament/co2 ###########################################################
+  - name: /dynament/co2
+    callerids:
+    - callerid: []
+      filter:
+        type: mean                          # mean, median, kmeans, ewma, nofilter
+        window_size: 200                    # @ mean, median, kmeans, ewma(optional)
+        k_size: 10                          # @ kmeans
+        decay_rate: 0.05                    # @ ewma x = old_x * (1.0 - a) + new_x * a
+        deviation_type: std_deviation       # std_deviation, min_max
+      states:
+      - state: 'state1'
+        number: 1
+        age:
+          type: student_t                   # student_t, nominal_value
+          true_mean: 0.10                   # @ student_t
+          std_deviation: 0.0003             # @ student_t(optional)
+          significance_level: 0.05          # @ student_t
+          value:                            # @ nominal_value
+            # gauss, exact, not, greather_than, less_than, in_between, not_in_between
+            type: gauss 
+            mean: 0.1                       # @ gauss
+            std_deviation: 0.25             # @ gauss
+            exact: 5.1                      # @ exact
+            exact_not: : 5.1                # @ not
+            greater_than: 5.1               # @ greather_than
+            less_than: 5.1                  # @ less_than
+            lower_bound: 2.0                # @ in_between, not_in_between
+            upper_bound: 5.1                # @ in_between, not_in_between
+          deviation:                        # @ nominal_value
+            # gauss, exact, not, greather_than, less_than, in_between, not_in_between
+          - type: gauss
+            mean: 0.1                       # @ gauss
+            std_deviation: 0.25             # @ gauss
+            exact: 5.1                      # @ exact
+            exact_not: : 5.1                # @ not
+            greater_than: 5.1               # @ greather_than
+            less_than: 5.1                  # @ less_than
+            lower_bound: 2.0                # @ in_between, not_in_between
+            upper_bound: 5.1                # @ in_between, not_in_between

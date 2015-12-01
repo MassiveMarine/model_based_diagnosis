@@ -1,0 +1,531 @@
+setup:
+- type: velocity
+  loop_rate: 1.0
+  correlations:
+  - source_A:
+      type: twist               # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /cmd_vel           # @ twist, twist_stamped, imu, odometry, pose_stamped
+      x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+    source_B:
+      type: imu                 # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /imu_data          # @ twist, twist_stamped, imu, odometry, pose_stamped
+      gravitation_cancelation: true
+      x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+    x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    use_yaw: true
+    rot_x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_z_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: '1'
+      number: 1
+      x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.5             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.6             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_z:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 1.0             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+  - source_A:
+      type: twist               # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /cmd_vel           # @ twist, twist_stamped, imu, odometry, pose_stamped
+      x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+    source_B:
+      type: pose_stamped        # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /robot_pose_simple # @ twist, twist_stamped, imu, odometry, pose_stamped
+      velocity_window_size: 25   # @ odometry, pose_stamped
+      acceleartion_window_size: 15 # @ twist, twist_stamped, odometry, pose_stamped
+      x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+    x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    use_yaw: true
+    rot_x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_z_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: '1'
+      number: 1
+      x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.4             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.5             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_z:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 1.0             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+  - source_A:
+      type: pose_stamped        # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /robot_pose_simple # @ twist, twist_stamped, imu, odometry, pose_stamped
+      velocity_window_size: 25   # @ odometry, pose_stamped
+      acceleartion_window_size: 15 # @ twist, twist_stamped, odometry, pose_stamped
+      x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+    source_B:
+      type: imu                 # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /imu_data          # @ twist, twist_stamped, imu, odometry, pose_stamped
+      gravitation_cancelation: true
+      x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+    x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    z_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    use_roll: true
+    use_pitch: true
+    use_yaw: true
+    rot_x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_z_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: '1'
+      number: 1
+      x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.5             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.5             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      z:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.5             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_z:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.9             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+  - source_A:
+      type: twist               # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /cmd_vel           # @ twist, twist_stamped, imu, odometry, pose_stamped
+      x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.2           # @ mean(optional), median, kmeans, ewma(optional)
+    source_B:
+      type: odometry            # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /odom              # @ twist, twist_stamped, imu, odometry, pose_stamped
+      velocity_window_size: 5   # @ odometry, pose_stamped
+      acceleartion_window_size: 5 # @ twist, twist_stamped, odometry, pose_stamped
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.5           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.5           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.5           # @ mean(optional), median, kmeans, ewma(optional)
+    x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 50           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 50           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    use_yaw: true
+    rot_x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 50           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 50           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_z_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 50           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: '1'
+      number: 1
+      x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.4             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.4             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_z:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 1.6             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+  - source_A:
+      type: odometry            # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /odom              # @ twist, twist_stamped, imu, odometry, pose_stamped
+      velocity_window_size: 5   # @ odometry, pose_stamped
+      acceleartion_window_size: 5 # @ twist, twist_stamped, odometry, pose_stamped
+    source_B:
+      type: imu                 # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /imu_data          # @ twist, twist_stamped, imu, odometry, pose_stamped
+      gravitation_cancelation: true
+      x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.05           # @ mean(optional), median, kmeans, ewma(optional)
+    x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    use_yaw: true
+    rot_x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_z_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 110           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: '1'
+      number: 1
+      x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.5             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.5             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_z:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 1.8             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+  - source_A:
+      type: odometry            # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /odom              # @ twist, twist_stamped, imu, odometry, pose_stamped
+      velocity_window_size: 10   # @ odometry, pose_stamped
+      acceleartion_window_size: 5 # @ twist, twist_stamped, odometry, pose_stamped
+    source_B:
+      type: pose_stamped        # twist, twist_stamped, imu, odometry, pose_stamped, tf
+      topic: /robot_pose_simple # @ twist, twist_stamped, imu, odometry, pose_stamped
+      velocity_window_size: 25   # @ odometry, pose_stamped
+      acceleartion_window_size: 15 # @ twist, twist_stamped, odometry, pose_stamped
+      x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_x_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_y_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+      rot_z_filter:
+        type: ewma                # mean, median, kmeans, ewma, nofilter
+        decay_rate: 0.3           # @ mean(optional), median, kmeans, ewma(optional)
+    x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    use_yaw: true
+    rot_x_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_y_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    rot_z_filter:
+      type: mean                # mean, median, kmeans, ewma, nofilter
+      window_size: 44           # @ mean(optional), median, kmeans, ewma(optional)
+      deviation_type: std_deviation       # std_deviation, min_max
+    states:
+    - state: '1'
+      number: 1
+      x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.4             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.4             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_x:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_y:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 0.2             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t
+      rot_z:
+        type: student_t                   # student_t, nominal_value
+        true_mean: 0.0                   # @ student_t
+        std_deviation: 1.8             # @ student_t(optional)
+        significance_level: 0.05          # @ student_t

@@ -1,0 +1,160 @@
+setup:
+- type: timeout
+  use_global_subscriber: true
+  topics:
+# 1 # /diagnostics #######################################################
+  - name: /diagnostics
+    callerids:
+    - callerid: []
+      timeout: 2.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 2 # /multi_position_share #######################################################
+  - name: /multi_position_share
+    callerids:
+    - callerid: []
+      timeout: 2.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 3 # /multi_robot_status #######################################################
+  - name: /multi_robot_status
+    callerids:
+    - callerid: []
+      timeout: 2.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined          
+# 4 # /position_share #######################################################
+  - name: /position_share
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 5 # /reserved_areas #######################################################
+  - name: /reserved_areas
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 6 # /robot_41/amcl_pose ###############################################################
+  - name: /robot_41/amcl_pose
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 7 # /robot_41/battery_status ###########################################################
+  - name: /robot_41/battery_status
+    callerids:
+    - callerid: []
+      timeout: 2.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 8 # /robot_41/cmd_vel_watchdog ###############################################
+  - name: /robot_41/cmd_vel_watchdog
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 9 # /robot_41/contact_with_station ###############################################
+  - name: /robot_41/contact_with_station
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 10 # /robot_41/core_status ###################################################################
+  - name: /robot_41/core_status
+    callerids:
+    - callerid: []
+      timeout: 3.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 11 # /robot_41/corrected_odometry_pose ####################################################
+  - name: /robot_41/corrected_odometry_pose
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 12 # /robot_41/hardware_status #####################################################
+  - name: /robot_41/hardware_status
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 13 # /robot_41/lam_button_states #####################################################
+  - name: /robot_41/lam_button_states
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 14 # /robot_41/lam_light_states #####################################################
+  - name: /robot_41/lam_light_states
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 15 # /robot_41/left_acc_wheel_vel_rpm ############################################################
+  - name: /robot_41/left_acc_wheel_vel_rpm
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 16 # /robot_41/localization_score ############################################################
+  - name: /robot_41/localization_score
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 17 # /robot_41/master_discovery/linkstats ############################################################
+  - name: /robot_41/master_discovery/linkstats
+    callerids:
+    - callerid: []
+      timeout: 2.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 18 # /robot_41/odom #####################################################
+  - name: /robot_41/odom
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 19 # /robot_41/parameters_hash #####################################################
+  - name: /robot_41/parameters_hash
+    callerids:
+    - callerid: []
+      timeout: 2.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 20 # /robot_41/right_acc_wheel_vel_rpm ##################################################################
+  - name: /robot_41/right_acc_wheel_vel_rpm
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 21 # /robot_41/scan ##################################################
+  - name: /robot_41/scan
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 22 # /robot_41/state_of_charge ##########################################
+  - name: /robot_41/state_of_charge
+    callerids:
+    - callerid: []
+      timeout: 2.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 23 # /robot_41/wheel_dists ########################################################
+  - name: /robot_41/wheel_dists
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 24 # /robot_41/wheel_rpm ###########################################
+  - name: /robot_41/wheel_rpm
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 25 # /robot_41/wheel_vels ######################################
+  - name: /robot_41/wheel_vels
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined
+# 26 # /tf #############################################
+  - name: /tf
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined

@@ -1,0 +1,17 @@
+setup:
+- type: scores
+  main_loop_rate: 1.0
+  use_global_subscriber: true
+  topics:
+# 1 # /robot_41/localization_score ############################################################
+  - name: /robot_41/localization_score
+    filter:
+      type: nofilter                          # mean, median, kmeans, ewma, nofilter
+    states:
+    - state: 'ok'
+      number: 1
+      score:
+        type: nominal_value                   # student_t, nominal_value
+        value:
+          type: greather_than
+          greater_than: 0.8        

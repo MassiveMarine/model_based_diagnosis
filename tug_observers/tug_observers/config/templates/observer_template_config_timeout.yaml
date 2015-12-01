@@ -1,0 +1,9 @@
+########## hz example ##########
+setup:
+- type: timeout
+  topics:
+  - name: /topicA
+    callerids:
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, if callerid is defined

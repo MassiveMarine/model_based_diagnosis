@@ -1,0 +1,13 @@
+########## node1 ##########
+setup:
+- type: timeout
+  use_global_subscriber: true
+  topics:
+  - name: /topicA
+    callerids:
+    - callerid: [/dynamic_publisher]
+      timeout: 1.0
+      max_timeouts_in_a_row: 2 # has no effect, because defined callerids
+    - callerid: []
+      timeout: 1.0
+      max_timeouts_in_a_row: 2

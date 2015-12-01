@@ -1,0 +1,8 @@
+<library path="lib/libresources_plugin">
+  <class name="resources" type="tug_observer_plugins_cpp::ResourcesPlugin"
+         base_class_type="tug_observers::ObserverPluginBase">
+    <description>
+      Observer plugin which checks if the resource consumption of a given node list is in specified condition
+    </description>
+  </class>
+</library>

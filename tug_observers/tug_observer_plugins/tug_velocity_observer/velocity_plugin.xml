@@ -1,0 +1,8 @@
+<library path="lib/libvelocity_plugin">
+  <class name="velocity" type="tug_observer_plugins_cpp::VelocityPlugin"
+         base_class_type="tug_observers::ObserverPluginBase">
+    <description>
+      Observer plugin which checks if two sources of velocities conside
+    </description>
+  </class>
+</library>

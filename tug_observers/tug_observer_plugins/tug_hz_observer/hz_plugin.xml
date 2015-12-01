@@ -1,0 +1,8 @@
+<library path="lib/libhz_plugin">
+  <class name="hz" type="tug_observer_plugins_cpp::HzPlugin"
+         base_class_type="tug_observers::ObserverPluginBase">
+    <description>
+      Observer plugin which if a topic is received with a certain frequency
+    </description>
+  </class>
+</library>

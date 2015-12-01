@@ -1,0 +1,53 @@
+setup:
+- type: resources
+  resource_topic: /robot_41/diag/node_infos
+  nodes:
+  - name: /robot_41/localize_to_target
+    cpu_filter:
+      type: mean
+      window_size: 3
+    mem_filter:
+      type: median
+      window_size: 3
+    states:
+    - state: '1'
+      number: 1
+      cpu:
+        type: nominal_value
+        value:
+          type: gauss
+          mean: 2.0
+          std_deviation: 1.0
+      memory:
+        type: nominal_value
+        value:
+          type: gauss
+          # mem usage in bytes
+          mean: 6512640
+          # mem usage std deviation in bytes
+          std_deviation: 1024
+  - name: /robot_41/triangle_extraction
+    cpu_filter:
+      type: kmeans
+      window_size: 5
+      k_size: 3
+    mem_filter:
+      type: ewma
+      decay_rate: 0.8
+    states:
+    - state: '1'
+      number: 1
+      cpu:
+        type: nominal_value
+        value:
+          type: gauss
+          mean: 1.0
+          std_deviation: 4.0
+      memory:
+        type: nominal_value
+        value:
+          type: gauss
+          # mem usage in bytes
+          mean: 6250496
+          # mem usage std deviation in bytes
+          std_deviation: 1024
