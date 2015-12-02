@@ -6,6 +6,7 @@ from tug_python_utils import YamlHelper
 from observation_store import ObservationWithNumber
 from observation_store import ObservationWithString
 from observation_store import ObservationContainer
+from diagnosis_store import DiagnosisContainer
 import rospy
 
 __author__ = 'clemens'
@@ -17,12 +18,40 @@ class Rule(object):
                  negative_possible_faulty_resources, recall_duration, is_single_shot):
         self._positive_observations = positive_observations
         self._negative_observations = negative_observations
+        if any(obs in self._positive_observations for obs in self._negative_observations):
+            raise ValueError("positive observations and negative observations are not allowed to intersect")
+
         self._positive_possible_faulty_resources = positive_possible_faulty_resources
         self._negative_possible_faulty_resources = negative_possible_faulty_resources
+        if any(obs in self._positive_possible_faulty_resources for obs in self._negative_possible_faulty_resources):
+            raise ValueError(
+                "positive possible faulty resources and possible faulty resources are not allowed to intersect")
         self._last_called = None
         self._recall_duration = recall_duration
         self._is_single_shot = is_single_shot
         self._was_triggered = False
+
+    def observations_to_use(self):
+        result = set()
+        for p_obs in self._positive_observations:
+            result.add((p_obs.type, p_obs.resource, p_obs.window_size))
+
+        for n_obs in self._negative_observations:
+            result.add((n_obs.type, n_obs.resource, n_obs.window_size))
+
+        return result
+
+    def resources_to_use(self):
+        result = set()
+        for p_obs in self._positive_possible_faulty_resources:
+            result.add((p_obs.resource, p_obs.window_size))
+
+        for n_obs in self._negative_possible_faulty_resources:
+            result.add((n_obs.resource, n_obs.window_size))
+
+        return result
+
+        return result
 
     def can_trigger(self, observation_store, diagnosis_store):
         if self._is_single_shot and self._was_triggered:
@@ -33,19 +62,21 @@ class Rule(object):
             return False
 
         for p_obs in self._positive_observations:
-            if not observation_store.has_observation(p_obs.type, p_obs.resource, p_obs.observation):
+            if not observation_store.has_observation(p_obs.type, p_obs.resource, p_obs.observation,
+                                                     p_obs.occurrences, p_obs.window_size):
                 return False
 
         for n_obs in self._negative_observations:
-            if observation_store.has_observation(p_obs.type, p_obs.resource, p_obs.observation):
+            if observation_store.has_observation(n_obs.type, n_obs.resource, n_obs.observation,
+                                                 n_obs.occurrences, n_obs.window_size):
                 return False
 
         for p_diag in self._positive_possible_faulty_resources:
-            if not diagnosis_store.possible_faulty(p_diag):
+            if not diagnosis_store.possible_faulty(p_diag.resource, p_diag.occurrences, p_diag.window_size):
                 return False
 
         for n_diag in self._negative_possible_faulty_resources:
-            if diagnosis_store.possible_faulty(n_diag):
+            if diagnosis_store.possible_faulty(n_diag.resource, n_diag.occurrences, n_diag.window_size):
                 return False
 
         return True
@@ -86,8 +117,8 @@ class ProcessRule(Rule):
 class EMailRule(Rule):
 
     def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
-                 negative_possible_faulty_resources, recall_duration, is_single_shot, host, port, username, password, subject,
-                 to_address, from_address, content):
+                 negative_possible_faulty_resources, recall_duration, is_single_shot, host, port, username,
+                 password, subject, to_address, from_address, content):
         super(EMailRule, self).__init__(positive_observations, negative_observations,
                                         positive_possible_faulty_resources,
                                         negative_possible_faulty_resources, recall_duration, is_single_shot)
@@ -96,6 +127,10 @@ class EMailRule(Rule):
         self._to_address = to_address
         self._from_address = from_address
         self._content = content
+        self._host = host
+        self._port = port
+        self._username = username
+        self._password = password
 
     def trigger(self):
         super(EMailRule, self).trigger_intern()
@@ -138,15 +173,33 @@ class RuleFactory(object):
                 the_obs.observation = ObservationWithNumber(YamlHelper.get_param(obs, 'observation'))
             else:
                 the_obs.observation = ObservationWithString(YamlHelper.get_param(obs, 'observation_msg'))
+            if YamlHelper.has_param(obs, 'occurrences'):
+                the_obs.occurrences = YamlHelper.get_param(obs, 'occurrences')
+            else:
+                the_obs.occurrences = None
+            if YamlHelper.has_param(obs, 'window_size'):
+                the_obs.window_size = YamlHelper.get_param(obs, 'window_size')
+            else:
+                the_obs.window_size = None
 
             result.add(the_obs)
         return result
 
     @staticmethod
-    def pars_diag(observations):
+    def pars_diag(resources):
         result = set()
-        for obs in observations:
-            result.add(YamlHelper.get_param(obs, 'resource'))
+        for res in resources:
+            the_res = DiagnosisContainer()
+            the_res.resource = YamlHelper.get_param(res, 'resource')
+            if YamlHelper.has_param(res, 'occurrences'):
+                the_res.occurrences = YamlHelper.get_param(res, 'occurrences')
+            else:
+                the_res.occurrences = None
+            if YamlHelper.has_param(res, 'window_size'):
+                the_res.window_size = YamlHelper.get_param(res, 'window_size')
+            else:
+                the_res.window_size = None
+            result.add(the_res)
         return result
 
     @staticmethod
