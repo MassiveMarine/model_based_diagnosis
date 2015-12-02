@@ -110,37 +110,39 @@ include_directories(
 
 ## Declare a cpp library
 add_library(observer_plugin_utils   src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValue.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValueFactory.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GaussNominalValue.cpp
-                                    src/filter/value_filter/ValueFilter.cpp
-                                    src/filter/value_filter/ValueFilterFactory.cpp src/filter/value_filter/MeanValueFilter.cpp
-                                    src/filter/value_filter/MedianValueFilter.cpp src/filter/value_filter/KMeansValueFilter.cpp
-                                    src/filter/value_filter/EWMAValueFilter.cpp src/filter/value_filter/NoValueFilter.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/ExactNominalValue.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotNominalValue.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GreaterThanNominalValue.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/LessThanNominalValue.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/InBetweenNominalValue.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotInBetweenNominalValue.cpp
-                                    src/filter/deviation_filter/DeviationFilter.cpp src/filter/Filter.cpp src/filter/FilteState.cpp
-                                    src/filter/deviation_filter/MinMaxDeviationFilter.cpp
-                                    src/filter/deviation_filter/DeviationFilterFactory.cpp
-                                    src/filter/deviation_filter/StandartDeviationFilter.cpp
-                                    src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithBuffer.cpp
-                                    src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithoutBuffer.cpp
-                                    src/filter/value_filter/mean_value_filter/MeanValueFilterWithBuffer.cpp
-                                    src/filter/value_filter/mean_value_filter/MeanValueFilterWithoutBuffer.cpp
-                                    src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithBuffer.cpp
-                                    src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithoutBuffer.cpp
-                                    src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithBuffer.cpp
-                                    src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithoutBuffer.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheck.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/NominalValueHypothesis.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheckFactory.cpp
-                                    src/hypothesis_check/singe_value_hypothesis_check/StudentsTSingleHypothesis.cpp
-                                    src/interpolation/Interpolation.cpp src/interpolation/LinearInterpolation.cpp
-                                    src/differentiation/Differentiation.cpp src/differentiation/SingleSideDifferentiation.cpp
-                                    src/differentiation/TwoSideDifferentiation.cpp src/differentiation/SimpleLinearRegression.cpp)
+        src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValueFactory.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GaussNominalValue.cpp
+        src/filter/value_filter/ValueFilter.cpp
+        src/filter/value_filter/ValueFilterFactory.cpp src/filter/value_filter/MeanValueFilter.cpp
+        src/filter/value_filter/MedianValueFilter.cpp src/filter/value_filter/KMeansValueFilter.cpp
+        src/filter/value_filter/EWMAValueFilter.cpp src/filter/value_filter/NoValueFilter.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/nominal_value/ExactNominalValue.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotNominalValue.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/nominal_value/GreaterThanNominalValue.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/nominal_value/LessThanNominalValue.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/nominal_value/InBetweenNominalValue.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/nominal_value/NotInBetweenNominalValue.cpp
+        src/filter/deviation_filter/DeviationFilter.cpp src/filter/Filter.cpp src/filter/FilteState.cpp
+        src/filter/deviation_filter/MinMaxDeviationFilter.cpp
+        src/filter/deviation_filter/DeviationFilterFactory.cpp
+        src/filter/deviation_filter/StandartDeviationFilter.cpp
+        src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithBuffer.cpp
+        src/filter/value_filter/ewma_value_filter/EWMAValueFilterWithoutBuffer.cpp
+        src/filter/value_filter/mean_value_filter/MeanValueFilterWithBuffer.cpp
+        src/filter/value_filter/mean_value_filter/MeanValueFilterWithoutBuffer.cpp
+        src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithBuffer.cpp
+        src/filter/deviation_filter/standart_deviation_filter/StandartDeviationFilterWithoutBuffer.cpp
+        src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithBuffer.cpp
+        src/filter/deviation_filter/min_max_deviation_filter/MinMaxDeviationFilterWithoutBuffer.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheck.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/NominalValueHypothesis.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/SingleValueHypothesisCheckFactory.cpp
+        src/hypothesis_check/singe_value_hypothesis_check/StudentsTSingleHypothesis.cpp
+        src/interpolation/Interpolation.cpp src/interpolation/LinearInterpolation.cpp
+        src/differentiation/Differentiation.cpp src/differentiation/SingleSideDifferentiation.cpp
+        src/differentiation/TwoSideDifferentiation.cpp src/differentiation/SimpleLinearRegression.cpp
+        src/integration/Integration.cpp src/integration/SimpleSummBasedIntegration.cpp
+        )
 
 ## Declare a cpp executable
 # add_executable(tug_observer_plugins_cpp_node src/tug_observer_plugins_cpp_node.cpp)
