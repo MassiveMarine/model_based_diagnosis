@@ -43,6 +43,7 @@ namespace tug_observers
           throw std::runtime_error("/" + static_cast<std::string>(params[i]) + " has no 'type' parameter");
 
         std::string type = static_cast<std::string>(param["type"]);
+        ROS_DEBUG_STREAM("loading observer of type " << type);
         ObserverPluginBasePtr new_plugin = plugin_manager_.loadPlugin(type, type);
 
         if (param.hasMember("start_up_time"))
@@ -55,21 +56,23 @@ namespace tug_observers
           new_plugin->setStartUpTime(start_up_time);
         }
 
+        ROS_DEBUG_STREAM("initialize observer of type " << type);
         new_plugin->initialize(params[i]);
+        ROS_DEBUG_STREAM("done prepearing of type " << type);
       }
     }
 
     void ObserverNode::startPlugins()
     {
-      ROS_DEBUG("[ObserverNode::startPlugins] 1");
+      ROS_DEBUG_STREAM("[ObserverNode::startPlugins] 1");
       Observers observers = plugin_manager_.getPluginList();
-      ROS_DEBUG("[ObserverNode::startPlugins] 2");
+      ROS_DEBUG_STREAM("[ObserverNode::startPlugins] 2");
       for (Observers::iterator it = observers.begin(); it != observers.end(); ++it)
       {
-        ROS_DEBUG("[ObserverNode::startPlugins] 2.1");
+        ROS_DEBUG_STREAM("[ObserverNode::startPlugins] 2.1");
         it->instance->startPlugin();
       }
-      ROS_DEBUG("[ObserverNode::startPlugins] 2.2");
+      ROS_DEBUG_STREAM("[ObserverNode::startPlugins] 2.2");
     }
 }  // namespace tug_observers
 
