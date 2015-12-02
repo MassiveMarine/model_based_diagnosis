@@ -17,11 +17,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #ifndef TUG_OBSERVER_PLUGIN_UTILS_HYPOTHESIS_CHECK_SINGE_VALUE_HYPOTHESIS_CHECK_NOMINAL_VALUE_NOMINALVALUE_H
 #define TUG_OBSERVER_PLUGIN_UTILS_HYPOTHESIS_CHECK_SINGE_VALUE_HYPOTHESIS_CHECK_NOMINAL_VALUE_NOMINALVALUE_H
 
+#include <stddef.h>
+
 template <class T>
 class NominalValue
 {
 public:
   virtual bool isNominal(const T& value) = 0;
+  virtual size_t getMinimumSampleSize()
+  {
+    return 1;
+  }
 };
 
 
