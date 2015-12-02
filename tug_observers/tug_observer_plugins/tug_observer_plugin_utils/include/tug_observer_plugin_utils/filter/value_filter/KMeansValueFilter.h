@@ -86,14 +86,15 @@ public:
     ROS_DEBUG_STREAM("lower index " << lower_index);
     size_t upper_index = getUpperIndex();
     ROS_DEBUG_STREAM("upper index " << upper_index);
-    std::sort(buffer_.begin(), buffer_.end());
+    boost::circular_buffer<T> tmp_buffer = buffer_;
+    std::sort(tmp_buffer.begin(), tmp_buffer.end());
     ROS_DEBUG("sorted");
     if(upper_index + 1 - lower_index < 2. * k_half_)
-      upper_index = std::min(buffer_.size() - 1, upper_index + 1);
+      upper_index = std::min(tmp_buffer.size() - 1, upper_index + 1);
     if(upper_index + 1 - lower_index > 2. * k_half_)
       lower_index = std::min(upper_index, lower_index + 1);
 
-    T result = std::accumulate(buffer_.begin() + lower_index, buffer_.begin() + upper_index + 1, static_cast<T>(0));
+    T result = std::accumulate(tmp_buffer.begin() + lower_index, tmp_buffer.begin() + upper_index + 1, static_cast<T>(0));
 
     return result / static_cast<T>(upper_index - lower_index + 1);
   }
