@@ -1,0 +1,8 @@
+<library path="lib/libmoveing_plugin">
+  <class name="moveing" type="tug_observer_plugins_cpp::MoveingPlugin"
+         base_class_type="tug_observers::ObserverPluginBase">
+    <description>
+      Observer plugin which checks if the robot is moveing
+    </description>
+  </class>
+</library>
