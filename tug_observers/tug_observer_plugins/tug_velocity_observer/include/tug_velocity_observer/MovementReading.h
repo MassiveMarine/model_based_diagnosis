@@ -20,19 +20,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include <ros/time.h>
 #include <sensor_msgs/Imu.h>
 
-struct LinearAccelerationReading
+struct ThreeAxisMovement
 {
     double x;
     double y;
     double z;
 };
 
-struct AngularVelocityReading
-{
-    double x;
-    double y;
-    double z;
-};
+struct LinearAccelerationReading : public ThreeAxisMovement
+{ };
+
+struct AngularVelocityReading : public ThreeAxisMovement
+{ };
 
 struct MovementReading
 {

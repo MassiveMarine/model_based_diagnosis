@@ -253,8 +253,6 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
   {
     x_state = diff_x_filter_->getFilteState();
     ROS_DEBUG_STREAM("x filter result " << x_state);
-    if (x_state.sample_size < 2)
-      return std::make_pair(false, std::vector<Observation>());
   }
 
   FilteState<double> y_state;
@@ -262,8 +260,6 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
   {
     y_state = diff_y_filter_->getFilteState();
     ROS_DEBUG_STREAM("y filter result " << y_state);
-    if (y_state.sample_size < 2)
-      return std::make_pair(false, std::vector<Observation>());
   }
 
   FilteState<double> z_state;
@@ -271,24 +267,16 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
   {
     z_state = diff_z_filter_->getFilteState();
     ROS_DEBUG_STREAM("z filter result " << z_state);
-    if (z_state.sample_size < 2)
-      return std::make_pair(false, std::vector<Observation>());
   }
 
   FilteState<double> rot_x_state = diff_rot_x_filter_->getFilteState();
   ROS_DEBUG_STREAM("rot x filter result " << rot_x_state);
-  if (rot_x_state.sample_size < 2)
-    return std::make_pair(false, std::vector<Observation>());
 
   FilteState<double> rot_y_state = diff_rot_y_filter_->getFilteState();
   ROS_DEBUG_STREAM("rot y filter result " << rot_y_state);
-  if (rot_y_state.sample_size < 2)
-    return std::make_pair(false, std::vector<Observation>());
 
   FilteState<double> rot_z_state = diff_rot_z_filter_->getFilteState();
   ROS_DEBUG_STREAM("rot z filter result " << rot_z_state);
-  if (rot_z_state.sample_size < 2)
-    return std::make_pair(false, std::vector<Observation>());
 
   sensor_msgs::Imu imu_msg;
   imu_msg.header.stamp = ros::Time(ros::WallTime::now().toSec());
@@ -311,24 +299,43 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
   {
     ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.1");
     ROS_DEBUG_STREAM("check state: '" << it->getName() << "'");
-    if (diff_x_filter_ && !it->conformsStateX(x_state))
+    if (diff_x_filter_)
     {
-      ROS_ERROR_STREAM("x filter is not confrom result " << x_state);
-      continue;
+      if (!it->canCheckX(x_state))
+        return std::make_pair(false, std::vector<Observation>());
+
+      if (!it->conformsStateX(x_state))
+      {
+        ROS_ERROR_STREAM("x filter is not confrom result " << x_state);
+        continue;
+      }
     }
     ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.2");
-    if (diff_y_filter_ && !it->conformsStateY(y_state))
+    if (diff_y_filter_)
     {
-      ROS_ERROR_STREAM("y filter is not confrom result " << y_state);
-      continue;
+      if (!it->canCheckY(x_state))
+        return std::make_pair(false, std::vector<Observation>());
+
+      if (!it->conformsStateY(y_state))
+      {
+        ROS_ERROR_STREAM("y filter is not confrom result " << y_state);
+        continue;
+      }
     }
     ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.3");
-    if (diff_z_filter_ && !it->conformsStateZ(z_state))
+    if (diff_z_filter_)
     {
-      ROS_ERROR_STREAM("z filter is not confrom result " << z_state);
-      continue;
+      if (!it->canCheckZ(x_state))
+        return std::make_pair(false, std::vector<Observation>());
+      if (!it->conformsStateZ(z_state))
+      {
+        ROS_ERROR_STREAM("z filter is not confrom result " << z_state);
+        continue;
+      }
     }
     ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.4");
+    if (it->canCheck(rot_x_state, rot_y_state, rot_z_state))
+      return std::make_pair(false, std::vector<Observation>());
     if (it->conformsState(rot_x_state, rot_y_state, rot_z_state))
       result.push_back(Observation(it->getName(), it->getNumber()));
     else
