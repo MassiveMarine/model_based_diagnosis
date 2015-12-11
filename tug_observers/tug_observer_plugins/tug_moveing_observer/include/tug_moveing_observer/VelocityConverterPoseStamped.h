@@ -14,46 +14,38 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TUG_VELOCITY_OBSERVER_MOVEMENTREADING_H
-#define TUG_VELOCITY_OBSERVER_MOVEMENTREADING_H
+#ifndef TUG_MOVEING_OBSERVER_VELOCITYCONVERTERPOSESTAMPED_H
+#define TUG_MOVEING_OBSERVER_VELOCITYCONVERTERPOSESTAMPED_H
 
-#include <ros/time.h>
-#include <sensor_msgs/Imu.h>
+#include <tug_moveing_observer/VelocityConverterTwistStamped.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <boost/circular_buffer.hpp>
+#include <tug_observer_plugin_utils/differentiation/SimpleLinearRegression.h>
+#include <string>
 
-struct ThreeAxisMovement
+class VelocityConverterPoseStamped : public VelocityConverterTwistStamped
 {
-    double x;
-    double y;
-    double z;
-};
+    std::string topic_;
+    unsigned int window_size_;
+    boost::circular_buffer<geometry_msgs::PoseStamped> pose_buffer_;
+    boost::shared_ptr<SimpleLinearRegression<double> > linear_x_velocity_calc_;
+    boost::shared_ptr<SimpleLinearRegression<double> > linear_y_velocity_calc_;
+    boost::shared_ptr<SimpleLinearRegression<double> > linear_z_velocity_calc_;
+    boost::shared_ptr<SimpleLinearRegression<double> > angular_x_velocity_calc_;
+    boost::shared_ptr<SimpleLinearRegression<double> > angular_y_velocity_calc_;
+    boost::shared_ptr<SimpleLinearRegression<double> > angular_z_velocity_calc_;
 
-struct LinearAccelerationReading : public ThreeAxisMovement
-{ };
+protected:
+    VelocityConverterPoseStamped(XmlRpc::XmlRpcValue params, boost::function<void(MovementReading)> call_back);
 
-struct AngularVelocityReading : public ThreeAxisMovement
-{ };
+public:
+    VelocityConverterPoseStamped(XmlRpc::XmlRpcValue params, boost::function<void(MovementReading)> call_back,
+                                 SubscriberFacade *plugin_base);
 
-struct MovementReading
-{
-    ros::Time reading_time;
-    ros::Time plot_time;
-    LinearAccelerationReading linear;
-    AngularVelocityReading angular;
+    void PoseStampedCB(const geometry_msgs::PoseStamped &msg);
 
-    sensor_msgs::Imu toIMUMsg()
-    {
-      sensor_msgs::Imu result;
-      result.header.stamp = plot_time;
-      result.angular_velocity.x = angular.x;
-      result.angular_velocity.y = angular.y;
-      result.angular_velocity.z = angular.z;
-      result.linear_acceleration.x = linear.x;
-      result.linear_acceleration.y = linear.y;
-      result.linear_acceleration.z = linear.z;
-
-      return result;
-    }
+    virtual std::string getName();
 };
 
 
-#endif  // TUG_VELOCITY_OBSERVER_MOVEMENTREADING_H
+#endif  // TUG_MOVEING_OBSERVER_VELOCITYCONVERTERPOSESTAMPED_H

@@ -1,6 +1,6 @@
 /*
 This file is part of the tug model based diagnosis software for robots
-Copyright (c) 2015, Clemens Muehlbacher
+Copyright (c) 2015, Clemens Muehlbacher, Stefan Loigge
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,21 +14,26 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TUG_OBSERVER_PLUGIN_UTILS_HYPOTHESIS_CHECK_SINGE_VALUE_HYPOTHESIS_CHECK_NOMINAL_VALUE_NOMINALVALUE_H
-#define TUG_OBSERVER_PLUGIN_UTILS_HYPOTHESIS_CHECK_SINGE_VALUE_HYPOTHESIS_CHECK_NOMINAL_VALUE_NOMINALVALUE_H
+#ifndef TUG_MOVEING_OBSERVER_VELOCITYCONVERTERPOSE_H
+#define TUG_MOVEING_OBSERVER_VELOCITYCONVERTERPOSE_H
 
-#include <stddef.h>
+#include <tug_moveing_observer/VelocityConverterPoseStamped.h>
+#include <geometry_msgs/Pose.h>
+#include <string>
 
-template <class T>
-class NominalValue
+class VelocityConverterPose : public VelocityConverterPoseStamped
 {
+    std::string topic_;
+protected:
+    VelocityConverterPose(XmlRpc::XmlRpcValue params, boost::function<void(MovementReading)> call_back);
+
 public:
-  virtual bool isNominal(const T& value) = 0;
-  virtual size_t getMinimumSampleSize()
-  {
-    return 1;
-  }
+    VelocityConverterPose(XmlRpc::XmlRpcValue params, boost::function<void(MovementReading)> call_back,
+                          SubscriberFacade *plugin_base);
+
+    void PoseCB(const geometry_msgs::Pose &msg);
+
+    virtual std::string getName();
 };
 
-
-#endif  // TUG_OBSERVER_PLUGIN_UTILS_HYPOTHESIS_CHECK_SINGE_VALUE_HYPOTHESIS_CHECK_NOMINAL_VALUE_NOMINALVALUE_H
+#endif  // TUG_MOVEING_OBSERVER_VELOCITYCONVERTERPOSE_H

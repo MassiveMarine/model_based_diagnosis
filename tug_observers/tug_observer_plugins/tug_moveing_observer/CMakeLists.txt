@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tug_velocity_observer)
+project(tug_moveing_observer)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -107,7 +107,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES velocity_plugin
+  LIBRARIES moveing_plugin
 #  CATKIN_DEPENDS geometry_msgs pluginlib roscpp tug_observer_plugin_utils tug_observers tug_observers_msgs
 #  DEPENDS system_lib
 )
@@ -125,16 +125,13 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(velocity_observer   src/VelocityState.cpp src/VelocityConverter.cpp
-                                src/VelocityConverterFactory.cpp src/VelocityConverterTwist.cpp
-                                src/VelocityConverterTwistStamped.cpp src/VelocityConverterIMU.cpp
-                                src/VelocityConverterOdometry.cpp src/VelocityConverterPoseStamped.cpp
-                                src/VelocityConverterTf.cpp src/MovementReading.cpp
-                                src/VelocityConverterPose.cpp src/VelocityObserver.cpp
-                                src/VelocityChecker.cpp)
-
-add_library(velocity_plugin
-                            src/VelocityPlugin.cpp)
+add_library(moveing_plugin src/VelocityState.cpp src/VelocityConverter.cpp
+        src/VelocityConverterFactory.cpp src/VelocityConverterTwist.cpp
+        src/VelocityConverterTwistStamped.cpp src/VelocityConverterIMU.cpp
+        src/VelocityConverterOdometry.cpp src/VelocityConverterPoseStamped.cpp
+        src/VelocityConverterTf.cpp src/MovementReading.cpp
+        src/VelocityConverterPose.cpp src/MoveingObserver.cpp
+        src/MoveingPlugin.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -149,13 +146,8 @@ add_library(velocity_plugin
 # add_dependencies(tug_velocity_observer_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(velocity_observer
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(velocity_plugin
-  ${catkin_LIBRARIES}
-  velocity_observer
+target_link_libraries(moveing_plugin
+        ${catkin_LIBRARIES}
 )
 
 #############
@@ -173,7 +165,7 @@ target_link_libraries(velocity_plugin
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS tug_velocity_observer tug_velocity_observer_node
+# install(TARGETS tug_moveing_observer tug_velocity_observer_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

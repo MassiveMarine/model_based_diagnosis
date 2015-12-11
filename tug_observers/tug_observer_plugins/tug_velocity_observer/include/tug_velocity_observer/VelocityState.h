@@ -48,6 +48,14 @@ public:
     std::string getName();
 
     int32_t getNumber();
+
+    bool canCheckX(FilteState<double> x_state);
+
+    bool canCheckY(FilteState<double> y_state);
+
+    bool canCheckZ(FilteState<double> z_state);
+
+    bool canCheck(FilteState<double> rot_x_state, FilteState<double> rot_y_state, FilteState<double> rot_z_state);
 };
 
 

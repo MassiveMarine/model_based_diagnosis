@@ -27,6 +27,10 @@ class Reporter(object):
             rule_type = YamlHelper.get_param(rule_config, "type")
             self._rules.append(RuleFactory.create_rule(rule_type, rule_config))
 
+        for rule in self._rules:
+            self._observation_store.observations_used(rule.observations_to_use())
+            self._diagnosis_store.resources_used(rule.resources_to_use())
+
         self._background_thread = thread.start_new_thread(self.run, tuple())
 
     def observer_callback(self, observations):
