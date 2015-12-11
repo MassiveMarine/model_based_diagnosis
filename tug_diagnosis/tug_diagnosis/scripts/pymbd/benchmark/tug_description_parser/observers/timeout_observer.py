@@ -42,7 +42,9 @@ class TimeoutObserver(BaseObserver):
 
         for topic in topics:
             callerids = topics_published_from_nodes.get(topic, [])
-            checkInputData.list_data_valid(callerids)
+            checkInputData.list_data_valid(callerids, allow_empty=True)
+            if not len(callerids):
+                continue
 
             for callerid in callerids:
                 observation = "timeout_obs_" + topic + "_" + callerid

@@ -54,7 +54,9 @@ class HzObserver(BaseObserver):
 
         for topic in topics:
             callerids = topics_published_from_nodes.get(topic, [])
-            checkInputData.list_data_valid(callerids)
+            checkInputData.list_data_valid(callerids, allow_empty=True)
+            if not len(callerids):
+                continue
 
             for callerid in callerids:
                 observation = "hz_obs_" + topic + "_" + callerid
@@ -64,7 +66,7 @@ class HzObserver(BaseObserver):
                 rules.append(HzObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
 
                 if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
-                    raise ValueError
+                    raise ValueError('subscribed topics are not not in topics published list!')
 
             new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("hz", topic, topics_published_from_nodes[topic])
             vars.update(new_vars)

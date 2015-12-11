@@ -22,7 +22,7 @@ class GeneralObserver(BaseObserver):
         self.ab_published_topics = ab_published_topics
 
     def __repr__(self):
-        return "general: %s, %s" % (self.ab_node, self.ab_topic)
+        return "general: %s, %s, %s" % (self.ab_node, self.ab_topic,self.ab_subscribed_topics)
 
     def to_clause(self):
         clause_list = [clause(neg(self.ab_topic) + " " + self.ab_node + " " + all_pos(self.ab_subscribed_topics))]

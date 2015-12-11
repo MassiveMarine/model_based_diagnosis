@@ -44,46 +44,64 @@ class ScoresObserver(BaseObserver):
             callerids = topics_published_from_nodes.get(topic, [])
             checkInputData.list_data_valid(callerids)
 
+            observation = "scores_obs_" + topic
+            vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+
+            subscribed_topics = []
             for callerid in callerids:
-                observation = "scores_obs_" + topic + "_" + callerid
-                vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+                subscribed_topics += nodes_subscribe_topics.get(callerid, [])
 
-                subscribed_topics = nodes_subscribe_topics.get(callerid, [])
-                rules.append(ScoresObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
+            rules.append(ScoresObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
 
-                if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
-                    raise ValueError
+            if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+                raise ValueError
 
-            new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("scores", topic, callerids)
-            vars.update(new_vars)
-            rules += new_rules
-            nodes += new_nodes
+            # callerids = topics_published_from_nodes.get(topic, [])
+            # checkInputData.list_data_valid(callerids)
+            #
+            # for callerid in callerids:
+            #     observation = "scores_obs_" + topic + "_" + callerid
+            #     vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+            #
+            #     subscribed_topics = nodes_subscribe_topics.get(callerid, [])
+            #     rules.append(ScoresObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
+            #
+            #     if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+            #         raise ValueError
+            #
+            # new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("scores", topic, callerids)
+            # vars.update(new_vars)
+            # rules += new_rules
+            # nodes += new_nodes
 
         return vars, rules, nodes, []
 
     @staticmethod
     def decrypt_resource_info(resource_info):
 
-        if not resource_info:
-            raise ValueError
-        if not isinstance(resource_info, str):
-            raise TypeError
+        # if not resource_info:
+        #     raise ValueError
+        # if not isinstance(resource_info, str):
+        #     raise TypeError
+        #
+        # [topic_name, callerids_str] = resource_info.split(' ', 1)
+        #
+        # checkInputData.str_data_valid(topic_name)
+        #
+        # if len(callerids_str) <= 2:
+        #     return ['scores_obs_' + str(topic_name) + "_all"]
+        #
+        # callerids = [x.strip() for x in callerids_str[1:-1].split(',')]
+        #
+        # infos = []
+        # for callerid in callerids:
+        #     checkInputData.str_data_valid(callerid)
+        #     infos.append('scores_obs_' + str(topic_name) + "_" + str(callerid))
+        #
+        # return infos
+        checkInputData.str_data_valid(resource_info, forbidden_chars=[' '])
 
-        [topic_name, callerids_str] = resource_info.split(' ', 1)
-
-        checkInputData.str_data_valid(topic_name)
-
-        if len(callerids_str) <= 2:
-            return ['scores_obs_' + str(topic_name) + "_all"]
-
-        callerids = [x.strip() for x in callerids_str[1:-1].split(',')]
-
-        infos = []
-        for callerid in callerids:
-            checkInputData.str_data_valid(callerid)
-            infos.append('scores_obs_' + str(topic_name) + "_" + str(callerid))
-
-        return infos
+        return ['scores_obs_' + resource_info]
 
 
 picosat.SENTENCE_INTERPRETERS[ScoresObserver] = lambda engine, pred, unused: pred.to_clause()
