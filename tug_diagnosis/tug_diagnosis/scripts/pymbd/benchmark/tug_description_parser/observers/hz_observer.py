@@ -28,6 +28,18 @@ class HzObserver(BaseObserver):
     @staticmethod
     def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
                                  nodes_publish_topics, nodes_subscribe_topics):
+        '''
+        Read config for the observer module and generate model. Model is returned via vars, rules, nodes and real_nodes.
+        :param config: configuration for this observer module
+        :param topics_published_from_nodes: dict with topic as key and list of nodes that publishs it
+        :param topics_subscribed_from_nodes: dict with topic as key and list of nodes that subscribes it
+        :param nodes_publish_topics: dict with node as key and list of topics that are published by them
+        :param nodes_subscribe_topics: dict with node as key and list of topics that are subscribed by them
+        :return: vars: dict of new added variables
+                 rules: list of new added rules
+                 nodes: list of new added nodes
+                 real_nodes: list of new added real nodes
+        '''
         checkInputData.dict_data_valid(config, False)
         topics = config['topics']
 
