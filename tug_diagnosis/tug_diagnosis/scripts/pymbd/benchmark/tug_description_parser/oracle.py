@@ -22,8 +22,9 @@ class TUGDescriptionOracle(Description):
         if not self.setup:
             self.setup = True
             self.net = Model(self.configs, **self.options)
-            self.net.set_observations(self.observations)
+            # self.net.set_observations(self.observations)
             self.nodes = TwoWayDict(dict(enumerate(self.net.temp_nodes)))
+        self.net.set_observations(self.observations)
             
     def set_options(self, **options):
         super(TUGDescriptionOracle, self).set_options(**options)

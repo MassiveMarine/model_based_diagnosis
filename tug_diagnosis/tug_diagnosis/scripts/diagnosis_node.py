@@ -55,7 +55,7 @@ class Diagnosis(object):
 
             observations = self._observation_store.get_observations()
 
-            if all( [j for (i,j) in observations]):
+            if all([j for (i, j) in observations]):
                 continue
 
             self._trigger_condition.release()
