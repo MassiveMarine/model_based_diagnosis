@@ -34,32 +34,33 @@ class Diagnosis(object):
 
     def run(self):
 
+        p = Problem()
+        the_list = ['hst-picosat',
+                    'hst-cache-picosat',
+                    'hst-ci-picosat',
+                    'hst-ci-cache-picosat',
+                    'hsdag-picosat',
+                    'hsdag-cache-picosat',
+                    'hsdag-ci-picosat',
+                    'hsdag-ci-cache-picosat',
+                    'hsdag-sicf-picosat',
+                    'hsdag-sicf-cache-picosat'
+                    ]
+
+        o = TUGDescriptionOracle(configs, ())
+
         while not rospy.is_shutdown():
             self._trigger_condition.acquire()
             self._trigger_condition.wait()
 
             observations = self._observation_store.get_observations()
 
-            if all( [j for (i,j) in observations]):
+            if all([j for (i, j) in observations]):
                 continue
 
             self._trigger_condition.release()
 
-            p = Problem()
-            the_list = ['hst-picosat',
-                        'hst-cache-picosat',
-                        'hst-ci-picosat',
-                        'hst-ci-cache-picosat',
-                        'hsdag-picosat',
-                        'hsdag-cache-picosat',
-                        'hsdag-ci-picosat',
-                        'hsdag-ci-cache-picosat',
-                        'hsdag-sicf-picosat',
-                        'hsdag-sicf-cache-picosat'
-                        ]
-
-            o = TUGDescriptionOracle(configs, observations)
-            # for i in the_list:
+            o.observations = observations
             r = p.compute_with_description(o, the_list[6])
             d = r.get_diagnoses()
             d = map(o.numbers_to_nodes, d)
@@ -94,7 +95,8 @@ class Diagnosis(object):
             rospy.loginfo( "new diagnosis done in " + str(r.get_stats()['total_time']) + " with '" + str(the_list[6]) + "':")
             for corrupt_node in corrupt_nodes:
                 rospy.loginfo(str(corrupt_node))
-
+            if not len(corrupt_nodes):
+                rospy.loginfo('no solution')
 
 
 if __name__ == "__main__":

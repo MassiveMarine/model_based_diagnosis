@@ -71,7 +71,8 @@ class Model(object):
     def set_observations(self, observations):
         # pass
         for name, value in observations:
-            self.temp_vars[name].value = value
+            if name in self.temp_vars.keys():
+                self.temp_vars[name].value = value
 
     def set_options(self, **options):
         self.options.update(options)
