@@ -74,9 +74,8 @@ class TUGResourceMonitor:
     def run(self, frequency=1.0):
 
         rate = rospy.Rate(frequency)
-        nodes_info = self.get_node_names_and_pids()
         while not rospy.is_shutdown():
-
+            nodes_info = self.get_node_names_and_pids()
             nodes_info_array = NodeInfoArray()
             nodes_info_array.header = Header(stamp=rospy.Time.now())
 
