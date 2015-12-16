@@ -66,7 +66,7 @@ namespace tug_observer_plugins_cpp
         ROS_DEBUG_STREAM("ResourcesPlugin::nodeInfoCallback 3.5 " << " with number of states: " << states.size());
         if (states.empty())
         {
-          reportError(name, "no_state_" + name, "For the node with the name '" + name
+          reportError(name, "no_state_" + name, "For the topic with the name '" + name
                                                 + "' no state could be estimated",
                       tug_observers_msgs::observation::NO_STATE_FITS, (*it)->getLastTime());
         }
