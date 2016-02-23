@@ -21,9 +21,9 @@ class TUGDescriptionOracle(Description):
     def setup_system_model(self):
         if not self.setup:
             self.setup = True
-            self.net = Model(self.configs, **self.options)
+            self.net = Model(**self.options)
             # self.net.set_observations(self.observations)
-            self.nodes = TwoWayDict(dict(enumerate(self.net.temp_nodes)))
+            self.nodes = TwoWayDict(dict(enumerate(self.net.nodes)))
         self.net.set_observations(self.observations)
             
     def set_options(self, **options):

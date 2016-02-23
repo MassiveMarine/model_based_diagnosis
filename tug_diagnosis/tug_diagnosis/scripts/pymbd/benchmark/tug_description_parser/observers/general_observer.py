@@ -36,8 +36,7 @@ class GeneralObserver(BaseObserver):
     @staticmethod
     def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
                                  nodes_publish_topics, nodes_subscribe_topics):
-        checkInputData.dict_data_valid(config, False)
-        topics = config['topics']
+        topics = config.resource
 
         checkInputData.list_data_valid(topics)
 
