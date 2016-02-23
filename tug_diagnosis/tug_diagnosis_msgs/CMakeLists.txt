@@ -48,6 +48,9 @@ add_message_files(
   resource_mode_assignement.msg
   diagnosis.msg
   diagnosis_set.msg
+  observer_configuration.msg
+  node_configuration.msg
+  configuration.msg
 )
 
 ## Generate services in the 'srv' folder
