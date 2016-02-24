@@ -7,5 +7,4 @@ compile_with_test:
   tags:
     - sim0
   except:
-    - master
     - safdar
