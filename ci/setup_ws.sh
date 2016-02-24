@@ -20,3 +20,7 @@ ln -s $REPO_PATH ./src/
 
 echo "ROS_PACKAGE_PATH:"
 echo $ROS_PACKAGE_PATH
+
+cd $TEMP_PATH/src
+git clone http://git.ist.tugraz.at/ais/utils.git
+cd ..
