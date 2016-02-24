@@ -1,0 +1,23 @@
+compile_only:
+  script:
+    - source ci/setup_ws.sh
+    - catkin_make
+
+  tags:
+    - sim0
+  except:
+    - safdar
+
+compile_with_test:
+  script:
+    - source ci/setup_ws.sh
+    - catkin_make
+    - catkin_make run_tests 
+
+  tags:
+    - sim0
+  except:
+    - safdar
+    - sloigge/diagnosis
+    - sloigge/observers
+    - sloigge/resource_monitor

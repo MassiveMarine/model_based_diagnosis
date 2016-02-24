@@ -7,8 +7,12 @@
 bin
 build
 lib
+*.class
 srv_gen
 msg_gen
+.project
+.cproject
+.pydevproject
 CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
