@@ -9,6 +9,24 @@ from pymbd.sat.variable import Variable
 from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_configuration
 
 
+class ModelGenerator(object):
+    def __init__(self):
+        self.config = None
+
+    def set_config(self, set_config):
+        print "set_config"
+        self.config = set_config
+
+    def add_config(self, add_config):
+        print "add_config"
+
+    def remove_config(self, remove_config):
+        print "remove_config"
+
+    def update_config(self, update_config):
+        print "update_config"
+
+
 class Model(object):
     
     def __init__(self, **options):
@@ -25,22 +43,17 @@ class Model(object):
         self.previous_diagnoses = set()
         self.last_max_card = 0
 
-        # self.configs = configs
-
         self.vars = {}
         self.rules = []
         self.nodes = []
         self.real_nodes = []
 
-        # temp preparation for new configuration technique
-        new_config = configuration()
-        new_config.nodes.append(node_configuration(name="node1", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
-        new_config.nodes.append(node_configuration(name="node2", pub_topic=["/topic1"], sub_topic=[]))
-        new_config.observers.append(observer_configuration(type="hz", resource=["/topic1", "/topic2"]))
-
-        self.set_model(new_config)
-
     def set_model(self, configs):
+        self.vars = {}
+        self.rules = []
+        self.nodes = []
+        self.real_nodes = []
+
         topics_published_from_nodes = dict()
         topics_subscribed_from_nodes = dict()
         nodes_publish_topics = dict()
