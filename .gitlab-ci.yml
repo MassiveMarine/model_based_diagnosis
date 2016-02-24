@@ -1,0 +1,10 @@
+compile_with_test:
+  script:
+    - source ci/setup_ws.sh
+    - catkin_make
+    - catkin_make run_tests 
+
+  tags:
+    - sim0
+  except:
+    - safdar
