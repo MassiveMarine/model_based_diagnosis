@@ -72,10 +72,6 @@ class HzObserver(BaseObserver):
                 subscribed_topics = nodes_subscribe_topics.get(callerid, [])
                 rules.append(HzObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
 
-                print observation
-                print subscribed_topics
-                print topics_published_from_nodes.keys()
-
                 if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
                     raise ValueError('subscribed topics are not not in topics published list!')
 
