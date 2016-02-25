@@ -179,6 +179,21 @@ class ServiceRule(Rule):
         subprocess.call(['rosservice', 'call', self._service_name, '\"' + self._call_msg + '\"'])
 
 
+class ParameterRule(Rule):
+
+    def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
+                 negative_possible_faulty_resources, recall_duration, is_single_shot, paramter_name, paramter_value):
+        super(ParameterRule, self).__init__(positive_observations, negative_observations,
+                                        positive_possible_faulty_resources,
+                                        negative_possible_faulty_resources, recall_duration, is_single_shot)
+        self._paramter_name = paramter_name
+        self._paramter_value = paramter_value
+
+    def trigger(self):
+        super(ParameterRule, self).trigger_intern()
+        subprocess.call(['rosparam', 'set', self._paramter_name, self._paramter_value])
+
+
 class RuleFactory(object):
 
     _factory_map = {
@@ -186,7 +201,8 @@ class RuleFactory(object):
                     'process': lambda config: ProcessRuleFactory.instantiate_rule(config),
                     'email': lambda config: EMailRuleFactory.instantiate_rule(config),
                     'logfile' : lambda config: LogFileRuleFactory.instantiate_rule(config),
-                    'service' : lambda config: ServiceRuleFactory.instantiate_rule(config)
+                    'service' : lambda config: ServiceRuleFactory.instantiate_rule(config),
+                    'paramter' : lambda config: ParameterRuleFactory.instantiate_rule(config)
                 }
 
     @staticmethod
@@ -365,3 +381,25 @@ class ServiceRuleFactory(RuleFactory):
         return ServiceRule(positive_observations, negative_observations, positive_possible_faulty_resources,
                          negative_possible_faulty_resources, recall_duration, is_single_shot, service_name,
                            service_type, call_msg)
+
+
+class ParameterRuleFactory(RuleFactory):
+
+    @staticmethod
+    def instantiate_rule(config):
+        is_single_shot = False
+        if YamlHelper.has_param(config, 'single_shot'):
+            is_single_shot = YamlHelper.get_param(config, 'single_shot')
+        paramter_name = YamlHelper.get_param(config, 'paramter_name')
+        paramter_value = YamlHelper.get_param(config, 'paramter_value')
+        positive_observations = RuleFactory.pars_positive_observations(config)
+        negative_observations = RuleFactory.pars_negative_observations(config)
+        positive_possible_faulty_resources = RuleFactory.pars_positive_possible_faulty_resources(config)
+        negative_possible_faulty_resources = RuleFactory.pars_negative_possible_faulty_resources(config)
+        recall_duration = None
+        if YamlHelper.has_param(config, 'recall_duration'):
+            recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
+
+        return ParameterRule(positive_observations, negative_observations, positive_possible_faulty_resources,
+                         negative_possible_faulty_resources, recall_duration, is_single_shot, paramter_name,
+                           paramter_value)

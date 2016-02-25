@@ -1,7 +1,6 @@
 rules:
-  - type: service
-    service_name: '/test_service'
-    service_type: 'tug_reporter/SetString'
-    call_msg: "message: 'test'"
+  - type: paramter
+    paramter_name: '/test_service'
+    paramter_value: '1.0'
     positive_possible_faulty_resources:
         - resource: 'imu'
