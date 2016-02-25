@@ -162,13 +162,31 @@ class LogFileRule(Rule):
         self._log_file.flush()
 
 
+class ServiceRule(Rule):
+
+    def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
+                 negative_possible_faulty_resources, recall_duration, is_single_shot, service_name, service_type,
+                 call_msg):
+        super(ServiceRule, self).__init__(positive_observations, negative_observations,
+                                        positive_possible_faulty_resources,
+                                        negative_possible_faulty_resources, recall_duration, is_single_shot)
+        self._service_name = service_name
+        self._service_type = service_type
+        self._call_msg = call_msg
+
+    def trigger(self):
+        super(ServiceRule, self).trigger_intern()
+        subprocess.call(['rosservice', 'call', self._service_name, '\"' + self._call_msg + '\"'])
+
+
 class RuleFactory(object):
 
     _factory_map = {
                     'print': lambda config: PrintRuleFactory.instantiate_rule(config),
                     'process': lambda config: ProcessRuleFactory.instantiate_rule(config),
                     'email': lambda config: EMailRuleFactory.instantiate_rule(config),
-                    'logfile' : lambda config: LogFileRuleFactory.instantiate_rule(config)
+                    'logfile' : lambda config: LogFileRuleFactory.instantiate_rule(config),
+                    'service' : lambda config: ServiceRuleFactory.instantiate_rule(config)
                 }
 
     @staticmethod
@@ -324,3 +342,26 @@ class LogFileRuleFactory(RuleFactory):
 
         return LogFileRule(positive_observations, negative_observations, positive_possible_faulty_resources,
                          negative_possible_faulty_resources, recall_duration, is_single_shot, log_file, log_entry)
+
+
+class ServiceRuleFactory(RuleFactory):
+
+    @staticmethod
+    def instantiate_rule(config):
+        is_single_shot = False
+        if YamlHelper.has_param(config, 'single_shot'):
+            is_single_shot = YamlHelper.get_param(config, 'single_shot')
+        service_name = YamlHelper.get_param(config, 'service_name')
+        service_type = YamlHelper.get_param(config, 'service_type')
+        call_msg = YamlHelper.get_param(config, 'call_msg')
+        positive_observations = RuleFactory.pars_positive_observations(config)
+        negative_observations = RuleFactory.pars_negative_observations(config)
+        positive_possible_faulty_resources = RuleFactory.pars_positive_possible_faulty_resources(config)
+        negative_possible_faulty_resources = RuleFactory.pars_negative_possible_faulty_resources(config)
+        recall_duration = None
+        if YamlHelper.has_param(config, 'recall_duration'):
+            recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
+
+        return ServiceRule(positive_observations, negative_observations, positive_possible_faulty_resources,
+                         negative_possible_faulty_resources, recall_duration, is_single_shot, service_name,
+                           service_type, call_msg)

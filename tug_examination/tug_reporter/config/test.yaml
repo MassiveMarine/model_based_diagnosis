@@ -1,22 +1,7 @@
 rules:
-  - type: process
-    process: "rosrun tug_reporter test.sh"
-    positive_observations:
-        - type: 'hz'
-          resource: 'imu'
-          observation: 0
-          occurrences: 2
-          window_size: 3
-    #single_shot: true
-  - type: print
-    message: 'second rule'
-    positive_possible_faulty_resources:
-        - resource: 'imu'
-          occurrences: 2
-          window_size: 3
-    #recall_duration: 10.0
-  - type: logfile
-    log_file: '/tmp/the_log.txt'
-    log_entry: 'third rule triggered'
+  - type: service
+    service_name: '/test_service'
+    service_type: 'tug_reporter/SetString'
+    call_msg: "message: 'test'"
     positive_possible_faulty_resources:
         - resource: 'imu'
