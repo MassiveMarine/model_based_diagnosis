@@ -15,3 +15,8 @@ rules:
           occurrences: 2
           window_size: 3
     #recall_duration: 10.0
+  - type: logfile
+    log_file: '/tmp/the_log.txt'
+    log_entry: 'third rule triggered'
+    positive_possible_faulty_resources:
+        - resource: 'imu'
