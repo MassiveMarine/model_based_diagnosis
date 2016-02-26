@@ -21,7 +21,7 @@ class TUGDescriptionOracle(Description):
         self.nodes = None
 
     def setup_system_model(self):
-        config = self.net_generator.config
+        config = self.net_generator.get_config_copy()
 
         if not config:
             return False
@@ -70,7 +70,6 @@ class TUGDescriptionOracle(Description):
         t1 = time.time()
         self.check_time += t1-t0
         return sat
-
 
     def finished(self):
         self.net.finished()
