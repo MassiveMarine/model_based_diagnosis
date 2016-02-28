@@ -26,6 +26,9 @@ class TUGDescriptionOracle(Description):
         if not config:
             return False
 
+        if not config.nodes or not config.observers:
+            return False
+
         if not self.setup:
             self.setup = True
             self.net.set_model(config)

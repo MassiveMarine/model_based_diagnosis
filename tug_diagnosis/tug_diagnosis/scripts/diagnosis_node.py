@@ -55,7 +55,7 @@ class Diagnosis(object):
         action = req.action
         config = req.config
 
-        print config
+        # print config
 
         if action == DiagnosisConfigurationRequest.ADD:
             self.o.net_generator.add_config(config)
@@ -69,6 +69,7 @@ class Diagnosis(object):
             return DiagnosisConfigurationResponse(errorcode=1, error_msg='unknown action')
 
         self.o.setup = False
+
         return DiagnosisConfigurationResponse(errorcode=0, error_msg='no error')
 
     def run(self):

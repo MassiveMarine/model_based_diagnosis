@@ -335,6 +335,8 @@ class Model(object):
         for name, value in observations:
             if name in self.vars.keys():
                 self.vars[name].value = value
+            else:
+                print 'A observation is unknown! It will be ignored by the model'
 
     def set_options(self, **options):
         self.options.update(options)
