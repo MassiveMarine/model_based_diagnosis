@@ -20,7 +20,8 @@ class BaseObserver(Sentence):
         raise NotImplementedError()
 
     @staticmethod
-    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes):
+    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
+                                 nodes_publish_topics, nodes_subscribe_topics):
         raise NotImplementedError("generate_model_parameter() is not implemented yet!")
 
     @staticmethod
@@ -84,11 +85,13 @@ class checkInputData():
             raise ValueError
 
     @staticmethod
-    def list_data_valid(the_list, check_entries=True, allow_empty=False):
+    def list_data_valid(the_list, check_entries=True, allow_empty=False, num_entries=0):
         if not isinstance(the_list, list):
             raise TypeError
         if not len(the_list) and not allow_empty:
             raise ValueError('List is empty!')
+        if num_entries > 0 and not len(the_list) == num_entries:
+            raise ValueError('List has wrong number of entries!')
 
         if check_entries:
             for entry in the_list:

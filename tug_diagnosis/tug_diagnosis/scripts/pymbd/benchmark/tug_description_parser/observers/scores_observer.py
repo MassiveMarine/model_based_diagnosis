@@ -2,6 +2,7 @@ from pymbd.sat import picosat
 from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.benchmark.tug_description_parser.observers.base_observer import *
+from tug_diagnosis_msgs.msg import observer_configuration
 
 
 class ScoresObserver(BaseObserver):
@@ -28,62 +29,68 @@ class ScoresObserver(BaseObserver):
     @staticmethod
     def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
                                  nodes_publish_topics, nodes_subscribe_topics):
-        checkInputData.dict_data_valid(config, False)
-        topics = config['topics']
+        config_type = str('scores')
+        if not isinstance(config, observer_configuration):
+            raise TypeError
+        if not config.type == config_type:
+            raise KeyError('given type in config is wrong!')
 
-        checkInputData.list_data_valid(topics)
+        topics = config.resource
+        checkInputData.list_data_valid(topics, num_entries=1)
 
-        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=False, allow_empty=False)
-        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=False, allow_empty=True)
+        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=True, entry_type=list, allow_empty=False)
+        checkInputData.list_data_valid(topics_published_from_nodes.keys(), check_entries=True)
+        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=True, entry_type=list, allow_empty=True)
+
 
         vars = {}
         rules = []
         nodes = []
 
-        for topic in topics:
-            callerids = topics_published_from_nodes.get(topic, [])
-            checkInputData.list_data_valid(callerids)
-
-            observation = "scores_obs_" + topic
-            vars[observation] = Variable(observation, Variable.BOOLEAN, None)
-
-            subscribed_topics = []
-            for callerid in callerids:
-                subscribed_topics += nodes_subscribe_topics.get(callerid, [])
-
-            rules.append(ScoresObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
-
-            if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
-                raise ValueError
-
+        topic = topics[0]
             # callerids = topics_published_from_nodes.get(topic, [])
             # checkInputData.list_data_valid(callerids)
             #
+            # observation = "scores_obs_" + topic
+            # vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+            #
+            # subscribed_topics = []
             # for callerid in callerids:
-            #     observation = "scores_obs_" + topic + "_" + callerid
-            #     vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+            #     subscribed_topics += nodes_subscribe_topics.get(callerid, [])
             #
-            #     subscribed_topics = nodes_subscribe_topics.get(callerid, [])
-            #     rules.append(ScoresObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
+            # rules.append(ScoresObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
             #
-            #     if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
-            #         raise ValueError
-            #
-            # new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("scores", topic, callerids)
-            # vars.update(new_vars)
-            # rules += new_rules
-            # nodes += new_nodes
+            # if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+            #     raise ValueError
+
+        callerids = topics_published_from_nodes.get(topic, [])
+        checkInputData.list_data_valid(callerids, allow_empty=False)
+
+        for callerid in callerids:
+            observation = config_type + "_obs_" + topic + "_" + callerid
+            vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+
+            subscribed_topics = nodes_subscribe_topics.get(callerid, [])
+            rules.append(ScoresObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
+
+            if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+                raise ValueError('subscribed topics are not not in topics published list!')
+
+        new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter(config_type, topic, callerids)
+        vars.update(new_vars)
+        rules += new_rules
+        nodes += new_nodes
 
         return vars, rules, nodes, []
 
     @staticmethod
     def decrypt_resource_info(resource_info):
 
-        # if not resource_info:
-        #     raise ValueError
-        # if not isinstance(resource_info, str):
-        #     raise TypeError
-        #
+        if not resource_info:
+            raise ValueError
+        if not isinstance(resource_info, str):
+            raise TypeError
+
         # [topic_name, callerids_str] = resource_info.split(' ', 1)
         #
         # checkInputData.str_data_valid(topic_name)
@@ -101,7 +108,7 @@ class ScoresObserver(BaseObserver):
         # return infos
         checkInputData.str_data_valid(resource_info, forbidden_chars=[' '])
 
-        return ['scores_obs_' + resource_info]
+        return ['scores_obs_' + str(resource_info)]
 
 
 picosat.SENTENCE_INTERPRETERS[ScoresObserver] = lambda engine, pred, unused: pred.to_clause()
@@ -193,7 +200,8 @@ class TestScoresObserver(unittest.TestCase):
         self.assertEqual(str(new_clause.literals[3]), "/topic", "Fourth literal in clause does not match!")
 
     def test_generate_model_parameter1(self):
-        config = {'topics': ['/topic'], 'type': 'scores'}
+        # config = {'topics': ['/topic'], 'type': 'scores'}
+        config = observer_configuration(type="scores", resource=['/topic'])
         topics_published_from_nodes = {'/topic': ['/node1', '/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
@@ -222,7 +230,8 @@ class TestScoresObserver(unittest.TestCase):
         self.assertEqual(len(real_nodes), 0, "scores should not add real nodes!")
 
     def test_generate_model_parameter2(self):
-        config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'scores'}
+        # config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'scores'}
+        config = observer_configuration(type="scores", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
@@ -231,10 +240,10 @@ class TestScoresObserver(unittest.TestCase):
 
         vars_req = {'scores_obs_/topic1_all': Variable('scores_obs_/topic1_all', 1, None),
                     'scores_obs_/topic1_node1': Variable('scores_obs_/topic1_node1', 1, None),
-                    'scores_obs_/topic2_all': Variable('scores_obs_/topic2_all', 1, None),
-                    'scores_obs_/topic2_node2': Variable('scores_obs_/topic2_node2', 1, None),
-                    'scores_obs_/topic3_all': Variable('scores_obs_/topic3_all', 1, None),
-                    'scores_obs_/topic3_node3': Variable('scores_obs_/topic3_node3', 1, None),
+                    # 'scores_obs_/topic2_all': Variable('scores_obs_/topic2_all', 1, None),
+                    # 'scores_obs_/topic2_node2': Variable('scores_obs_/topic2_node2', 1, None),
+                    # 'scores_obs_/topic3_all': Variable('scores_obs_/topic3_all', 1, None),
+                    # 'scores_obs_/topic3_node3': Variable('scores_obs_/topic3_node3', 1, None),
                     }
 
         self.assertEqual(len(vars), len(vars_req), "scores added wrong number of variables!")
@@ -244,10 +253,11 @@ class TestScoresObserver(unittest.TestCase):
 
         rules_req = [ScoresObserver(ab_pred('node1'), 'scores_obs_/topic1_node1', all_ab_pred([])),
                      CalleridsObserver('scores_obs_/topic1_all', ['scores_obs_/topic1_node1']),
-                     ScoresObserver(ab_pred('node2'), 'scores_obs_/topic2_node2', all_ab_pred(['/topic1'])),
-                     CalleridsObserver('scores_obs_/topic2_all', ['scores_obs_/topic2_node2']),
-                     ScoresObserver(ab_pred('node3'), 'scores_obs_/topic3_node3', all_ab_pred(['/topic2'])),
-                     CalleridsObserver('scores_obs_/topic3_all', ['scores_obs_/topic3_node3']),]
+                     # ScoresObserver(ab_pred('node2'), 'scores_obs_/topic2_node2', all_ab_pred(['/topic1'])),
+                     # CalleridsObserver('scores_obs_/topic2_all', ['scores_obs_/topic2_node2']),
+                     # ScoresObserver(ab_pred('node3'), 'scores_obs_/topic3_node3', all_ab_pred(['/topic2'])),
+                     # CalleridsObserver('scores_obs_/topic3_all', ['scores_obs_/topic3_node3']),
+                     ]
 
         rules_req_str = [str(x) for x in rules_req]
 
@@ -258,23 +268,36 @@ class TestScoresObserver(unittest.TestCase):
 
     def test_generate_model_parameter_errors_1(self):
         # test different arguments for the config-parameter which all should raise exeptions
-        config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'scores'}
+        # config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'scores'}
+        config = observer_configuration(type="scores", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
 
-        config_tests = [(KeyError, {'topics_wrong_name': ['/topic'], 'type': 'scores'}),
-                        (KeyError, {'type': 'scores'}),
-                        (KeyError, {}),
-                        (TypeError, "not_a_dict"),
+        # config_tests = [(KeyError, {'topics_wrong_name': ['/topic'], 'type': 'scores'}),
+        #                 (KeyError, {'type': 'scores'}),
+        #                 (KeyError, {}),
+        #                 (TypeError, "not_a_dict"),
+        #                 (TypeError, 1),
+        #                 (ValueError, {'topics': [], 'type': 'scores'}),
+        #                 (ValueError, {'topics': [''], 'type': 'scores'}),
+        #                 (TypeError, {'topics': [1], 'type': 'scores'}),
+        #                 (TypeError, {'topics': "no_list", 'type': 'scores'}),
+        #                 (TypeError, {'topics': 1, 'type': 'scores'}),
+        #                 (ValueError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'scores'})
+        #                 ]
+        config_tests = [(KeyError, observer_configuration(type="scores_wrong", resource=['/topic'])),
+                        (ValueError, observer_configuration(type="scores")),
+                        (KeyError, observer_configuration()),
+                        (TypeError, observer_configuration),
                         (TypeError, 1),
-                        (ValueError, {'topics': [], 'type': 'scores'}),
-                        (ValueError, {'topics': [''], 'type': 'scores'}),
-                        (TypeError, {'topics': [1], 'type': 'scores'}),
-                        (TypeError, {'topics': "no_list", 'type': 'scores'}),
-                        (TypeError, {'topics': 1, 'type': 'scores'}),
-                        (ValueError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'scores'})
+                        (ValueError, observer_configuration(type="scores", resource=[''])),
+                        (TypeError, observer_configuration(type="scores", resource=[1])),
+                        (TypeError, observer_configuration(type="scores", resource='no_list')),
+                        (TypeError, observer_configuration(type="scores", resource=1)),
+                        (ValueError, observer_configuration(type="scores", resource=['/topic1', '/topic2', '/topic3'])),
+                        (ValueError, observer_configuration(type="scores", resource=['/topic_wrong']))
                         ]
 
         for (error, config) in config_tests:
@@ -287,20 +310,21 @@ class TestScoresObserver(unittest.TestCase):
             print "... DONE"
 
     def test_generate_model_parameter_errors_2(self):
-        config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'scores'}
+        # config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'scores'}
+        config = observer_configuration(type="scores", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
 
         topics_published_from_nodes_testes = \
-            [(ValueError, {'/topic':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+            [#(ValueError, {'/topic':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (ValueError, {'/topic3': []       , '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic':  ['node2'], '/topic1': ['node1']}),
+             # (ValueError, {'/topic3': ['node3'], '/topic':  ['node2'], '/topic1': ['node1']}),
              (ValueError, {'/topic3': ['node3'], '/topic2': []       , '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic':  ['node1']}),
+             # (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic':  ['node1']}),
              (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': []       }),
-             (ValueError, {1:  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+             (TypeError, {1:  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (ValueError, {'/':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (ValueError, {'':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (KeyError, {}),
@@ -336,7 +360,8 @@ class TestScoresObserver(unittest.TestCase):
             print "... DONE"
 
     def test_generate_model_parameter_errors_3(self):
-        config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'scores'}
+        # config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'scores'}
+        config = observer_configuration(type="scores", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
@@ -363,16 +388,11 @@ class TestScoresObserver(unittest.TestCase):
             print "... DONE"
 
     def test_decrypt_resource_info(self):
-        self.assertEqual(ScoresObserver.decrypt_resource_info("/topic_name [node1, node2]"), ['scores_obs_/topic_name_node1', 'scores_obs_/topic_name_node2'], "Topic name decryption not correct!")
-        self.assertEqual(ScoresObserver.decrypt_resource_info("/topic_name [node1, node2, node3, node4, node5]"), ['scores_obs_/topic_name_node1', 'scores_obs_/topic_name_node2', 'scores_obs_/topic_name_node3',
-                                                                                                               'scores_obs_/topic_name_node4', 'scores_obs_/topic_name_node5'], "Topic name decryption not correct!")
-        self.assertEqual(ScoresObserver.decrypt_resource_info("/topic_name [node1]"), ['scores_obs_/topic_name_node1'], "Topic name decryption not correct!")
-        self.assertEqual(ScoresObserver.decrypt_resource_info("/topic_name {}"), ['scores_obs_/topic_name_all'], "Topic name decryption not correct!")
+        self.assertEqual(ScoresObserver.decrypt_resource_info("/topic_name"), ['scores_obs_/topic_name'], "Topic name decryption not correct!")
 
         resource_info_tests = [
             (ValueError, "/ [node1, node2]"),
             (ValueError, "/ [node1, /]"),
-            (ValueError, "/topic_name"),
             (ValueError, "/topic_name [/]"),
             (ValueError, "/topic_name [/node1, ]"),
             (ValueError, "/topic_name [/node1, /]"),

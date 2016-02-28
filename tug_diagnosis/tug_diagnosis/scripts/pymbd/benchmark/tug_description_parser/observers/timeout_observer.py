@@ -2,6 +2,7 @@ from pymbd.sat import picosat
 from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.benchmark.tug_description_parser.observers.base_observer import *
+from tug_diagnosis_msgs.msg import observer_configuration
 
 
 class TimeoutObserver(BaseObserver):
@@ -28,38 +29,47 @@ class TimeoutObserver(BaseObserver):
 
     @staticmethod
     def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics):
-        checkInputData.dict_data_valid(config, False)
-        topics = config['topics']
+        config_type = str('timeout')
+        if not isinstance(config, observer_configuration):
+            raise TypeError
+        if not config.type == config_type:
+            raise KeyError('given type in config is wrong!')
 
-        checkInputData.list_data_valid(topics)
+        # checkInputData.dict_data_valid(config, False)
+        # topics = config['topics']
 
-        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=False, allow_empty=False)
-        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=False, allow_empty=True)
+        topics = config.resource
+        checkInputData.list_data_valid(topics, num_entries=1)
+
+        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=True, entry_type=list, allow_empty=False)
+        checkInputData.list_data_valid(topics_published_from_nodes.keys(), check_entries=True)
+        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=True, entry_type=list, allow_empty=True)
 
         vars = {}
         rules = []
         nodes = []
 
-        for topic in topics:
-            callerids = topics_published_from_nodes.get(topic, [])
-            checkInputData.list_data_valid(callerids, allow_empty=True)
-            if not len(callerids):
-                continue
+        topic = topics[0]
+        callerids = topics_published_from_nodes.get(topic, [])
+        # checkInputData.list_data_valid(callerids, allow_empty=True)
+        checkInputData.list_data_valid(callerids, allow_empty=False)
+        # if not len(callerids):
+        #     continue
 
-            for callerid in callerids:
-                observation = "timeout_obs_" + topic + "_" + callerid
-                vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+        for callerid in callerids:
+            observation = config_type + "_obs_" + topic + "_" + callerid
+            vars[observation] = Variable(observation, Variable.BOOLEAN, None)
 
-                subscribed_topics = nodes_subscribe_topics.get(callerid, [])
-                rules.append(TimeoutObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
+            subscribed_topics = nodes_subscribe_topics.get(callerid, [])
+            rules.append(TimeoutObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
 
-                if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
-                    raise ValueError
+            if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+                raise ValueError('subscribed topics are not not in topics published list!')
 
-            new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("timeout", topic, topics_published_from_nodes[topic])
-            vars.update(new_vars)
-            rules += new_rules
-            nodes += new_nodes
+        new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter(config_type, topic, topics_published_from_nodes[topic])
+        vars.update(new_vars)
+        rules += new_rules
+        nodes += new_nodes
 
         return vars, rules, nodes, []
 
@@ -175,7 +185,8 @@ class TestTimeoutObserver(unittest.TestCase):
         self.assertEqual(str(new_clause.literals[3]), "/topic", "Fourth literal in clause does not match!")
 
     def test_generate_model_parameter1(self):
-        config = {'topics': ['/topic'], 'type': 'timeout'}
+        # config = {'topics': ['/topic'], 'type': 'timeout'}
+        config = observer_configuration(type="timeout", resource=['/topic'])
         topics_published_from_nodes = {'/topic': ['/node1', '/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
@@ -204,7 +215,8 @@ class TestTimeoutObserver(unittest.TestCase):
         self.assertEqual(len(real_nodes), 0, "timeout should not add real nodes!")
 
     def test_generate_model_parameter2(self):
-        config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'timeout'}
+        # config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'timeout'}
+        config = observer_configuration(type="timeout", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
@@ -213,10 +225,10 @@ class TestTimeoutObserver(unittest.TestCase):
 
         vars_req = {'timeout_obs_/topic1_all': Variable('timeout_obs_/topic1_all', 1, None),
                     'timeout_obs_/topic1_node1': Variable('timeout_obs_/topic1_node1', 1, None),
-                    'timeout_obs_/topic2_all': Variable('timeout_obs_/topic2_all', 1, None),
-                    'timeout_obs_/topic2_node2': Variable('timeout_obs_/topic2_node2', 1, None),
-                    'timeout_obs_/topic3_all': Variable('timeout_obs_/topic3_all', 1, None),
-                    'timeout_obs_/topic3_node3': Variable('timeout_obs_/topic3_node3', 1, None),
+                    # 'timeout_obs_/topic2_all': Variable('timeout_obs_/topic2_all', 1, None),
+                    # 'timeout_obs_/topic2_node2': Variable('timeout_obs_/topic2_node2', 1, None),
+                    # 'timeout_obs_/topic3_all': Variable('timeout_obs_/topic3_all', 1, None),
+                    # 'timeout_obs_/topic3_node3': Variable('timeout_obs_/topic3_node3', 1, None),
                     }
 
         self.assertEqual(len(vars), len(vars_req), "timeout added wrong number of variables!")
@@ -226,10 +238,11 @@ class TestTimeoutObserver(unittest.TestCase):
 
         rules_req = [TimeoutObserver(ab_pred('node1'), 'timeout_obs_/topic1_node1', all_ab_pred([])),
                      CalleridsObserver('timeout_obs_/topic1_all', ['timeout_obs_/topic1_node1']),
-                     TimeoutObserver(ab_pred('node2'), 'timeout_obs_/topic2_node2', all_ab_pred(['/topic1'])),
-                     CalleridsObserver('timeout_obs_/topic2_all', ['timeout_obs_/topic2_node2']),
-                     TimeoutObserver(ab_pred('node3'), 'timeout_obs_/topic3_node3', all_ab_pred(['/topic2'])),
-                     CalleridsObserver('timeout_obs_/topic3_all', ['timeout_obs_/topic3_node3']),]
+                     # TimeoutObserver(ab_pred('node2'), 'timeout_obs_/topic2_node2', all_ab_pred(['/topic1'])),
+                     # CalleridsObserver('timeout_obs_/topic2_all', ['timeout_obs_/topic2_node2']),
+                     # TimeoutObserver(ab_pred('node3'), 'timeout_obs_/topic3_node3', all_ab_pred(['/topic2'])),
+                     # CalleridsObserver('timeout_obs_/topic3_all', ['timeout_obs_/topic3_node3']),
+                     ]
 
         rules_req_str = [str(x) for x in rules_req]
 
@@ -240,23 +253,36 @@ class TestTimeoutObserver(unittest.TestCase):
 
     def test_generate_model_parameter_errors_1(self):
         # test different arguments for the config-parameter which all should raise exeptions
-        config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'timeout'}
+        # config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'timeout'}
+        config = observer_configuration(type="timeout", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
 
-        config_tests = [(KeyError, {'topics_wrong_name': ['/topic'], 'type': 'timeout'}),
-                        (KeyError, {'type': 'timeout'}),
-                        (KeyError, {}),
-                        (TypeError, "not_a_dict"),
+        # config_tests = [(KeyError, {'topics_wrong_name': ['/topic'], 'type': 'timeout'}),
+        #                 (KeyError, {'type': 'timeout'}),
+        #                 (KeyError, {}),
+        #                 (TypeError, "not_a_dict"),
+        #                 (TypeError, 1),
+        #                 (ValueError, {'topics': [], 'type': 'timeout'}),
+        #                 (ValueError, {'topics': [''], 'type': 'timeout'}),
+        #                 (TypeError, {'topics': [1], 'type': 'timeout'}),
+        #                 (TypeError, {'topics': "no_list", 'type': 'timeout'}),
+        #                 (TypeError, {'topics': 1, 'type': 'timeout'}),
+        #                 (ValueError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'timeout'})
+        #                 ]
+        config_tests = [(KeyError, observer_configuration(type="timeout_wrong", resource=['/topic'])),
+                        (ValueError, observer_configuration(type="timeout")),
+                        (KeyError, observer_configuration()),
+                        (TypeError, observer_configuration),
                         (TypeError, 1),
-                        (ValueError, {'topics': [], 'type': 'timeout'}),
-                        (ValueError, {'topics': [''], 'type': 'timeout'}),
-                        (TypeError, {'topics': [1], 'type': 'timeout'}),
-                        (TypeError, {'topics': "no_list", 'type': 'timeout'}),
-                        (TypeError, {'topics': 1, 'type': 'timeout'}),
-                        (ValueError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'timeout'})
+                        (ValueError, observer_configuration(type="timeout", resource=[''])),
+                        (TypeError, observer_configuration(type="timeout", resource=[1])),
+                        (TypeError, observer_configuration(type="timeout", resource='no_list')),
+                        (TypeError, observer_configuration(type="timeout", resource=1)),
+                        (ValueError, observer_configuration(type="timeout", resource=['/topic1', '/topic2', '/topic3'])),
+                        (ValueError, observer_configuration(type="timeout", resource=['/topic_wrong']))
                         ]
 
         for (error, config) in config_tests:
@@ -269,20 +295,22 @@ class TestTimeoutObserver(unittest.TestCase):
             print "... DONE"
 
     def test_generate_model_parameter_errors_2(self):
-        config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'timeout'}
+        # config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'timeout'}
+        config = observer_configuration(type="timeout", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
 
         topics_published_from_nodes_testes = \
-            [(ValueError, {'/topic':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+            [
+             # (ValueError, {'/topic':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (ValueError, {'/topic3': []       , '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic':  ['node2'], '/topic1': ['node1']}),
+             # (ValueError, {'/topic3': ['node3'], '/topic':  ['node2'], '/topic1': ['node1']}),
              (ValueError, {'/topic3': ['node3'], '/topic2': []       , '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic':  ['node1']}),
+             # (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic':  ['node1']}),
              (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': []       }),
-             (ValueError, {1:  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+             (TypeError, {1:  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (ValueError, {'/':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (ValueError, {'':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (KeyError, {}),
@@ -318,7 +346,8 @@ class TestTimeoutObserver(unittest.TestCase):
             print "... DONE"
 
     def test_generate_model_parameter_errors_3(self):
-        config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'timeout'}
+        # config = {'topics': ['/topic1', '/topic2', '/topic3'], 'type': 'timeout'}
+        config = observer_configuration(type="timeout", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}

@@ -41,44 +41,44 @@ class HzObserver(BaseObserver):
                  nodes: list of new added nodes
                  real_nodes: list of new added real nodes
         '''
+        config_type = str('hz')
         if not isinstance(config, observer_configuration):
             raise TypeError
-        if not config.type == 'hz':
+        if not config.type == config_type:
             raise KeyError('given type in config is wrong!')
-        # checkInputData.dict_data_valid(config, False)
-        # topics = config['topics']
 
         topics = config.resource
-        checkInputData.list_data_valid(topics)
+        checkInputData.list_data_valid(topics, num_entries=1)
 
-        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=False, allow_empty=False)
-        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=False, allow_empty=True)
+        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=True, entry_type=list, allow_empty=False)
+        checkInputData.list_data_valid(topics_published_from_nodes.keys(), check_entries=True)
+        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=True, entry_type=list, allow_empty=True)
 
         vars = {}
         rules = []
         nodes = []
 
-        for topic in topics:
-            callerids = topics_published_from_nodes.get(topic, [])
-            # checkInputData.list_data_valid(callerids, allow_empty=True)
-            checkInputData.list_data_valid(callerids, allow_empty=False)
-            if not len(callerids):
-                continue
+        topic = topics[0]
+        callerids = topics_published_from_nodes.get(topic, [])
+        # checkInputData.list_data_valid(callerids, allow_empty=True)
+        checkInputData.list_data_valid(callerids, allow_empty=False)
+        # if not len(callerids):
+        #     return {}, [], [], []
 
-            for callerid in callerids:
-                observation = "hz_obs_" + topic + "_" + callerid
-                vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+        for callerid in callerids:
+            observation = config_type + "_obs_" + topic + "_" + callerid
+            vars[observation] = Variable(observation, Variable.BOOLEAN, None)
 
-                subscribed_topics = nodes_subscribe_topics.get(callerid, [])
-                rules.append(HzObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
+            subscribed_topics = nodes_subscribe_topics.get(callerid, [])
+            rules.append(HzObserver(ab_pred(str(callerid)), observation, all_ab_pred(subscribed_topics)))
 
-                if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
-                    raise ValueError('subscribed topics are not not in topics published list!')
+            if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+                raise ValueError('subscribed topics are not not in topics published list!')
 
-            new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter("hz", topic, topics_published_from_nodes[topic])
-            vars.update(new_vars)
-            rules += new_rules
-            nodes += new_nodes
+        new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter(config_type, topic, topics_published_from_nodes[topic])
+        vars.update(new_vars)
+        rules += new_rules
+        nodes += new_nodes
 
         return vars, rules, nodes, []
 
@@ -225,7 +225,7 @@ class TestHzObserver(unittest.TestCase):
         self.assertEqual(len(real_nodes), 0, "Hz should not add real nodes!")
 
     def test_generate_model_parameter2(self):
-        config = observer_configuration(type="hz", resource=['/topic1', '/topic2', '/topic3'])
+        config = observer_configuration(type="hz", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
@@ -234,10 +234,10 @@ class TestHzObserver(unittest.TestCase):
 
         vars_req = {'hz_obs_/topic1_all': Variable('hz_obs_/topic1_all', 1, None),
                     'hz_obs_/topic1_node1': Variable('hz_obs_/topic1_node1', 1, None),
-                    'hz_obs_/topic2_all': Variable('hz_obs_/topic2_all', 1, None),
-                    'hz_obs_/topic2_node2': Variable('hz_obs_/topic2_node2', 1, None),
-                    'hz_obs_/topic3_all': Variable('hz_obs_/topic3_all', 1, None),
-                    'hz_obs_/topic3_node3': Variable('hz_obs_/topic3_node3', 1, None),
+                    # 'hz_obs_/topic2_all': Variable('hz_obs_/topic2_all', 1, None),
+                    # 'hz_obs_/topic2_node2': Variable('hz_obs_/topic2_node2', 1, None),
+                    # 'hz_obs_/topic3_all': Variable('hz_obs_/topic3_all', 1, None),
+                    # 'hz_obs_/topic3_node3': Variable('hz_obs_/topic3_node3', 1, None),
                     }
 
         self.assertEqual(len(vars), len(vars_req), "Hz added wrong number of variables!")
@@ -247,10 +247,11 @@ class TestHzObserver(unittest.TestCase):
 
         rules_req = [HzObserver(ab_pred('node1'), 'hz_obs_/topic1_node1', all_ab_pred([])),
                      CalleridsObserver('hz_obs_/topic1_all', ['hz_obs_/topic1_node1']),
-                     HzObserver(ab_pred('node2'), 'hz_obs_/topic2_node2', all_ab_pred(['/topic1'])),
-                     CalleridsObserver('hz_obs_/topic2_all', ['hz_obs_/topic2_node2']),
-                     HzObserver(ab_pred('node3'), 'hz_obs_/topic3_node3', all_ab_pred(['/topic2'])),
-                     CalleridsObserver('hz_obs_/topic3_all', ['hz_obs_/topic3_node3']),]
+                     # HzObserver(ab_pred('node2'), 'hz_obs_/topic2_node2', all_ab_pred(['/topic1'])),
+                     # CalleridsObserver('hz_obs_/topic2_all', ['hz_obs_/topic2_node2']),
+                     # HzObserver(ab_pred('node3'), 'hz_obs_/topic3_node3', all_ab_pred(['/topic2'])),
+                     # CalleridsObserver('hz_obs_/topic3_all', ['hz_obs_/topic3_node3']),
+                     ]
 
         rules_req_str = [str(x) for x in rules_req]
 
@@ -260,7 +261,8 @@ class TestHzObserver(unittest.TestCase):
         self.assertEqual(len(real_nodes), 0, "Hz should not add real nodes!")
 
     def test_generate_model_parameter_errors_1(self):
-        config = observer_configuration(type="hz", resource=['/topic1', '/topic2', '/topic3'])
+        # config = observer_configuration(type="hz", resource=['/topic1', '/topic2', '/topic3'])
+        config = observer_configuration(type="hz", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
@@ -275,7 +277,8 @@ class TestHzObserver(unittest.TestCase):
                         (TypeError, observer_configuration(type="hz", resource=[1])),
                         (TypeError, observer_configuration(type="hz", resource='no_list')),
                         (TypeError, observer_configuration(type="hz", resource=1)),
-                        (ValueError, observer_configuration(type="hz", resource=['/topic_wrong', '/topic2', '/topic3']))
+                        (ValueError, observer_configuration(type="hz", resource=['/topic1', '/topic2', '/topic3'])),
+                        (ValueError, observer_configuration(type="hz", resource=['/topic_wrong']))
                         ]
 
         for (error, config) in config_tests:
@@ -288,20 +291,21 @@ class TestHzObserver(unittest.TestCase):
             print "... DONE"
 
     def test_generate_model_parameter_errors_2(self):
-        config = observer_configuration(type="hz", resource=['/topic1', '/topic2', '/topic3'])
+        # config = observer_configuration(type="hz", resource=['/topic1', '/topic2', '/topic3'])
+        config = observer_configuration(type="hz", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
 
         topics_published_from_nodes_testes = \
-            [(ValueError, {'/topic':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+            [#(ValueError, {'/topic':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (ValueError, {'/topic3': []       , '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic':  ['node2'], '/topic1': ['node1']}),
+             # (ValueError, {'/topic3': ['node3'], '/topic':  ['node2'], '/topic1': ['node1']}),
              (ValueError, {'/topic3': ['node3'], '/topic2': []       , '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic':  ['node1']}),
+             # (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic':  ['node1']}),
              (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': []       }),
-             (ValueError, {1:  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+             (TypeError, {1:  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (ValueError, {'/':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (ValueError, {'':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
              (KeyError, {}),
@@ -337,7 +341,8 @@ class TestHzObserver(unittest.TestCase):
             print "... DONE"
 
     def test_generate_model_parameter_errors_3(self):
-        config = observer_configuration(type="hz", resource=['/topic1', '/topic2', '/topic3'])
+        # config = observer_configuration(type="hz", resource=['/topic1', '/topic2', '/topic3'])
+        config = observer_configuration(type="hz", resource=['/topic1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}

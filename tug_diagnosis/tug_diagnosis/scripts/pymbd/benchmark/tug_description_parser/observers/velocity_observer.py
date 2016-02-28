@@ -2,6 +2,7 @@ from pymbd.sat import picosat
 from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.benchmark.tug_description_parser.observers.base_observer import *
+from tug_diagnosis_msgs.msg import observer_configuration
 
 import re
 regex_prog = re.compile('(\S+)\s+(\S+)')
@@ -36,42 +37,50 @@ class VelocityObserver(BaseObserver):
     @staticmethod
     def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
                                  nodes_publish_topics, nodes_subscribe_topics):
-        checkInputData.dict_data_valid(config, check_entries=False)
-        topics = config['topics']
+        config_type = str('velocity')
+        if not isinstance(config, observer_configuration):
+            raise TypeError
+        if not config.type == config_type:
+            raise KeyError('given type in config is wrong!')
 
-        checkInputData.list_data_valid(topics, check_entries=False)
+        topics = config.resource
+        checkInputData.list_data_valid(topics, num_entries=2)
 
-        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=False, allow_empty=False)
-        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=False, allow_empty=True)
+        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=True, entry_type=list, allow_empty=False)
+        checkInputData.list_data_valid(topics_published_from_nodes.keys(), check_entries=True)
+        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=True, entry_type=list, allow_empty=True)
 
         vars = {}
         rules = []
         real_nodes = []
 
-        real_nodes.append("velocity")
-        vars["velocity"] = Variable("velocity", Variable.BOOLEAN, None)
-        vars[ab_pred("velocity")] = Variable(ab_pred("velocity"), Variable.BOOLEAN, None)
+        real_nodes.append(config_type)
+        vars[config_type] = Variable(config_type, Variable.BOOLEAN, None)
+        vars[ab_pred(config_type)] = Variable(ab_pred(config_type), Variable.BOOLEAN, None)
 
-        for topic_pair in topics:
-            checkInputData.list_data_valid(topic_pair, check_entries=True)
-            topic_a = topic_pair[0]
-            topic_b = topic_pair[1]
+        topic_pair = topics
+        checkInputData.list_data_valid(topic_pair, check_entries=True, allow_empty=False)
+        topic_a = topic_pair[0]
+        topic_b = topic_pair[1]
 
-            observation = "velocity_obs_" + topic_a + "_" + topic_b
-            vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+        if not set(topic_pair).issubset(topics_published_from_nodes.keys()):
+            raise ValueError('topics are not not in topics published list!')
 
-            nodes_a = topics_published_from_nodes.get(topic_a, [])
-            nodes_b = topics_published_from_nodes.get(topic_b, [])
-            checkInputData.list_data_valid(nodes_a, check_entries=True)
-            checkInputData.list_data_valid(nodes_b, check_entries=True)
+        observation = config_type + "_obs_" + topic_a + "_" + topic_b
+        vars[observation] = Variable(observation, Variable.BOOLEAN, None)
 
-            subscribed_topics = []
-            [subscribed_topics.extend(nodes_subscribe_topics.get(node, [])) for node in nodes_a + nodes_b]
+        nodes_a = topics_published_from_nodes.get(topic_a, [])
+        nodes_b = topics_published_from_nodes.get(topic_b, [])
+        checkInputData.list_data_valid(nodes_a, check_entries=True, allow_empty=False)
+        checkInputData.list_data_valid(nodes_b, check_entries=True, allow_empty=False)
 
-            rules.append(VelocityObserver(all_ab_pred(nodes_a), all_ab_pred(nodes_b), ab_pred("velocity"), observation, all_ab_pred(subscribed_topics)))
+        subscribed_topics = []
+        [subscribed_topics.extend(nodes_subscribe_topics.get(node, [])) for node in nodes_a + nodes_b]
 
-            if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
-                raise ValueError
+        rules.append(VelocityObserver(all_ab_pred(nodes_a), all_ab_pred(nodes_b), ab_pred(config_type), observation, all_ab_pred(subscribed_topics)))
+
+        if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+            raise ValueError('subscribed topics are not not in topics published list!')
 
         return vars, rules, [], real_nodes
 
@@ -231,7 +240,8 @@ class TestVelocityObserver(unittest.TestCase):
         self.assertEqual(str(new_clause.literals[7]), "velocity_obs_node1_node2", "A literal in clause does not match!")
 
     def test_generate_model_parameter1(self):
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'velocity'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'velocity'}
+        config = observer_configuration(type="velocity", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['/node1'], '/topicB': ['/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topicA'], '/node2': ['/topicB']}
@@ -261,7 +271,8 @@ class TestVelocityObserver(unittest.TestCase):
         self.assertEqual(str(real_nodes[0]), 'velocity', "'Velocity' not added to real nodes!")
 
     def test_generate_model_parameter_errors_1(self):
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'velocity'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'velocity'}
+        config = observer_configuration(type="velocity", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['/node1'], '/topicB': ['/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topicA'], '/node2': ['/topicB']}
@@ -285,6 +296,19 @@ class TestVelocityObserver(unittest.TestCase):
                         (TypeError, {'topics': 1, 'type': 'velocity'}),
                         (TypeError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'velocity'})
                         ]
+        config_tests = [(KeyError, observer_configuration(type="velocity_wrong", resource=['/topicA', '/topicB'])),
+                        (ValueError, observer_configuration(type="velocity")),
+                        (KeyError, observer_configuration()),
+                        (TypeError, observer_configuration),
+                        (TypeError, 1),
+                        (ValueError, observer_configuration(type="velocity", resource=[''])),
+                        (ValueError, observer_configuration(type="velocity", resource=[1])),
+                        (TypeError, observer_configuration(type="velocity", resource='no_list')),
+                        (TypeError, observer_configuration(type="velocity", resource=1)),
+                        (ValueError, observer_configuration(type="velocity", resource=['/topicA', '/topicB', '/topicC'])),
+                        (ValueError, observer_configuration(type="velocity", resource=['/topicA'])),
+                        (ValueError, observer_configuration(type="velocity", resource=['/topic_wrong']))
+                        ]
 
         for (error, config) in config_tests:
             with self.assertRaises(error):
@@ -297,7 +321,8 @@ class TestVelocityObserver(unittest.TestCase):
 
     def test_generate_model_parameter_errors_2(self):
 
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'velocity'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'velocity'}
+        config = observer_configuration(type="velocity", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['/node1'], '/topicB': ['/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topicA'], '/node2': ['/topicB']}
@@ -310,10 +335,10 @@ class TestVelocityObserver(unittest.TestCase):
                                              (TypeError, 1),
                                              (ValueError, {'/topicB': ['/', '/node2']}),
                                              (ValueError, {'/topicB': ['', '/node2']}),
-                                             (ValueError, {'/topicB': [1, '/node2']}),
+                                             (TypeError, {'/topicB': [1, '/node2']}),
                                              (ValueError, {'/topicB': ['/node1', '/']}),
                                              (ValueError, {'/topicB': ['/node1', '']}),
-                                             (ValueError, {'/topicB': ['/node1', 1]}),
+                                             (TypeError, {'/topicB': ['/node1', 1]}),
                                              (ValueError, {'/topicB': ['/', '/node2'], '/topicA': ['/nodeA1']}),
                                              (ValueError, {'/topicB': ['', '/node2'], '/topicA': ['/nodeA1']}),
                                              (TypeError, {'/topicB': [1, '/node2'], '/topicA': ['/nodeA1']}),
@@ -337,8 +362,8 @@ class TestVelocityObserver(unittest.TestCase):
             print "... DONE"
 
     def test_generate_model_parameter_errors_3(self):
-
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'velocity'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'velocity'}
+        config = observer_configuration(type="velocity", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['/node1'], '/topicB': ['/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topicA'], '/node2': ['/topicB']}
