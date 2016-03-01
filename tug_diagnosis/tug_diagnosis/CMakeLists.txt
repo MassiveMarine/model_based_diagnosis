@@ -7,6 +7,7 @@ project(tug_diagnosis)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   roslint
+  tug_observer_plugin_utils
 )
 
 ## System dependencies are found with CMake's conventions
