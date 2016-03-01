@@ -2,6 +2,7 @@ from pymbd.sat import picosat
 from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.benchmark.tug_description_parser.observers.base_observer import *
+from tug_diagnosis_msgs.msg import observer_configuration
 
 
 class ResourcesObserver(BaseObserver):
@@ -29,25 +30,30 @@ class ResourcesObserver(BaseObserver):
     @staticmethod
     def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
                                  nodes_publish_topics, nodes_subscribe_topics):
-        checkInputData.dict_data_valid(config, False)
-        nodes = config['nodes']
+        config_type = str('resources')
+        if not isinstance(config, observer_configuration):
+            raise TypeError
+        if not config.type == config_type:
+            raise KeyError('given type in config is wrong!')
 
-        checkInputData.list_data_valid(nodes)
+        nodes = config.resource
+        checkInputData.list_data_valid(nodes, num_entries=1)
 
-        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=False, allow_empty=True)
+        # checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=False, allow_empty=True)
+        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=True, entry_type=list, allow_empty=True)
 
         vars = {}
         rules = []
 
-        for node in nodes:
-            observation = "resources_obs_" + node
-            vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+        node = nodes[0]
+        observation = config_type + "_obs_" + node
+        vars[observation] = Variable(observation, Variable.BOOLEAN, None)
 
-            subscribed_topics = nodes_subscribe_topics.get(node, [])
-            rules.append(ResourcesObserver(ab_pred(node), observation, all_ab_pred(subscribed_topics)))
+        subscribed_topics = nodes_subscribe_topics.get(node, [])
+        rules.append(ResourcesObserver(ab_pred(node), observation, all_ab_pred(subscribed_topics)))
 
-            if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
-                raise ValueError
+        if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+            raise ValueError('subscribed topics are not not in topics published list!')
 
         return vars, rules, [], []
 
@@ -146,7 +152,8 @@ class TestResourcesObserver(unittest.TestCase):
         self.assertEqual(str(new_clause.literals[3]), "/obs_node", "Fourth literal in clause does not match!")
 
     def test_generate_model_parameter1(self):
-        config = {'nodes': ['/node1', '/node2', '/node3'], 'type': 'resources'}
+        # config = {'nodes': ['/node1', '/node2', '/node3'], 'type': 'resources'}
+        config = observer_configuration(type="resources", resource=['/node1'])
         topics_published_from_nodes = {'/topic': ['/node1', '/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
@@ -154,8 +161,9 @@ class TestResourcesObserver(unittest.TestCase):
         vars, rules, nodes, real_nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'resources_obs_/node1': Variable('resources_obs_/node1', 1, None),
-                    'resources_obs_/node2': Variable('resources_obs_/node2', 1, None),
-                    'resources_obs_/node3': Variable('resources_obs_/node3', 1, None)}
+                    # 'resources_obs_/node2': Variable('resources_obs_/node2', 1, None),
+                    # 'resources_obs_/node3': Variable('resources_obs_/node3', 1, None)
+                    }
 
         self.assertEqual(len(vars), len(vars_req), "resources added wrong number of variables!")
         for i, obj in vars.items():
@@ -164,8 +172,9 @@ class TestResourcesObserver(unittest.TestCase):
 
         subscribed_topics = []
         rules_req = [ResourcesObserver(ab_pred('/node1'), 'resources_obs_/node1', subscribed_topics),
-                     ResourcesObserver(ab_pred('/node2'), 'resources_obs_/node2', subscribed_topics),
-                     ResourcesObserver(ab_pred('/node3'), 'resources_obs_/node3', subscribed_topics)]
+                     # ResourcesObserver(ab_pred('/node2'), 'resources_obs_/node2', subscribed_topics),
+                     # ResourcesObserver(ab_pred('/node3'), 'resources_obs_/node3', subscribed_topics)
+                     ]
 
         rules_req_str = [str(x) for x in rules_req]
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
@@ -174,7 +183,8 @@ class TestResourcesObserver(unittest.TestCase):
         self.assertEqual(len(real_nodes), 0, "resources should not add real nodes!")
 
     def test_generate_model_parameter2(self):
-        config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'resources'}
+        # config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'resources'}
+        config = observer_configuration(type="resources", resource=['node1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
@@ -182,8 +192,9 @@ class TestResourcesObserver(unittest.TestCase):
         vars, rules, nodes, real_nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'resources_obs_node1': Variable('resources_obs_node1', 1, None),
-                    'resources_obs_node2': Variable('resources_obs_node2', 1, None),
-                    'resources_obs_node3': Variable('resources_obs_node3', 1, None)}
+                    # 'resources_obs_node2': Variable('resources_obs_node2', 1, None),
+                    # 'resources_obs_node3': Variable('resources_obs_node3', 1, None)
+                    }
 
         self.assertEqual(len(vars), len(vars_req), "resources added wrong number of variables!")
         for i, obj in vars.items():
@@ -191,8 +202,9 @@ class TestResourcesObserver(unittest.TestCase):
             self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
 
         rules_req = [ResourcesObserver(ab_pred('node1'), 'resources_obs_node1', all_ab_pred([])),
-                     ResourcesObserver(ab_pred('node2'), 'resources_obs_node2', all_ab_pred(['/topic1'])),
-                     ResourcesObserver(ab_pred('node3'), 'resources_obs_node3', all_ab_pred(['/topic2']))]
+                     # ResourcesObserver(ab_pred('node2'), 'resources_obs_node2', all_ab_pred(['/topic1'])),
+                     # ResourcesObserver(ab_pred('node3'), 'resources_obs_node3', all_ab_pred(['/topic2']))
+                     ]
 
         rules_req_str = [str(x) for x in rules_req]
 
@@ -202,24 +214,37 @@ class TestResourcesObserver(unittest.TestCase):
         self.assertEqual(len(real_nodes), 0, "resources should not add real nodes!")
 
     def test_generate_model_parameter_errors_1(self):
-        config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'resources'}
+        # config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'resources'}
+        config = observer_configuration(type="resources", resource=['node1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
 
-        config_tests = [(KeyError, {'nodes_wrong_name': ['node1'], 'type': 'resources'}),
-                        (KeyError, {'type': 'resources'}),
-                        (KeyError, {}),
-                        (TypeError, "not_a_dict"),
-                        (TypeError, 1),
-                        (ValueError, {'nodes': [], 'type': 'resources'}),
-                        (ValueError, {'nodes': [''], 'type': 'resources'}),
-                        (TypeError, {'nodes': [1], 'type': 'resources'}),
-                        (TypeError, {'nodes': "no_list", 'type': 'resources'}),
-                        (TypeError, {'nodes': 1, 'type': 'resources'})
-                        ]
+        # config_tests = [(KeyError, {'nodes_wrong_name': ['node1'], 'type': 'resources'}),
+        #                 (KeyError, {'type': 'resources'}),
+        #                 (KeyError, {}),
+        #                 (TypeError, "not_a_dict"),
+        #                 (TypeError, 1),
+        #                 (ValueError, {'nodes': [], 'type': 'resources'}),
+        #                 (ValueError, {'nodes': [''], 'type': 'resources'}),
+        #                 (TypeError, {'nodes': [1], 'type': 'resources'}),
+        #                 (TypeError, {'nodes': "no_list", 'type': 'resources'}),
+        #                 (TypeError, {'nodes': 1, 'type': 'resources'})
+        #                 ]
 
+        config_tests = [(KeyError, observer_configuration(type="resources_wrong", resource=['/node'])),
+                        (ValueError, observer_configuration(type="resources")),
+                        (KeyError, observer_configuration()),
+                        (TypeError, observer_configuration),
+                        (TypeError, 1),
+                        (ValueError, observer_configuration(type="resources", resource=[''])),
+                        (TypeError, observer_configuration(type="resources", resource=[1])),
+                        (TypeError, observer_configuration(type="resources", resource='no_list')),
+                        (TypeError, observer_configuration(type="resources", resource=1)),
+                        (ValueError, observer_configuration(type="resources", resource=['/node1', '/node2', '/node3'])),
+                        # (ValueError, observer_configuration(type="resources", resource=['/node_wrong']))
+                        ]
         for (error, config) in config_tests:
             with self.assertRaises(error):
                 print "'" + str(error.__name__) + "' should be raised by '" + str(config) + "'",
@@ -230,7 +255,8 @@ class TestResourcesObserver(unittest.TestCase):
             print "... DONE"
 
     def test_generate_model_parameter_errors_2(self):
-        config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'resources'}
+        # config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'resources'}
+        config = observer_configuration(type="resources", resource=['node1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}

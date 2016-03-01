@@ -2,6 +2,7 @@ from pymbd.sat import picosat
 from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.benchmark.tug_description_parser.observers.base_observer import *
+from tug_diagnosis_msgs.msg import observer_configuration
 
 
 class ActivatedObserver(BaseObserver):
@@ -26,18 +27,22 @@ class ActivatedObserver(BaseObserver):
     @staticmethod
     def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
                                  nodes_publish_topics, nodes_subscribe_topics):
-        checkInputData.dict_data_valid(config, False)
-        nodes = config['nodes']
+        config_type = str('activated')
+        if not isinstance(config, observer_configuration):
+            raise TypeError
+        if not config.type == config_type:
+            raise KeyError('given type in config is wrong!')
 
-        checkInputData.list_data_valid(nodes)
+        nodes = config.resource
+        checkInputData.list_data_valid(nodes, num_entries=1)
 
         vars = {}
         rules = []
 
-        for node in nodes:
-            observation = "activated_obs_" + node
-            vars[observation] = Variable(observation, Variable.BOOLEAN, None)
-            rules.append(ActivatedObserver(ab_pred(str(node)), observation))
+        node = nodes[0]
+        observation = config_type + "_obs_" + node
+        vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+        rules.append(ActivatedObserver(ab_pred(str(node)), observation))
 
         return vars, rules, [], []
 
@@ -100,7 +105,8 @@ class TestActivatedObserver(unittest.TestCase):
         self.assertEqual(str(new_clause.literals[1]), "/name", "Second literal in clause does not match!")
 
     def test_generate_model_parameter1(self):
-        config = {'nodes': ['/node1', '/node2', '/node3'], 'type': 'activated'}
+        # config = {'nodes': ['/node1', '/node2', '/node3'], 'type': 'activated'}
+        config = observer_configuration(type="activated", resource=['/node1'])
         topics_published_from_nodes = {'/topic': ['/node1', '/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
@@ -108,8 +114,9 @@ class TestActivatedObserver(unittest.TestCase):
         vars, rules, nodes, real_nodes = ActivatedObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
 
         vars_req = {'activated_obs_/node1': Variable('activated_obs_/node1', 1, None),
-                    'activated_obs_/node2': Variable('activated_obs_/node2', 1, None),
-                    'activated_obs_/node3': Variable('activated_obs_/node3', 1, None)}
+                    # 'activated_obs_/node2': Variable('activated_obs_/node2', 1, None),
+                    # 'activated_obs_/node3': Variable('activated_obs_/node3', 1, None)
+                    }
 
         self.assertEqual(len(vars), len(vars_req), "Activated added wrong number of variables!")
         for i, obj in vars.items():
@@ -117,8 +124,9 @@ class TestActivatedObserver(unittest.TestCase):
             self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
 
         rules_req = [ActivatedObserver(ab_pred('/node1'), 'activated_obs_/node1'),
-                     ActivatedObserver(ab_pred('/node2'), 'activated_obs_/node2'),
-                     ActivatedObserver(ab_pred('/node3'), 'activated_obs_/node3')]
+                     # ActivatedObserver(ab_pred('/node2'), 'activated_obs_/node2'),
+                     # ActivatedObserver(ab_pred('/node3'), 'activated_obs_/node3')
+                     ]
 
         rules_req_str = [str(x) for x in rules_req]
         self.assertTrue(not any([x for x in rules if str(x) not in rules_req_str]), "Rules does not match!")
@@ -127,22 +135,35 @@ class TestActivatedObserver(unittest.TestCase):
         self.assertEqual(len(real_nodes), 0, "Activated should not add real nodes!")
 
     def test_generate_model_parameter_errors_1(self):
-        config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'activated'}
+        # config = {'nodes': ['node1', 'node2', 'node3'], 'type': 'activated'}
+        config = observer_configuration(type="activated", resource=['node1'])
         topics_published_from_nodes = {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
 
-        config_tests = [(KeyError, {'nodes_wrong_name': ['node1'], 'type': 'activated'}),
-                        (KeyError, {'type': 'activated'}),
-                        (KeyError, {}),
-                        (TypeError, "not_a_dict"),
+        # config_tests = [(KeyError, {'nodes_wrong_name': ['node1'], 'type': 'activated'}),
+        #                 (KeyError, {'type': 'activated'}),
+        #                 (KeyError, {}),
+        #                 (TypeError, "not_a_dict"),
+        #                 (TypeError, 1),
+        #                 (ValueError, {'nodes': [], 'type': 'activated'}),
+        #                 (ValueError, {'nodes': [''], 'type': 'activated'}),
+        #                 (TypeError, {'nodes': [1], 'type': 'activated'}),
+        #                 (TypeError, {'nodes': "no_list", 'type': 'activated'}),
+        #                 (TypeError, {'nodes': 1, 'type': 'activated'})
+        #                 ]
+
+        config_tests = [(KeyError, observer_configuration(type="activated_wrong", resource=['/topic'])),
+                        (ValueError, observer_configuration(type="activated")),
+                        (KeyError, observer_configuration()),
+                        (TypeError, observer_configuration),
                         (TypeError, 1),
-                        (ValueError, {'nodes': [], 'type': 'activated'}),
-                        (ValueError, {'nodes': [''], 'type': 'activated'}),
-                        (TypeError, {'nodes': [1], 'type': 'activated'}),
-                        (TypeError, {'nodes': "no_list", 'type': 'activated'}),
-                        (TypeError, {'nodes': 1, 'type': 'activated'})
+                        (ValueError, observer_configuration(type="activated", resource=[''])),
+                        (TypeError, observer_configuration(type="activated", resource=[1])),
+                        (TypeError, observer_configuration(type="activated", resource='no_list')),
+                        (TypeError, observer_configuration(type="activated", resource=1)),
+                        (ValueError, observer_configuration(type="activated", resource=['/topic1', '/topic2', '/topic3'])),
                         ]
 
         for (error, config) in config_tests:

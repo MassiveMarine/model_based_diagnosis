@@ -7,6 +7,7 @@ project(tug_diagnosis)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   roslint
+  tug_observer_plugin_utils
 )
 
 ## System dependencies are found with CMake's conventions
@@ -187,3 +188,8 @@ include_directories(
 catkin_add_nosetests(scripts)
 roslint_python()
 roslint_add_test()
+
+execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/scripts/lib/picosat
+                COMMAND sh configure)
+execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/scripts/lib/picosat
+                COMMAND make)
