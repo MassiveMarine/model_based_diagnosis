@@ -18,12 +18,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #define TUG_OBSERVER_PLUGIN_UTILS_HYPOTHESIS_CHECK_SINGE_VALUE_HYPOTHESIS_CHECK_SINGLEVALUEHYPOTHESISCHECK_H
 
 #include <tug_observer_plugin_utils/filter/FilteState.h>
+#include <stddef.h>
 
 template <class T>
 class SingleValueHypothesisCheck
 {
 public:
     virtual bool checkHypothesis(const FilteState<T>& state) = 0;
+    virtual size_t getMinimumSampleSize() = 0;
 };
 
 

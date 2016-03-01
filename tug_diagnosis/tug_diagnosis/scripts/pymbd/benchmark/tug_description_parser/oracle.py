@@ -1,30 +1,39 @@
-from model import Model
+from model import Model, ModelGenerator
 from pymbd.diagnosis.description import Description
 from pymbd.util.two_way_dict import TwoWayDict
 import time
 
 
 class TUGDescriptionOracle(Description):
-    
-    def __init__(self, configs, observations, **options):
+
+    def __init__(self, **options):
         super(TUGDescriptionOracle, self).__init__([], **options)
-        self.configs = configs
         self.comp_calls = 0
         self.check_calls = 0
         self.comp_time = 0
         self.check_time = 0
         self.scs = set()
+        self.model_ready = False
+        self.observations = ()
+        self.net = Model(**self.options)
+        self.net_generator = ModelGenerator()
         self.setup = False
-        self.observations = observations
-        self.net = None
+        self.nodes = None
 
     def setup_system_model(self):
+        config = self.net_generator.config
+
+        if not config:
+            return False
+
         if not self.setup:
             self.setup = True
-            self.net = Model(self.configs, **self.options)
-            self.net.set_observations(self.observations)
-            self.nodes = TwoWayDict(dict(enumerate(self.net.temp_nodes)))
-            
+            self.net.set_model(config)
+            self.nodes = TwoWayDict(dict(enumerate(self.net.nodes)))
+
+        self.net.set_observations(self.observations)
+        return True
+
     def set_options(self, **options):
         super(TUGDescriptionOracle, self).set_options(**options)
         if self.net is not None:
@@ -34,11 +43,13 @@ class TUGDescriptionOracle(Description):
         return self.net.is_real_node(node_name)
     
     def get_num_nodes(self):
-        self.setup_system_model()
+        if not self.setup_system_model():
+            return 0
         return len(self.nodes)
         
     def get_conflict_set(self, h):
-        self.setup_system_model()
+        if not self.setup_system_model():
+            return None
         self.comp_calls += 1
         t0 = time.time()
         cs = self.net.calculate_conflicts(self.numbers_to_nodes(h))
@@ -51,7 +62,8 @@ class TUGDescriptionOracle(Description):
             return None
     
     def check_consistency(self, h):
-        self.setup_system_model()
+        if not self.setup_system_model():
+            return None
         self.check_calls += 1
         t0 = time.time()
         sat = self.net.check_consistency(self.numbers_to_nodes(h))

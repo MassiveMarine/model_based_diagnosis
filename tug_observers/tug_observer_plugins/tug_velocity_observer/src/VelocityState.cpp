@@ -113,3 +113,38 @@ int32_t VelocityState::getNumber()
 {
   return number_;
 }
+
+bool VelocityState::canCheckX(FilteState<double> x_state)
+{
+  if (!x_)
+    throw std::runtime_error("no hypthesis check for x defined in the state: " + name_);
+
+  return x_->getMinimumSampleSize() <= x_state.sample_size;
+}
+
+bool VelocityState::canCheckY(FilteState<double> y_state)
+{
+  if (!y_)
+    throw std::runtime_error("no hypthesis check for y defined in the state: " + name_);
+
+  return y_->getMinimumSampleSize() <= y_state.sample_size;
+}
+
+bool VelocityState::canCheckZ(FilteState<double> z_state)
+{
+  if (!z_)
+    throw std::runtime_error("no hypthesis check for z defined in the state: " + name_);
+
+  return z_->getMinimumSampleSize() <= z_state.sample_size;
+}
+
+bool VelocityState::canCheck(FilteState<double> rot_x_state, FilteState<double> rot_y_state,
+                             FilteState<double> rot_z_state)
+{
+  if (rot_x_->getMinimumSampleSize() > rot_x_state.sample_size)
+    return false;
+  if (rot_y_->getMinimumSampleSize() > rot_y_state.sample_size)
+    return false;
+  if (rot_z_->getMinimumSampleSize() > rot_z_state.sample_size)
+    return false;
+}

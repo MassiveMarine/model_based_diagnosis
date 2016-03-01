@@ -6,10 +6,30 @@ from pymbd.sat.description import Description
 from pymbd.sat.problem import Problem
 from pymbd.sat.variable import Variable
 
+from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_configuration
+
+
+class ModelGenerator(object):
+    def __init__(self):
+        self.config = None
+
+    def set_config(self, set_config):
+        print "set_config"
+        self.config = set_config
+
+    def add_config(self, add_config):
+        print "add_config"
+
+    def remove_config(self, remove_config):
+        print "remove_config"
+
+    def update_config(self, update_config):
+        print "update_config"
+
 
 class Model(object):
     
-    def __init__(self, configs, **options):
+    def __init__(self, **options):
         self.sat_engine_name = options.get('sat_solver', None)
         self.check_problem = Problem(self.sat_engine_name)
         self.comp_problem = self.check_problem
@@ -23,55 +43,57 @@ class Model(object):
         self.previous_diagnoses = set()
         self.last_max_card = 0
 
-        self.configs = configs
+        self.vars = {}
+        self.rules = []
+        self.nodes = []
+        self.real_nodes = []
 
-        vars = {}
-        rules = []
+    def set_model(self, configs):
+        self.vars = {}
+        self.rules = []
+        self.nodes = []
+        self.real_nodes = []
+
         topics_published_from_nodes = dict()
         topics_subscribed_from_nodes = dict()
         nodes_publish_topics = dict()
         nodes_subscribe_topics = dict()
-        nodes = []
-        self.real_nodes = []
         topics = set()
-
-        for node in configs['nodes']:
-            node_name = node['name']
+        for node in configs.nodes:
+            node_name = node.name
             self.real_nodes.append(node_name)
-            vars[node_name] = Variable(node_name, Variable.BOOLEAN, None)
-            vars[ab_pred(node_name)] = Variable(ab_pred(node_name), Variable.BOOLEAN, None)
+            self.vars[node_name] = Variable(node_name, Variable.BOOLEAN, None)
+            self.vars[ab_pred(node_name)] = Variable(ab_pred(node_name), Variable.BOOLEAN, None)
 
-            for topic in node.get('pub_topic', []):
+            for topic in node.pub_topic:
                 topics_published_from_nodes.setdefault(topic, []).append(node_name)
                 nodes_publish_topics.setdefault(node_name, []).append(topic)
 
-            for topic in node.get('sub_topic', []):
+            for topic in node.sub_topic:
                 topics_subscribed_from_nodes.setdefault(topic, []).append(node_name)
                 nodes_subscribe_topics.setdefault(node_name, []).append(topic)
 
-            topics.update(node.get('pub_topic', []))
-            topics.update(node.get('sub_topic', []))
+            topics.update(node.pub_topic)
+            topics.update(node.sub_topic)
 
         topics = list(topics)
-        config_for_general = {'topics': topics, 'type': 'general'}
 
-        configs['observations'].append(config_for_general)
+        configs.observers.append(observer_configuration(type="general", resource=topics))
 
-        for config in configs['observations']:
+        for config in configs.observers:
             new_vars, new_rules, new_nodes, new_real_nodes = generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
-            vars.update(new_vars)
-            rules += new_rules
-            nodes += new_nodes
+            self.vars.update(new_vars)
+            self.rules += new_rules
+            self.nodes += new_nodes
             self.real_nodes += new_real_nodes
 
-        self.temp_vars = vars
-        self.temp_rules = rules
-        self.temp_nodes = self.real_nodes + nodes
+        self.nodes = self.real_nodes + self.nodes
 
     def set_observations(self, observations):
         # pass
         for name, value in observations:
-            self.temp_vars[name].value = value
+            if name in self.vars.keys():
+                self.vars[name].value = value
 
     def set_options(self, **options):
         self.options.update(options)
@@ -108,9 +130,9 @@ class Model(object):
         if self.options['separate_tp'] == True and self.check_problem == self.comp_problem:
             self.check_problem = Problem(self.sat_engine_name)
 
-        vars = self.temp_vars.values()
-        rules = self.temp_rules[:]
-        nodes = self.temp_nodes[:]
+        vars = self.vars.values()
+        rules = self.rules[:]
+        nodes = self.nodes[:]
 
         # for all gates not in h set the AB predicate to false.
         for node in set(nodes)-h:
@@ -145,9 +167,9 @@ class Model(object):
             self.first_check_call = True
             self.first_comp_call = True
 
-        vars = self.temp_vars.values()
-        rules = self.temp_rules[:]
-        nodes = self.temp_nodes[:]
+        vars = self.vars.values()
+        rules = self.rules[:]
+        nodes = self.nodes[:]
 
         rules.append(PushSentence())
 

@@ -9,6 +9,7 @@ from pymbd.benchmark.tug_description_parser.observer import OBSERVERS
 import rospy
 from tug_observers_msgs.msg import observer_info
 from tug_diagnosis_msgs.msg import diagnosis_set, diagnosis, resource_mode_assignement
+from tug_diagnosis_msgs.srv import *
 from std_msgs.msg import Header
 from observation_store import ObservationStore
 import threading
@@ -19,8 +20,25 @@ class Diagnosis(object):
     def __init__(self):
         self._observation_store = ObservationStore()
         self._trigger_condition = threading.Condition()
+
+        self.p = Problem()
+        self.solver_list = ['hst-picosat',
+                            'hst-cache-picosat',
+                            'hst-ci-picosat',
+                            'hst-ci-cache-picosat',
+                            'hsdag-picosat',
+                            'hsdag-cache-picosat',
+                            'hsdag-ci-picosat',
+                            'hsdag-ci-cache-picosat',
+                            'hsdag-sicf-picosat',
+                            'hsdag-sicf-cache-picosat'
+                            ]
+
+        self.o = TUGDescriptionOracle()
+
         self._observer_sub = rospy.Subscriber("/observers/info", observer_info, self.observer_callback)
         self._diagnosis_pub = rospy.Publisher('/diagnosis', diagnosis_set, queue_size=10)
+        self._service = rospy.Service('diagnosis_configuration_change', DiagnosisConfiguration, self.handle_diagnosis_configuration_change)
 
     def observer_callback(self, observations):
         for obs in observations.observation_infos:
@@ -32,7 +50,42 @@ class Diagnosis(object):
             self._trigger_condition.notify_all()
             self._trigger_condition.release()
 
+    def handle_diagnosis_configuration_change(self, req):
+        action = req.action
+        config = req.config
+
+        if action == DiagnosisConfigurationRequest.ADD:
+            pass
+        elif action == DiagnosisConfigurationRequest.REMOVE:
+            pass
+        elif action == DiagnosisConfigurationRequest.SET:
+            print config
+            self.o.net_generator.set_config(config)
+        elif action == DiagnosisConfigurationRequest.UPDATE:
+            pass
+        else:
+            return DiagnosisConfigurationResponse(errorcode=1, error_msg='unknown action')
+
+        self.o.setup = False
+
+        return DiagnosisConfigurationResponse(errorcode=0, error_msg='no error')
+
     def run(self):
+
+        # p = Problem()
+        # the_list = ['hst-picosat',
+        #             'hst-cache-picosat',
+        #             'hst-ci-picosat',
+        #             'hst-ci-cache-picosat',
+        #             'hsdag-picosat',
+        #             'hsdag-cache-picosat',
+        #             'hsdag-ci-picosat',
+        #             'hsdag-ci-cache-picosat',
+        #             'hsdag-sicf-picosat',
+        #             'hsdag-sicf-cache-picosat'
+        #             ]
+        #
+        # o = TUGDescriptionOracle()
 
         while not rospy.is_shutdown():
             self._trigger_condition.acquire()
@@ -40,35 +93,22 @@ class Diagnosis(object):
 
             observations = self._observation_store.get_observations()
 
-            if all( [j for (i,j) in observations]):
+            # check if all observations are valid
+            if all([j for (i, j) in observations]):
                 continue
 
             self._trigger_condition.release()
 
-            p = Problem()
-            the_list = ['hst-picosat',
-                        'hst-cache-picosat',
-                        'hst-ci-picosat',
-                        'hst-ci-cache-picosat',
-                        'hsdag-picosat',
-                        'hsdag-cache-picosat',
-                        'hsdag-ci-picosat',
-                        'hsdag-ci-cache-picosat',
-                        'hsdag-sicf-picosat',
-                        'hsdag-sicf-cache-picosat'
-                        ]
-
-            o = TUGDescriptionOracle(configs, observations)
-            # for i in the_list:
-            r = p.compute_with_description(o, the_list[6])
+            self.o.observations = observations
+            r = self.p.compute_with_description(self.o, self.solver_list[6])
             d = r.get_diagnoses()
-            d = map(o.numbers_to_nodes, d)
+            d = map(self.o.numbers_to_nodes, d)
 
             corrupt_nodes = []
 
             msg = diagnosis_set()
             msg.header = Header(stamp=rospy.Time.now())
-            msg.type = the_list[6]
+            msg.type = self.solver_list[6]
 
             for diag in d:
 
@@ -76,7 +116,7 @@ class Diagnosis(object):
                 corrupt_set = []
                 for node in diag:
 
-                    if not o.is_real_node(node):
+                    if not self.o.is_real_node(node):
                         continue
                     corrupt_set.append(node)
 
@@ -91,16 +131,20 @@ class Diagnosis(object):
 
             self._diagnosis_pub.publish(msg)
 
-            rospy.loginfo( "new diagnosis done in " + str(r.get_stats()['total_time']) + " with '" + str(the_list[6]) + "':")
+            rospy.loginfo( "new diagnosis done in " + str(r.get_stats()['total_time']) + " with '" + str(self.solver_list[6]) + "':")
             for corrupt_node in corrupt_nodes:
                 rospy.loginfo(str(corrupt_node))
-
+            if not len(corrupt_nodes):
+                rospy.loginfo('no solution')
 
 
 if __name__ == "__main__":
     rospy.init_node('tug_diagnosis', anonymous=False)
 
-    configs = rospy.get_param('/tug_diagnosis_node')
+    # if rospy.has_param('/tug_diagnosis_node'):
+    #     configs = rospy.get_param('/tug_diagnosis_node')
+    # else:
+    #     configs = dict()
 
     the_diagnostics = Diagnosis()
 

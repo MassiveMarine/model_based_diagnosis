@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<launch>
+  <include file="$(find tug_observes)/launch/stage/observer_stage_cpp.launch"></include>
+  <include file="$(find tug_observes)/launch/stage/observer_stage_python.launch"></include>
+</launch>

@@ -89,7 +89,7 @@ void HzMergedBases::sendResourceInfo()
   if (states.empty())
   {
     ROS_ERROR_STREAM("got hz filter state " << hz_state << " for " << name_);
-    plugin_base_->reportError(name_, "no_state_" + name_, "For the node with the name '" + name_
+    plugin_base_->reportError(name_, "no_state_" + name_, "For the topic with the name '" + name_
                                                           + "' no state could be estimated",
                               tug_observers_msgs::observation::NO_STATE_FITS, current_filter_time_);
   }

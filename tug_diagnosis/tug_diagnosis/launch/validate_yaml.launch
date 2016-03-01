@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node name="tug_diagnosis_node" pkg="tug_diagnosis" type="yaml_validater.py" output="screen" required='true'>
+
+    <!--<rosparam command="load" file="$(find tug_diagnosis)/config/config.yaml" />-->
+    <rosparam command="load" file="$(find tug_diagnosis)/config/config_anna.yaml" />
+    <!--<rosparam command="load" file="$(find tug_diagnosis)/config/config_paul.yaml" />-->
+    <!--<rosparam command="load" file="$(find tug_diagnosis)/config/config_stage.yaml" />-->
+
+  </node>
+
+</launch>

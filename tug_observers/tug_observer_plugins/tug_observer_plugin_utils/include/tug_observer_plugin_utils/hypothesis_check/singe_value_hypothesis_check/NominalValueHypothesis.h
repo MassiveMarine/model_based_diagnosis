@@ -77,6 +77,15 @@ public:
 
       return result;
     }
+
+    virtual size_t getMinimumSampleSize()
+    {
+      size_t result = value_check_->getMinimumSampleSize();
+      for (size_t i = 0; i < deviation_check_.size(); ++i)
+        result = std::max(result, deviation_check_[i]->getMinimumSampleSize());
+
+      return result;
+    }
 };
 
 

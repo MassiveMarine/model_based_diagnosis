@@ -1,11 +1,41 @@
-  nodes:
+nodes:
+#    - name: "/robot_41/triangle_extraction"
+#    - name: "/robot_41/localize_to_target"
+
+#    - name: "starter1"
+#      sub_topic: []
+#      pub_topic: ["/topicA"]
+#
+#    - name: "starter2"
+#      sub_topic: []
+#      pub_topic: ["/topicA"]
+#
+#    - name: "timing1"
+#      sub_topic: ["/topicA"]
+#      pub_topic: ["/topicB"]
+#    - name: "timing2"
+#      sub_topic: ["/topicA"]
+#      pub_topic: ["/topicB"]
+
 #    - name: "imu"
 #      sub_topic: []
 #      pub_topic: ["/imu_topic"]
 
-    - name: "timing_node"
-      sub_topic: []
-      pub_topic: ["/topicA", "/topicB"]
+#    - name: "ukf"
+#      sub_topic: ["/imu_topic"]
+#      pub_topic: ["/ukf_topic"]
+
+#    - name: "timing_node"
+#      sub_topic: []
+#      pub_topic: ["/topicA", "/topicB"]
+
+#    - name: "/rostopic_11690_1447419401392"
+#      sub_topic: []
+#      pub_topic: ["/topic"]
+
+#    - name: "/rostopic_11797_1447419406816"
+#      sub_topic: []
+#      pub_topic: ["/topic"]
 
 #    - name: "loam"
 #      sub_topic: []
@@ -15,21 +45,63 @@
 #      sub_topic: []
 #      pub_topic: ["/odom_topic", "/cmd_topic"]
 
-  observations:
-  #  - type: "resource"
-  #    nodes: ["imu", "loam", "base"]
-#    - type: "hz"
-#      topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic"]
+#    - name: "ukf"
+#      sub_topic: ["/loam_topic"]
+#      pub_topic: ["/ukf_topic"]
+  - name: "node1"
+    sub_topic: ["/topic3"]
+    pub_topic: ["/topic1"]
 
-  #  - type: "timestamp"
-  #    topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic"]
+  - name: "node2"
+    sub_topic: []
+    pub_topic: ["/topic2"]
 
-  #  - type: "timeout"
-  #    topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic"]
-  #
-    - type: "timing"
-      topics: [["/topicA", "/topicB"]]
-#    - type: "movement"
+  - name: "node3"
+    sub_topic: []
+    pub_topic: ["/topic3"]
+
+#    - name: "node4"
+#      sub_topic: []
+#      pub_topic: ["/topic4"]
+
+observations:
+  - type: "activated"
+    nodes: ["node1", "node2", "node3"]
+
+#      nodes: ["node1", "node2", "node3", "node4"]
+#    - type: "resources"
+#      nodes: ["node1", "node2", "node3", "node4"]
+  - type: "hz"
+    topics: ["/topic1", "/topic2", "/topic3"]
+
+#    - type: "timeout"
+#      topics: ["/topic1", "/topic2", "/topic3", "/topic4"]
+  - type: "timestamp"
+    topics: ["/topic1", "/topic2", "/topic3"]
+
+#      topics: ["/topic1", "/topic2", "/topic3", "/topic4"]
+  - type: "scores"
+    topics: ["/topic1", "/topic2", "/topic3"]
+
+#      topics: ["/topic1", "/topic2", "/topic3", "/topic4"]
+  - type: "velocity"
+    topics: [["/topic1", "/topic2"]]
+
+  - type: "timing"
+    topics: [["/topic1", "/topic2"]]
+
+#      topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic", "/ukf_topic"]
+#      topics: ["/topic"]
+
+#  - type: "timestamp"
+#    topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic"]
+
+#  - type: "timeout"
+#    topics: ["/imu_topic", "/loam_topic", "/odom_topic", "/cmd_topic"]
+#
+#    - type: "timing"
+#      topics: [["/topicA", "/topicB"]]
+#    - type: "velocity"
 #      topics: [["/imu_topic", "/loam_topic"],
 #               ["/imu_topic", "/odom_topic"],
 #               ["/imu_topic", "/cmd_topic"],

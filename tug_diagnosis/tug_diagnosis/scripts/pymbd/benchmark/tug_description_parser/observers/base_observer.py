@@ -78,7 +78,7 @@ class checkInputData():
             raise TypeError
 
         if any(x == data for x in ['/', '', ab_pred("/"), ab_pred("")]+forbidden_str):
-            raise ValueError
+            raise ValueError("'" + str(data) + "' is a forbidden one!")
 
         if any(x in data for x in ['$', '#', '|']+forbidden_chars):
             raise ValueError
@@ -88,7 +88,7 @@ class checkInputData():
         if not isinstance(the_list, list):
             raise TypeError
         if not len(the_list) and not allow_empty:
-            raise ValueError
+            raise ValueError('List is empty!')
 
         if check_entries:
             for entry in the_list:

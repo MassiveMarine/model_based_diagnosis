@@ -21,7 +21,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 namespace tug_observers
 {
 
-    ObserverPluginBase::ObserverPluginBase(std::string type) : spinner_(1, &internal_call_back_queue_), type_(type)
+    ObserverPluginBase::ObserverPluginBase(std::string type) : spinner_(1, &internal_call_back_queue_), type_(type),
+    is_started_up_(true)
     {
       nh_.setCallbackQueue(&internal_call_back_queue_);
     }
@@ -39,6 +40,9 @@ namespace tug_observers
     void ObserverPluginBase::reportError(std::string resource, std::string error_msg, std::string verbose_error_msg,
                                          int32_t error_code, ros::Time time_of_occurence)
     {
+      if (!isStartedUp())
+        return;
+
       if (error_code >= 0)
       {
         ROS_WARN_STREAM("report error with state which is positive " <<
@@ -58,11 +62,40 @@ namespace tug_observers
     void ObserverPluginBase::reportStates(std::string resource, std::vector<Observation> observations,
                                           ros::Time time_of_occurence)
     {
+      if (!isStartedUp())
+        return;
       ObserverInfoSender::sendInfo(resource, type_, observations, time_of_occurence);
     }
 
     void ObserverPluginBase::flush()
     {
+      if (!isStartedUp())
+        return;
       ObserverInfoSender::flush();
+    }
+
+    void ObserverPluginBase::setStartUpTime(double start_up_time)
+    {
+      ROS_DEBUG_STREAM("set start up time to " << start_up_time);
+      is_started_up_ = false;
+      start_up_time_ = ros::Time::now() + ros::Duration(start_up_time);
+    }
+
+    bool ObserverPluginBase::isStartedUp()
+    {
+      if(is_started_up_)
+        return true;
+
+      ROS_DEBUG_STREAM("checking the time to set is started");
+      if(start_up_time_ < ros::Time::now())
+      {
+        ROS_DEBUG_STREAM("observer is started");
+        is_started_up_ = true;
+      }
+
+      if(!is_started_up_)
+        ROS_DEBUG_STREAM("observer is not started yet");
+
+      return is_started_up_;
     }
 }  // namespace tug_observers

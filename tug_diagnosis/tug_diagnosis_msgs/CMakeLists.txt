@@ -48,14 +48,16 @@ add_message_files(
   resource_mode_assignement.msg
   diagnosis.msg
   diagnosis_set.msg
+  observer_configuration.msg
+  node_configuration.msg
+  configuration.msg
 )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  DiagnosisConfiguration.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(

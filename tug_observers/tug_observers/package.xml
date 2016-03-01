@@ -48,6 +48,7 @@
   <build_depend>tug_observers_msgs</build_depend>
   <build_depend>tug_time</build_depend>
   <build_depend>roslint</build_depend>
+  <build_depend>tug_yaml</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
@@ -55,6 +56,7 @@
   <run_depend>pluginlib</run_depend>
   <run_depend>tug_observers_msgs</run_depend>
   <run_depend>tug_time</run_depend>
+  <run_depend>tug_yaml</run_depend>
 
   <test_depend>tug_testing</test_depend>
   <!-- The export tag contains other, unspecified, tags -->

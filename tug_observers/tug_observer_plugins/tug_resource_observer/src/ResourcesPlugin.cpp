@@ -59,6 +59,9 @@ namespace tug_observer_plugins_cpp
 
     void ResourcesPlugin::nodeInfoCallback(const tug_resource_monitor::NodeInfoArray::ConstPtr &msg)
     {
+      if(!isStartedUp())
+        return;
+
       ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 1");
       std::set<std::string> remaining_nodes = nodes_of_interrest_;
       std::vector<std::map<std::string, NodeResource>::iterator> found_node_resources;

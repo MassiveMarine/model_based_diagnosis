@@ -37,6 +37,8 @@ private:
   ros::CallbackQueue internal_call_back_queue_;
   ros::AsyncSpinner spinner_;
   std::string type_;
+  bool is_started_up_;
+  ros::Time start_up_time_;
 
 public:
   virtual ~ObserverPluginBase();
@@ -51,6 +53,11 @@ public:
   void reportStates(std::string resource, std::vector<Observation> observations, ros::Time time_of_occurence);
 
   void flush();
+
+  void setStartUpTime(double start_up_time);
+
+  bool isStartedUp();
+
 protected:
   explicit ObserverPluginBase(std::string type);
 };

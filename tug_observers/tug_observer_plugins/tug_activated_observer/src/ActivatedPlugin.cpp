@@ -54,6 +54,9 @@ void ActivatedPlugin::initialize(XmlRpc::XmlRpcValue params)
 
 void ActivatedPlugin::nodeInfoCallback(const tug_resource_monitor::NodeInfoArray::ConstPtr &msg)
 {
+  if(!isStartedUp())
+    return;
+
   ROS_DEBUG("ActivatedPlugin::nodeInfoCallback 1");
   std::set<std::string> remaining_nodes = nodes_of_interrest_;
   ROS_DEBUG("ActivatedPlugin::nodeInfoCallback 2");

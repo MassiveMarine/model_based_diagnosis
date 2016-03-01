@@ -124,6 +124,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+## Declare a C++ library
 add_library(velocity_observer   src/VelocityState.cpp src/VelocityConverter.cpp
                                 src/VelocityConverterFactory.cpp src/VelocityConverterTwist.cpp
                                 src/VelocityConverterTwistStamped.cpp src/VelocityConverterIMU.cpp
@@ -132,7 +133,6 @@ add_library(velocity_observer   src/VelocityState.cpp src/VelocityConverter.cpp
                                 src/VelocityConverterPose.cpp src/VelocityObserver.cpp
                                 src/VelocityChecker.cpp)
 
-## Declare a C++ library
 add_library(velocity_plugin
                             src/VelocityPlugin.cpp)
 

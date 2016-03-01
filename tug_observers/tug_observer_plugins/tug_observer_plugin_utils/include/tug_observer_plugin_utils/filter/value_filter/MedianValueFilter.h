@@ -60,8 +60,9 @@ public:
     ROS_DEBUG_STREAM("value at upper_median_index: " << buffer_[upper_median_index] <<
                              " value at lower_median_index:" << buffer_[lower_median_index]);
 
-    std::sort(buffer_.begin(), buffer_.end());
-    return (buffer_[upper_median_index] + buffer_[lower_median_index]) / static_cast<T>(2);
+    boost::circular_buffer<T> tmp_buffer = buffer_;
+    std::sort(tmp_buffer.begin(), tmp_buffer.end());
+    return (tmp_buffer[upper_median_index] + tmp_buffer[lower_median_index]) / static_cast<T>(2);
   }
 
   virtual void reset()

@@ -13,6 +13,7 @@ if(CATKIN_ENABLE_TESTING)
             tug_plugin_manager
             tug_observers_msgs
             tug_time
+            tug_yaml
             roslint
             tug_testing
     )
@@ -24,6 +25,7 @@ else()
       tug_plugin_manager
       tug_observers_msgs
       tug_time
+      tug_yaml
     )
 endif()
 

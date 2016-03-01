@@ -93,6 +93,11 @@ public:
 
       return true;
     }
+
+    virtual size_t getMinimumSampleSize()
+    {
+      return 2;
+    }
 };
 
 #endif  // TUG_OBSERVER_PLUGIN_UTILS_HYPOTHESIS_CHECK_SINGE_VALUE_HYPOTHESIS_CHECK_STUDENTSTSINGLEHYPOTHESIS_H

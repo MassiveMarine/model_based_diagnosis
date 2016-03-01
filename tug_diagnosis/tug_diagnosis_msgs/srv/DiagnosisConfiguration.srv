@@ -1,0 +1,20 @@
+# configuration for diagnosis
+configuration config
+
+# define what should be done with the config
+int32 action
+int32 ADD=1
+int32 REMOVE=2
+int32 SET=3
+int32 UPDATE=4
+
+---
+
+# return with an errorcode and an error message
+int32 errorcode
+string error_msg
+int32 NO_ERROR=0
+int32 GENERAL_ERROR=0
+
+
+
