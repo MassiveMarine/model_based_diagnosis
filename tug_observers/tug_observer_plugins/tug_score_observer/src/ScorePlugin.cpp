@@ -24,7 +24,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 namespace tug_observer_plugins_cpp
 {
-    ScoresPlugin::ScoresPlugin() : ObserverPluginBase("score")
+    ScoresPlugin::ScoresPlugin() : ObserverPluginBase("scores")
     { }
 
     void ScoresPlugin::initialize(XmlRpc::XmlRpcValue params)
