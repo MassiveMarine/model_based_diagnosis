@@ -77,8 +77,11 @@ class Diagnosis(object):
         while not rospy.is_shutdown():
             self._trigger_condition.acquire()
             self._trigger_condition.wait()
-
-            observations = self._observation_store.get_observations()
+            try:
+                observations = self._observation_store.get_observations()
+            except ValueError as e:
+                rospy.logerr(e)
+                continue
 
             # check if all observations are valid
             if all([j for (i, j) in observations]):

@@ -78,11 +78,13 @@ class checkInputData():
         if not isinstance(data, str):
             raise TypeError
 
-        if any(x == data for x in ['/', '', ab_pred("/"), ab_pred("")]+forbidden_str):
-            raise ValueError("'" + str(data) + "' is a forbidden one!")
+        forbidden_strings_list = ['/', '', ab_pred("/"), ab_pred("")]+forbidden_str
+        if any(x == data for x in forbidden_strings_list):
+            raise ValueError("Forbidden strings found! '" + str(forbidden_strings_list) + "' are not allowed. '" + str(data) + "' use one of these.")
 
-        if any(x in data for x in ['$', '#', '|']+forbidden_chars):
-            raise ValueError
+        forbidden_chars_list = ['$', '#', '|']+forbidden_chars
+        if any(x in data for x in forbidden_chars_list):
+            raise ValueError("Forbidden characters found! '" + str(forbidden_chars_list) + "' are not allowed. '" + str(data) + "' use one of these.")
 
     @staticmethod
     def list_data_valid(the_list, check_entries=True, allow_empty=False, num_entries=0):
