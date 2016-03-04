@@ -14,6 +14,7 @@ from std_msgs.msg import Header
 from observation_store import ObservationStore
 import threading
 
+# from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_configuration
 
 class Diagnosis(object):
 
@@ -54,15 +55,16 @@ class Diagnosis(object):
         action = req.action
         config = req.config
 
+        # print config
+
         if action == DiagnosisConfigurationRequest.ADD:
-            pass
+            self.o.net_generator.add_config(config)
         elif action == DiagnosisConfigurationRequest.REMOVE:
-            pass
+            self.o.net_generator.remove_config(config)
         elif action == DiagnosisConfigurationRequest.SET:
-            print config
             self.o.net_generator.set_config(config)
         elif action == DiagnosisConfigurationRequest.UPDATE:
-            pass
+            self.o.net_generator.update_config(config)
         else:
             return DiagnosisConfigurationResponse(errorcode=1, error_msg='unknown action')
 
@@ -72,26 +74,14 @@ class Diagnosis(object):
 
     def run(self):
 
-        # p = Problem()
-        # the_list = ['hst-picosat',
-        #             'hst-cache-picosat',
-        #             'hst-ci-picosat',
-        #             'hst-ci-cache-picosat',
-        #             'hsdag-picosat',
-        #             'hsdag-cache-picosat',
-        #             'hsdag-ci-picosat',
-        #             'hsdag-ci-cache-picosat',
-        #             'hsdag-sicf-picosat',
-        #             'hsdag-sicf-cache-picosat'
-        #             ]
-        #
-        # o = TUGDescriptionOracle()
-
         while not rospy.is_shutdown():
             self._trigger_condition.acquire()
             self._trigger_condition.wait()
-
-            observations = self._observation_store.get_observations()
+            try:
+                observations = self._observation_store.get_observations()
+            except ValueError as e:
+                rospy.logerr(e)
+                continue
 
             # check if all observations are valid
             if all([j for (i, j) in observations]):
@@ -140,11 +130,6 @@ class Diagnosis(object):
 
 if __name__ == "__main__":
     rospy.init_node('tug_diagnosis', anonymous=False)
-
-    # if rospy.has_param('/tug_diagnosis_node'):
-    #     configs = rospy.get_param('/tug_diagnosis_node')
-    # else:
-    #     configs = dict()
 
     the_diagnostics = Diagnosis()
 

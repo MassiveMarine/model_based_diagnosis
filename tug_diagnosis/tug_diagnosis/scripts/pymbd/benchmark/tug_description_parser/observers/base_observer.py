@@ -20,7 +20,8 @@ class BaseObserver(Sentence):
         raise NotImplementedError()
 
     @staticmethod
-    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes):
+    def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
+                                 nodes_publish_topics, nodes_subscribe_topics):
         raise NotImplementedError("generate_model_parameter() is not implemented yet!")
 
     @staticmethod
@@ -77,18 +78,22 @@ class checkInputData():
         if not isinstance(data, str):
             raise TypeError
 
-        if any(x == data for x in ['/', '', ab_pred("/"), ab_pred("")]+forbidden_str):
-            raise ValueError("'" + str(data) + "' is a forbidden one!")
+        forbidden_strings_list = ['/', '', ab_pred("/"), ab_pred("")]+forbidden_str
+        if any(x == data for x in forbidden_strings_list):
+            raise ValueError("Forbidden strings found! '" + str(forbidden_strings_list) + "' are not allowed. '" + str(data) + "' use one of these.")
 
-        if any(x in data for x in ['$', '#', '|']+forbidden_chars):
-            raise ValueError
+        forbidden_chars_list = ['$', '#', '|']+forbidden_chars
+        if any(x in data for x in forbidden_chars_list):
+            raise ValueError("Forbidden characters found! '" + str(forbidden_chars_list) + "' are not allowed. '" + str(data) + "' use one of these.")
 
     @staticmethod
-    def list_data_valid(the_list, check_entries=True, allow_empty=False):
+    def list_data_valid(the_list, check_entries=True, allow_empty=False, num_entries=0):
         if not isinstance(the_list, list):
             raise TypeError
         if not len(the_list) and not allow_empty:
             raise ValueError('List is empty!')
+        if num_entries > 0 and not len(the_list) == num_entries:
+            raise ValueError('List has wrong number of entries!')
 
         if check_entries:
             for entry in the_list:

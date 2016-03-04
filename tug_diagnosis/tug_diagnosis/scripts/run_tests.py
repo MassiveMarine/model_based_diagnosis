@@ -18,10 +18,11 @@ from pymbd.benchmark.tug_description_parser.observers.velocity_observer import T
 from pymbd.benchmark.tug_description_parser.observers.scores_observer import TestScoresObserver
 from pymbd.benchmark.tug_description_parser.observers.activated_observer import TestActivatedObserver
 
+from pymbd.benchmark.tug_description_parser.model import TestConfigurationValidation
+from pymbd.benchmark.tug_description_parser.model import TestModelGenerator
+
 
 if __name__ == '__main__':
-
-    print "Hallo"
 
     rostest.rosrun(PKG, 'test_base_observer', TestCalleridsObserver)
     rostest.rosrun(PKG, 'test_hz_observer', TestHzObserver)
@@ -32,3 +33,6 @@ if __name__ == '__main__':
     rostest.rosrun(PKG, 'test_velocity_observer', TestVelocityObserver)
     rostest.rosrun(PKG, 'test_scores_observer', TestScoresObserver)
     rostest.rosrun(PKG, 'test_activated_observer', TestActivatedObserver)
+
+    rostest.rosrun(PKG, 'test_configuration_validation', TestConfigurationValidation)
+    rostest.rosrun(PKG, 'test_model_generator', TestModelGenerator)

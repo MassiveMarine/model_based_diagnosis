@@ -2,6 +2,7 @@ from pymbd.sat import picosat
 from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.benchmark.tug_description_parser.observers.base_observer import *
+from tug_diagnosis_msgs.msg import observer_configuration
 
 import re
 regex_prog = re.compile('(\S*)\s?(\[\S*\s?\S*\s?\])\s?(\S*)\s?(\[\S*\s?\S*\s?\])')
@@ -32,66 +33,74 @@ class TimingObserver(BaseObserver):
     @staticmethod
     def generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes,
                                  nodes_publish_topics, nodes_subscribe_topics):
-        checkInputData.dict_data_valid(config, check_entries=False)
-        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=False)
-        checkInputData.dict_data_valid(topics_subscribed_from_nodes, check_entries=False, allow_empty=True)
-        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=False, allow_empty=True)
-        topics = config['topics']
+        config_type = str('timing')
+        if not isinstance(config, observer_configuration):
+            raise TypeError
+        if not config.type == config_type:
+            raise KeyError('given type in config is wrong!')
+
+        topics = config.resource
+        checkInputData.list_data_valid(topics, num_entries=2)
+
+        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=True, entry_type=list, allow_empty=False)
+        checkInputData.list_data_valid(topics_published_from_nodes.keys(), check_entries=True)
+        checkInputData.dict_data_valid(topics_subscribed_from_nodes, check_entries=True, entry_type=list, allow_empty=True)
+        checkInputData.list_data_valid(topics_subscribed_from_nodes.keys(), check_entries=True, allow_empty=True)
+        checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=True, entry_type=list, allow_empty=True)
 
         vars = {}
         rules = []
         nodes = []
 
-        checkInputData.list_data_valid(topics, check_entries=False)
+        topic_pair = topics[:]
+        checkInputData.list_data_valid(topic_pair, check_entries=True, allow_empty=False)
+        topicA = topic_pair[0]
+        topicB = topic_pair[1]
 
-        for topic_pair in topics:
-            checkInputData.list_data_valid(topic_pair, check_entries=True)
-            topicA = topic_pair[0]
-            topicB = topic_pair[1]
+        if not set(topic_pair).issubset(topics_published_from_nodes.keys()):
+            raise ValueError('topics are not not in topics published list!')
 
-            if not set(topic_pair).issubset(topics_published_from_nodes.keys()):
-                raise ValueError
+        nodes_list = []
+        nodes_a = topics_published_from_nodes.get(topicA, [])
+        nodes_b = topics_published_from_nodes.get(topicB, [])
+        checkInputData.list_data_valid(nodes_a, check_entries=True, allow_empty=False)
+        checkInputData.list_data_valid(nodes_b, check_entries=True, allow_empty=False)
 
-            nodes_list = []
-            nodes_a = topics_published_from_nodes.get(topicA, [])
-            checkInputData.list_data_valid(nodes_a, check_entries=True, allow_empty=False)
-            nodes_b = topics_published_from_nodes.get(topicB, [])
-            checkInputData.list_data_valid(nodes_b, check_entries=True, allow_empty=False)
-            topics_to_node_a = topics_subscribed_from_nodes.get(topicA, [])
-            checkInputData.list_data_valid(topics_to_node_a, check_entries=True, allow_empty=True)
-            topics_to_node_b = topics_subscribed_from_nodes.get(topicB, [])
-            checkInputData.list_data_valid(topics_to_node_b, check_entries=True, allow_empty=True)
+        topics_to_node_a = topics_subscribed_from_nodes.get(topicA, [])
+        topics_to_node_b = topics_subscribed_from_nodes.get(topicB, [])
+        checkInputData.list_data_valid(topics_to_node_a, check_entries=True, allow_empty=True)
+        checkInputData.list_data_valid(topics_to_node_b, check_entries=True, allow_empty=True)
 
-            for node in nodes_b:
-                if node in topics_to_node_a:
-                    nodes_list += nodes_b
-                    break
+        for node in nodes_b:
+            if node in topics_to_node_a:
+                nodes_list += nodes_b
+                break
 
-            for node in nodes_a:
-                if node in topics_to_node_b:
-                    nodes_list += nodes_a
+        for node in nodes_a:
+            if node in topics_to_node_b:
+                nodes_list += nodes_a
 
-            if not nodes_list:
-                nodes_list = nodes_a + nodes_b
+        if not nodes_list:
+            nodes_list = nodes_a + nodes_b
 
-            for calleridA in nodes_a:
-                for calleridB in nodes_b:
+        for calleridA in nodes_a:
+            for calleridB in nodes_b:
 
-                    observation = "timing_obs_" + topicA + "_" + calleridA + "_" + topicB + "_" + calleridB
-                    vars[observation] = Variable(observation, Variable.BOOLEAN, None)
+                observation = config_type + "_obs_" + topicA + "_" + calleridA + "_" + topicB + "_" + calleridB
+                vars[observation] = Variable(observation, Variable.BOOLEAN, None)
 
-                    subscribed_topics = nodes_subscribe_topics.get(calleridB, [])
-                    checkInputData.list_data_valid(subscribed_topics, allow_empty=True)
+                subscribed_topics = nodes_subscribe_topics.get(calleridB, [])
+                checkInputData.list_data_valid(subscribed_topics, allow_empty=True)
 
-                    rules.append(TimingObserver(all_ab_pred(nodes_list), observation, all_ab_pred(subscribed_topics) ))
+                rules.append(TimingObserver(all_ab_pred(nodes_list), observation, all_ab_pred(subscribed_topics) ))
 
-                    if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
-                        raise ValueError
+                if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
+                    raise ValueError('subscribed topics are not not in topics published list!')
 
-            new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter_2("timing", topicA, topics_published_from_nodes[topicA], topicB, topics_published_from_nodes[topicB])
-            vars.update(new_vars)
-            rules += new_rules
-            nodes += new_nodes
+        new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter_2(config_type, topicA, topics_published_from_nodes[topicA], topicB, topics_published_from_nodes[topicB])
+        vars.update(new_vars)
+        rules += new_rules
+        nodes += new_nodes
 
         return vars, rules, nodes, []
 
@@ -236,7 +245,8 @@ class TestTimingObserver(unittest.TestCase):
         # +----------+ /topicA  +---------+ /topicB
         # | starter1 |--------->| timing1 |------->
         # +----------+          +---------+
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        config = observer_configuration(type="timing", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['node1'], '/topicB': ['node2']}
         topics_subscribed_from_nodes = {'/topicA': ['node2']}
         nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB']}
@@ -275,7 +285,8 @@ class TestTimingObserver(unittest.TestCase):
         # +----------+ /topicB
         # | starter2 |--------->
         # +----------+
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        config = observer_configuration(type="timing", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['node1'], '/topicB': ['node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB']}
@@ -314,7 +325,8 @@ class TestTimingObserver(unittest.TestCase):
         # +----------+ /topicA  |  |   +---------+ /topicB  |
         # | starter2 |---------->  +-->| timing2 |----------+
         # +----------+                 +---------+
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        config = observer_configuration(type="timing", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['node1', 'node3'], '/topicB': ['node2', 'node4']}
         topics_subscribed_from_nodes = {'/topicA': ['node2', 'node4']}
         nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB'], 'node3': ['/topicA'], 'node4': ['/topicB']}
@@ -362,30 +374,44 @@ class TestTimingObserver(unittest.TestCase):
 
 
     def test_generate_model_parameter_errors_1(self):
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        config = observer_configuration(type="timing", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['/node1'], '/topicB': ['/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topicA'], '/node2': ['/topicB']}
         nodes_subscribe_topics = {}
 
-        config_tests = [(KeyError, {'topics_wrong_name': [['/topicA', '/topicB']], 'type': 'timing'}),
-                        (KeyError, {'type': 'timing'}),
-                        (KeyError, {}),
-                        (TypeError, "not_a_dict"),
+        # config_tests = [(KeyError, {'topics_wrong_name': [['/topicA', '/topicB']], 'type': 'timing'}),
+        #                 (KeyError, {'type': 'timing'}),
+        #                 (KeyError, {}),
+        #                 (TypeError, "not_a_dict"),
+        #                 (TypeError, 1),
+        #                 (ValueError, {'topics': [], 'type': 'timing'}),
+        #                 (ValueError, {'topics': [[]], 'type': 'timing'}),
+        #                 (ValueError, {'topics': [['']], 'type': 'timing'}),
+        #                 (TypeError, {'topics': [[1]], 'type': 'timing'}),
+        #                 (TypeError, {'topics': ["no_list_list"], 'type': 'timing'}),
+        #                 (TypeError, {'topics': [1], 'type': 'timing'}),
+        #                 (ValueError, {'topics': [['/wrong_topic_name', '/topicB']], 'type': 'timing'}),
+        #                 (ValueError, {'topics': [], 'type': 'timing'}),
+        #                 (TypeError, {'topics': [''], 'type': 'timing'}),
+        #                 (TypeError, {'topics': [1], 'type': 'timing'}),
+        #                 (TypeError, {'topics': "no_list", 'type': 'timing'}),
+        #                 (TypeError, {'topics': 1, 'type': 'timing'}),
+        #                 (TypeError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'timing'})
+        #                 ]
+        config_tests = [(KeyError, observer_configuration(type="timing_wrong", resource=['/topicA', '/topicB'])),
+                        (ValueError, observer_configuration(type="timing")),
+                        (KeyError, observer_configuration()),
+                        (TypeError, observer_configuration),
                         (TypeError, 1),
-                        (ValueError, {'topics': [], 'type': 'timing'}),
-                        (ValueError, {'topics': [[]], 'type': 'timing'}),
-                        (ValueError, {'topics': [['']], 'type': 'timing'}),
-                        (TypeError, {'topics': [[1]], 'type': 'timing'}),
-                        (TypeError, {'topics': ["no_list_list"], 'type': 'timing'}),
-                        (TypeError, {'topics': [1], 'type': 'timing'}),
-                        (ValueError, {'topics': [['/wrong_topic_name', '/topicB']], 'type': 'timing'}),
-                        (ValueError, {'topics': [], 'type': 'timing'}),
-                        (TypeError, {'topics': [''], 'type': 'timing'}),
-                        (TypeError, {'topics': [1], 'type': 'timing'}),
-                        (TypeError, {'topics': "no_list", 'type': 'timing'}),
-                        (TypeError, {'topics': 1, 'type': 'timing'}),
-                        (TypeError, {'topics': ['/topic', '/topic2', '/topic3'], 'type': 'timing'})
+                        (ValueError, observer_configuration(type="timing", resource=[''])),
+                        (ValueError, observer_configuration(type="timing", resource=[1])),
+                        (TypeError, observer_configuration(type="timing", resource='no_list')),
+                        (TypeError, observer_configuration(type="timing", resource=1)),
+                        (ValueError, observer_configuration(type="timing", resource=['/topicA', '/topicB', '/topicC'])),
+                        (ValueError, observer_configuration(type="timing", resource=['/topicA'])),
+                        (ValueError, observer_configuration(type="timing", resource=['/topic_wrong']))
                         ]
 
         for (error, config) in config_tests:
@@ -399,7 +425,8 @@ class TestTimingObserver(unittest.TestCase):
 
     def test_generate_model_parameter_errors_2(self):
 
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        config = observer_configuration(type="timing", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['/node1'], '/topicB': ['/node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topicA'], '/node2': ['/topicB']}
@@ -412,10 +439,10 @@ class TestTimingObserver(unittest.TestCase):
                                              (TypeError, 1),
                                              (ValueError, {'/topicB': ['/', '/node2']}),
                                              (ValueError, {'/topicB': ['', '/node2']}),
-                                             (ValueError, {'/topicB': [1, '/node2']}),
+                                             (TypeError, {'/topicB': [1, '/node2']}),
                                              (ValueError, {'/topicB': ['/node1', '/']}),
                                              (ValueError, {'/topicB': ['/node1', '']}),
-                                             (ValueError, {'/topicB': ['/node1', 1]}),
+                                             (TypeError, {'/topicB': ['/node1', 1]}),
                                              (ValueError, {'/topicB': ['/', '/node2'], '/topicA': ['/nodeA1']}),
                                              (ValueError, {'/topicB': ['', '/node2'], '/topicA': ['/nodeA1']}),
                                              (TypeError, {'/topicB': [1, '/node2'], '/topicA': ['/nodeA1']}),
@@ -439,8 +466,8 @@ class TestTimingObserver(unittest.TestCase):
             print "... DONE"
 
     def test_generate_model_parameter_errors_3(self):
-
-        config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        # config = {'topics': [['/topicA', '/topicB']], 'type': 'timing'}
+        config = observer_configuration(type="timing", resource=['/topicA', '/topicB'])
         topics_published_from_nodes = {'/topicA': ['node1'], '/topicB': ['node2']}
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'node1': ['/topicA'], 'node2': ['/topicB']}
