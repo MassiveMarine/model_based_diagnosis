@@ -8,6 +8,7 @@ from observation_store import ObservationWithString
 from observation_store import ObservationContainer
 from diagnosis_store import DiagnosisContainer
 import rospy
+import dynamic_reconfigure.client
 
 __author__ = 'clemens'
 
@@ -194,6 +195,23 @@ class ParameterRule(Rule):
         subprocess.call(['rosparam', 'set', self._paramter_name, self._paramter_value])
 
 
+class DynamicParameterRule(Rule):
+
+    def __init__(self, positive_observations, negative_observations, positive_possible_faulty_resources,
+                 negative_possible_faulty_resources, recall_duration, is_single_shot, node_name, paramter_name,
+                 paramter_value):
+        super(DynamicParameterRule, self).__init__(positive_observations, negative_observations,
+                                        positive_possible_faulty_resources,
+                                        negative_possible_faulty_resources, recall_duration, is_single_shot)
+        self._client = dynamic_reconfigure.client.Client(node_name)
+        self._paramter_name = paramter_name
+        self._paramter_value = paramter_value
+
+    def trigger(self):
+        super(DynamicParameterRule, self).trigger_intern()
+        self._client.update_configuration({self._paramter_name : self._paramter_value})
+
+
 class RuleFactory(object):
 
     _factory_map = {
@@ -202,7 +220,8 @@ class RuleFactory(object):
                     'email': lambda config: EMailRuleFactory.instantiate_rule(config),
                     'logfile' : lambda config: LogFileRuleFactory.instantiate_rule(config),
                     'service' : lambda config: ServiceRuleFactory.instantiate_rule(config),
-                    'paramter' : lambda config: ParameterRuleFactory.instantiate_rule(config)
+                    'paramter' : lambda config: ParameterRuleFactory.instantiate_rule(config),
+                    'dynamic_paramter' : lambda config: DynamicParameterRuleFactory.instantiate_rule(config)
                 }
 
     @staticmethod
@@ -402,4 +421,27 @@ class ParameterRuleFactory(RuleFactory):
 
         return ParameterRule(positive_observations, negative_observations, positive_possible_faulty_resources,
                          negative_possible_faulty_resources, recall_duration, is_single_shot, paramter_name,
+                           paramter_value)
+
+
+class DynamicParameterRuleFactory(RuleFactory):
+
+    @staticmethod
+    def instantiate_rule(config):
+        is_single_shot = False
+        if YamlHelper.has_param(config, 'single_shot'):
+            is_single_shot = YamlHelper.get_param(config, 'single_shot')
+        node_name = YamlHelper.get_param(config, 'node_name')
+        paramter_name = YamlHelper.get_param(config, 'paramter_name')
+        paramter_value = YamlHelper.get_param(config, 'paramter_value')
+        positive_observations = RuleFactory.pars_positive_observations(config)
+        negative_observations = RuleFactory.pars_negative_observations(config)
+        positive_possible_faulty_resources = RuleFactory.pars_positive_possible_faulty_resources(config)
+        negative_possible_faulty_resources = RuleFactory.pars_negative_possible_faulty_resources(config)
+        recall_duration = None
+        if YamlHelper.has_param(config, 'recall_duration'):
+            recall_duration = rospy.Duration(YamlHelper.get_param(config, 'recall_duration'))
+
+        return DynamicParameterRule(positive_observations, negative_observations, positive_possible_faulty_resources,
+                         negative_possible_faulty_resources, recall_duration, is_single_shot, node_name, paramter_name,
                            paramter_value)

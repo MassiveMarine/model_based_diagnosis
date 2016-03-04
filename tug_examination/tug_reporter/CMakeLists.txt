@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   tug_observers_msgs
   roslint
   message_generation
+  dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions

@@ -1,6 +1,7 @@
 rules:
-  - type: paramter
-    paramter_name: '/test_service'
-    paramter_value: '1.0'
+  - type: dynamic_paramter
+    node_name: 'calculate_odom_faulty_imu_calib'
+    paramter_name: 'use_imu'
+    paramter_value: 'false'
     positive_possible_faulty_resources:
         - resource: 'imu'
