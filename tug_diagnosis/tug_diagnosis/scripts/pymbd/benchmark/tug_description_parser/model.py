@@ -5,6 +5,7 @@ from sentences import PushSentence
 from pymbd.sat.description import Description
 from pymbd.sat.problem import Problem
 from pymbd.sat.variable import Variable
+from config_validater import DiagnosisConfigValidater
 
 from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_configuration
 
@@ -71,8 +72,21 @@ class ModelGenerator(object):
     def __init__(self, **options):
         self.config = None
 
+    def test_config(self):
+        check = DiagnosisConfigValidater(config=self.config, debug=True)
+        result = check.run_tests()
+        print 'all passed' if result else 'some failed'
+        return result
+
     def set_config(self, set_config):
+        config_backup = self.copy(self.config)
+
         self.config = self.copy(set_config)
+
+        if not self.test_config():
+            self.config = config_backup
+            return False
+        return True
 
     def add_config(self, config_add):
         """
@@ -85,6 +99,7 @@ class ModelGenerator(object):
             raise ValueError('No config given for adding')
 
         config_add = self.copy(config_add)
+        config_backup = self.copy(self.config)
 
         # add to nodes
         for node in config_add.nodes:
@@ -96,16 +111,6 @@ class ModelGenerator(object):
                 known_node.pub_topic = list(set(known_node.pub_topic + node.pub_topic))
             else:
                 self.config.nodes.append(node)
-
-        # for observer in config_add.observers:
-        #     # add to observers
-        #     type_list = [_.type for _ in self.config.observers]
-        #     if observer.type in type_list:
-        #         index_if_exists = type_list.index(observer.type)
-        #         known_observer = self.config.observers[index_if_exists]
-        #         known_observer.resource = list(set(known_observer.resource + observer.resource))
-        #     else:
-        #         self.config.observers.append(observer)
 
         # add to observers
         for observer in config_add.observers:
@@ -123,6 +128,11 @@ class ModelGenerator(object):
                 continue
 
             self.config.observers.append(observer)
+        if not self.test_config():
+            self.config = config_backup
+            return False
+
+        return True
 
     def remove_config(self, config_remove):
         """
@@ -139,6 +149,8 @@ class ModelGenerator(object):
         :param config_remove: config about nodes and observers that should be removed from the model config
         """
         config_remove = self.copy(config_remove)
+        config_backup = self.copy(self.config)
+
         for node in config_remove.nodes:
             # remove to nodes
             name_list = [_.name for _ in self.config.nodes]
@@ -158,22 +170,6 @@ class ModelGenerator(object):
 
                 elif not len(known_node.sub_topic) and not len(known_node.pub_topic):
                     del self.config.nodes[index_if_exists]
-
-        # for observer in config_remove.observers:
-        #     # remove to observers
-        #     type_list = [_.type for _ in self.config.observers]
-        #     if observer.type in type_list:
-        #         index_if_exists = type_list.index(observer.type)
-        #         known_observer = self.config.observers[index_if_exists]
-        #         for resource in observer.resource:
-        #             if resource in known_observer.resource:
-        #                 known_observer.resource.remove(resource)
-        #
-        #         if not len(observer.resource):
-        #             del self.config.observers[index_if_exists]
-        #
-        #         elif not len(known_observer.resource):
-        #             del self.config.observers[index_if_exists]
 
         # remove to observers
         for observer in config_remove.observers:
@@ -199,6 +195,12 @@ class ModelGenerator(object):
             # deleting from list while iterating is a bad idea, so list is reduced here
             self.config.observers = [x for x in self.config.observers if x]
 
+        if not self.test_config():
+            self.config = config_backup
+            return False
+
+        return True
+
     def update_config(self, config_update):
         """
         This is similar to set, but only for given nodes and/or observers. All observers of given type are
@@ -206,6 +208,8 @@ class ModelGenerator(object):
         :param config_update: new config for given nodes and/or observers
         """
         config_update = self.copy(config_update)
+        config_backup = self.copy(self.config)
+
         for node in config_update.nodes:
             # update to nodes
             name_list = [_.name for _ in self.config.nodes]
@@ -213,14 +217,6 @@ class ModelGenerator(object):
                 index_if_exists = name_list.index(node.name)
                 del self.config.nodes[index_if_exists]
             self.config.nodes.append(node)
-
-        # for observer in config_update.observers:
-        #     # update to nodes
-        #     type_list = [_.type for _ in self.config.observers]
-        #     if observer.type in type_list:
-        #         index_if_exists = type_list.index(observer.type)
-        #         del self.config.observers[index_if_exists]
-        #     self.config.observers.append(observer)
 
         # remove to observers
         for observer in config_update.observers:
@@ -237,6 +233,13 @@ class ModelGenerator(object):
 
         for observer in config_update.observers:
             self.config.observers.append(observer)
+
+        if not self.test_config():
+            self.config = config_backup
+            return False
+
+        return True
+
 
     @staticmethod
     def copy(config):
