@@ -41,9 +41,6 @@ class VelocityObserver
     boost::shared_ptr<Filter<double> > diff_y_filter_;
     boost::shared_ptr<Filter<double> > diff_z_filter_;
 
-    bool use_roll_;
-    bool use_pitch_;
-    bool use_yaw_;
     boost::shared_ptr<Filter<double> > diff_rot_x_filter_;
     boost::shared_ptr<Filter<double> > diff_rot_y_filter_;
     boost::shared_ptr<Filter<double> > diff_rot_z_filter_;

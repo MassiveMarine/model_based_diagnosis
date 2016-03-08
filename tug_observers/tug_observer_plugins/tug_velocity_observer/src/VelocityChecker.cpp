@@ -55,7 +55,13 @@ std::vector<boost::tuple<std::string, std::vector<Observation>, ros::Time> > Vel
                                                                                   (*it)->getCurrentFilterTime()));
     }
     else
+    {
+      result.push_back(
+              boost::make_tuple<std::string, std::vector<Observation>, ros::Time>((*it)->getName(),
+                                                                                  std::vector<Observation>(),
+                                                                                  (*it)->getCurrentFilterTime()));
       ROS_DEBUG("got no estimated states");
+    }
   }
 
   return result;

@@ -63,6 +63,8 @@ VelocityConverter::VelocityConverter(XmlRpc::XmlRpcValue params, boost::function
 void VelocityConverter::sendMovement(MovementReading twist)
 {
   MovementReading call_back_twist;
+  call_back_twist.reading_time = twist.reading_time;
+  call_back_twist.plot_time = twist.plot_time;
   if (x_filter_)
   {
     x_filter_->update(twist.linear.x);

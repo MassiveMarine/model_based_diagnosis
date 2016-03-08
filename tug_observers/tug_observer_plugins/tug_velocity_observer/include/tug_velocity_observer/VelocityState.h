@@ -43,7 +43,11 @@ public:
 
     bool conformsStateZ(FilteState<double> z_state);
 
-    bool conformsState(FilteState<double> rot_x_state, FilteState<double> rot_y_state, FilteState<double> rot_z_state);
+    bool conformsStateRotX(FilteState<double> rot_x_state);
+
+    bool conformsStateRotY(FilteState<double> rot_y_state);
+
+    bool conformsStateRotZ(FilteState<double> rot_z_state);
 
     std::string getName();
 
@@ -55,7 +59,11 @@ public:
 
     bool canCheckZ(FilteState<double> z_state);
 
-    bool canCheck(FilteState<double> rot_x_state, FilteState<double> rot_y_state, FilteState<double> rot_z_state);
+    bool canCheckRotX(FilteState<double> rot_x_state);
+
+    bool canCheckRotY(FilteState<double> rot_y_state);
+
+    bool canCheckRotZ(FilteState<double> rot_z_state);
 };
 
 
