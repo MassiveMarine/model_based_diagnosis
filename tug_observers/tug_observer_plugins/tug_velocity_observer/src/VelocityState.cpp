@@ -23,54 +23,49 @@ VelocityState::VelocityState(XmlRpc::XmlRpcValue value)
 {
   name_ = ProcessYaml::getValue<std::string>("state", value);
   number_ = ProcessYaml::getValue<int32_t>("number", value);
-
+  ROS_DEBUG("check for x");
   if (value.hasMember("x"))
   {
     XmlRpc::XmlRpcValue x_params = value["x"];
     x_ = SingleValueHypothesisCheckFactory<double>::createSingleValueHypothesisCheck(
             ProcessYaml::getValue<std::string>("type", x_params), x_params);
   }
-
+  ROS_DEBUG("check for y");
   if (value.hasMember("y"))
   {
     XmlRpc::XmlRpcValue y_params = value["y"];
     y_ = SingleValueHypothesisCheckFactory<double>::createSingleValueHypothesisCheck(
             ProcessYaml::getValue<std::string>("type", y_params), y_params);
   }
-
+  ROS_DEBUG("check for z");
   if (value.hasMember("z"))
   {
     XmlRpc::XmlRpcValue z_params = value["z"];
     z_ = SingleValueHypothesisCheckFactory<double>::createSingleValueHypothesisCheck(
             ProcessYaml::getValue<std::string>("type", z_params), z_params);
   }
-
-  if (!value.hasMember("rot_x"))
+  ROS_DEBUG("check for rot x");
+  if (value.hasMember("rot_x"))
   {
-    ROS_ERROR("No rotation x for state for a velocity state");
-    throw std::runtime_error("No rotation x for state for a velocity state");
+    XmlRpc::XmlRpcValue rot_x_params = value["rot_x"];
+    rot_x_ = SingleValueHypothesisCheckFactory<double>::createSingleValueHypothesisCheck(
+            ProcessYaml::getValue<std::string>("type", rot_x_params), rot_x_params);
   }
-  XmlRpc::XmlRpcValue rot_x_params = value["rot_x"];
-  rot_x_ = SingleValueHypothesisCheckFactory<double>::createSingleValueHypothesisCheck(
-          ProcessYaml::getValue<std::string>("type", rot_x_params), rot_x_params);
-
-  if (!value.hasMember("rot_y"))
+  ROS_DEBUG("check for rot y");
+  if (value.hasMember("rot_y"))
   {
-    ROS_ERROR("No rotation y for state for a velocity state");
-    throw std::runtime_error("No rotation y for state for a velocity state");
+    XmlRpc::XmlRpcValue rot_y_params = value["rot_y"];
+    rot_y_ = SingleValueHypothesisCheckFactory<double>::createSingleValueHypothesisCheck(
+            ProcessYaml::getValue<std::string>("type", rot_y_params), rot_y_params);
   }
-  XmlRpc::XmlRpcValue rot_y_params = value["rot_y"];
-  rot_y_ = SingleValueHypothesisCheckFactory<double>::createSingleValueHypothesisCheck(
-          ProcessYaml::getValue<std::string>("type", rot_y_params), rot_y_params);
-
-  if (!value.hasMember("rot_z"))
+  ROS_DEBUG("check for rot z");
+  if (value.hasMember("rot_z"))
   {
-    ROS_ERROR("No rotation z for state for a velocity state");
-    throw std::runtime_error("No rotation z for state for a velocity state");
+    XmlRpc::XmlRpcValue rot_z_params = value["rot_z"];
+    rot_z_ = SingleValueHypothesisCheckFactory<double>::createSingleValueHypothesisCheck(
+            ProcessYaml::getValue<std::string>("type", rot_z_params), rot_z_params);
   }
-  XmlRpc::XmlRpcValue rot_z_params = value["rot_z"];
-  rot_z_ = SingleValueHypothesisCheckFactory<double>::createSingleValueHypothesisCheck(
-          ProcessYaml::getValue<std::string>("type", rot_z_params), rot_z_params);
+  ROS_DEBUG("done with init states");
 }
 
 bool VelocityState::conformsStateX(FilteState<double> x_state)
@@ -97,11 +92,28 @@ bool VelocityState::conformsStateZ(FilteState<double> z_state)
   return z_->checkHypothesis(z_state);
 }
 
-bool VelocityState::conformsState(FilteState<double> rot_x_state, FilteState<double> rot_y_state,
-                                  FilteState<double> rot_z_state)
+bool VelocityState::conformsStateRotX(FilteState<double> rot_x_state)
 {
-  return rot_x_->checkHypothesis(rot_x_state) && rot_y_->checkHypothesis(rot_y_state) &&
-         rot_z_->checkHypothesis(rot_z_state);
+  if (!rot_x_)
+    throw std::runtime_error("no hypthesis check for rot x defined in the state: " + name_);
+
+  return rot_x_->checkHypothesis(rot_x_state);
+}
+
+bool VelocityState::conformsStateRotY(FilteState<double> rot_y_state)
+{
+  if (!rot_y_)
+    throw std::runtime_error("no hypthesis check for rot y defined in the state: " + name_);
+
+  return rot_y_->checkHypothesis(rot_y_state);
+}
+
+bool VelocityState::conformsStateRotZ(FilteState<double> rot_z_state)
+{
+  if (!rot_z_)
+    throw std::runtime_error("no hypthesis check for rot z defined in the state: " + name_);
+
+  return rot_z_->checkHypothesis(rot_z_state);
 }
 
 std::string VelocityState::getName()
@@ -138,13 +150,29 @@ bool VelocityState::canCheckZ(FilteState<double> z_state)
   return z_->getMinimumSampleSize() <= z_state.sample_size;
 }
 
-bool VelocityState::canCheck(FilteState<double> rot_x_state, FilteState<double> rot_y_state,
-                             FilteState<double> rot_z_state)
+bool VelocityState::canCheckRotX(FilteState<double> rot_x_state)
 {
+  if (!rot_x_)
+    throw std::runtime_error("no hypthesis check for rot x defined in the state: " + name_);
   if (rot_x_->getMinimumSampleSize() > rot_x_state.sample_size)
     return false;
+  return  true;
+}
+
+bool VelocityState::canCheckRotY(FilteState<double> rot_y_state)
+{
+  if (!rot_y_)
+    throw std::runtime_error("no hypthesis check for rot y defined in the state: " + name_);
   if (rot_y_->getMinimumSampleSize() > rot_y_state.sample_size)
     return false;
+  return  true;
+}
+
+bool VelocityState::canCheckRotZ(FilteState<double> rot_z_state)
+{
+  if (!rot_z_)
+    throw std::runtime_error("no hypthesis check for rot z defined in the state: " + name_);
   if (rot_z_->getMinimumSampleSize() > rot_z_state.sample_size)
     return false;
+  return  true;
 }

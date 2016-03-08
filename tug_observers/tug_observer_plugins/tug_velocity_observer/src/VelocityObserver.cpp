@@ -24,10 +24,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include <string>
 #include <vector>
 
-VelocityObserver::VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade *plugin_base) : use_roll_(false),
-                                                                                                use_pitch_(false),
-                                                                                                use_yaw_(false),
-                                                                                                spinner_(1)
+VelocityObserver::VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade *plugin_base) : spinner_(1)
 {
   boost::mutex::scoped_lock the_lock(filter_mutex_);
 
@@ -69,34 +66,24 @@ VelocityObserver::VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade 
     diff_z_filter_ = boost::make_shared<Filter<double> >(z_filter_params);
   }
 
-  use_roll_ = ProcessYaml::getValue<bool>("use_roll", params, false);
-  use_pitch_ = ProcessYaml::getValue<bool>("use_pitch", params, false);
-  use_yaw_ = ProcessYaml::getValue<bool>("use_yaw", params, false);
-
-  if (!params.hasMember("rot_x_filter"))
+  if (params.hasMember("rot_x_filter"))
   {
-    ROS_ERROR("No rot_x_filter for velocity plugin defined");
-    throw std::runtime_error("No rot_x_filter for velocity plugin defined");
+    XmlRpc::XmlRpcValue rot_x_filter_params = params["rot_x_filter"];
+    diff_rot_x_filter_ = boost::make_shared<Filter<double> >(rot_x_filter_params);
   }
-  XmlRpc::XmlRpcValue rot_x_filter_params = params["rot_x_filter"];
-  diff_rot_x_filter_ = boost::make_shared<Filter<double> >(rot_x_filter_params);
-
-  if (!params.hasMember("rot_y_filter"))
+  ROS_DEBUG("check for rot_y_filter");
+  if (params.hasMember("rot_y_filter"))
   {
-    ROS_ERROR("No rot_y_filter for velocity plugin defined");
-    throw std::runtime_error("No rot_y_filter for velocity plugin defined");
+    XmlRpc::XmlRpcValue rot_y_filter_params = params["rot_y_filter"];
+    diff_rot_y_filter_ = boost::make_shared<Filter<double> >(rot_y_filter_params);
   }
-  XmlRpc::XmlRpcValue rot_y_filter_params = params["rot_y_filter"];
-  diff_rot_y_filter_ = boost::make_shared<Filter<double> >(rot_y_filter_params);
-
-  if (!params.hasMember("rot_z_filter"))
+  ROS_DEBUG("check for rot_z_filter");
+  if (params.hasMember("rot_z_filter"))
   {
-    ROS_ERROR("No rot_z_filter for velocity plugin defined");
-    throw std::runtime_error("No rot_z_filter for velocity plugin defined");
+    XmlRpc::XmlRpcValue rot_z_filter_params = params["rot_z_filter"];
+    diff_rot_z_filter_ = boost::make_shared<Filter<double> >(rot_z_filter_params);
   }
-  XmlRpc::XmlRpcValue rot_z_filter_params = params["rot_z_filter"];
-  diff_rot_z_filter_ = boost::make_shared<Filter<double> >(rot_z_filter_params);
-
+  ROS_DEBUG("ini states");
   if (!params.hasMember("states"))
   {
     ROS_ERROR("No states for velocity plugin defined");
@@ -128,6 +115,8 @@ VelocityObserver::VelocityObserver(XmlRpc::XmlRpcValue params, SubscriberFacade 
 MovementReading VelocityObserver::getCompensatedTwist(MovementReading value)
 {
   MovementReading result;
+  result.reading_time = value.reading_time;
+  result.plot_time = value.plot_time;
   if (diff_x_filter_)
     result.linear.x = value.linear.x;
   else
@@ -143,17 +132,17 @@ MovementReading VelocityObserver::getCompensatedTwist(MovementReading value)
   else
     result.linear.z = 0.;
 
-  if (use_roll_)
+  if (diff_rot_x_filter_)
     result.angular.x = value.angular.x;
   else
     result.angular.x = 0.;
 
-  if (use_pitch_)
+  if (diff_rot_y_filter_)
     result.angular.y = value.angular.y;
   else
     result.angular.y = 0.;
 
-  if (use_yaw_)
+  if (diff_rot_z_filter_)
     result.angular.z = value.angular.z;
   else
     result.angular.z = 0.;
@@ -176,9 +165,14 @@ void VelocityObserver::updateFilters(MovementReading a, MovementReading b)
   if (diff_z_filter_)
     diff_z_filter_->update(a.linear.z - b.linear.z);
 
-  diff_rot_x_filter_->update(a.angular.x - b.angular.x);
-  diff_rot_y_filter_->update(a.angular.y - b.angular.y);
-  diff_rot_z_filter_->update(a.angular.z - b.angular.z);
+  if (diff_rot_x_filter_)
+    diff_rot_x_filter_->update(a.angular.x - b.angular.x);
+
+  if (diff_rot_y_filter_)
+    diff_rot_y_filter_->update(a.angular.y - b.angular.y);
+
+  if (diff_rot_z_filter_)
+    diff_rot_z_filter_->update(a.angular.z - b.angular.z);
 
   if (a.reading_time < b.reading_time)
     current_filter_time_ = b.reading_time;
@@ -269,14 +263,26 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
     ROS_DEBUG_STREAM("z filter result " << z_state);
   }
 
-  FilteState<double> rot_x_state = diff_rot_x_filter_->getFilteState();
-  ROS_DEBUG_STREAM("rot x filter result " << rot_x_state);
+  FilteState<double> rot_x_state;
+  if (diff_rot_x_filter_)
+  {
+    rot_x_state = diff_rot_x_filter_->getFilteState();
+    ROS_DEBUG_STREAM("rot x filter result " << rot_x_state);
+  }
 
-  FilteState<double> rot_y_state = diff_rot_y_filter_->getFilteState();
-  ROS_DEBUG_STREAM("rot y filter result " << rot_y_state);
+  FilteState<double> rot_y_state;
+  if (diff_rot_y_filter_)
+  {
+    rot_y_state = diff_rot_y_filter_->getFilteState();
+    ROS_DEBUG_STREAM("rot y filter result " << rot_y_state);
+  }
 
-  FilteState<double> rot_z_state = diff_rot_z_filter_->getFilteState();
-  ROS_DEBUG_STREAM("rot z filter result " << rot_z_state);
+  FilteState<double> rot_z_state;
+  if (diff_rot_z_filter_)
+  {
+    rot_z_state = diff_rot_z_filter_->getFilteState();
+    ROS_DEBUG_STREAM("rot z filter result " << rot_z_state);
+  }
 
   sensor_msgs::Imu imu_msg;
   imu_msg.header.stamp = ros::Time(ros::WallTime::now().toSec());
@@ -287,9 +293,12 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
   if (diff_z_filter_)
     imu_msg.linear_acceleration.z = z_state.value;
 
-  imu_msg.angular_velocity.x = rot_x_state.value;
-  imu_msg.angular_velocity.y = rot_y_state.value;
-  imu_msg.angular_velocity.z = rot_z_state.value;
+  if (diff_rot_x_filter_)
+    imu_msg.angular_velocity.x = rot_x_state.value;
+  if (diff_rot_y_filter_)
+    imu_msg.angular_velocity.y = rot_y_state.value;
+  if (diff_rot_z_filter_)
+    imu_msg.angular_velocity.z = rot_z_state.value;
 
   filter_result_publisher_.publish(imu_msg);
 
@@ -313,7 +322,7 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
     ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.2");
     if (diff_y_filter_)
     {
-      if (!it->canCheckY(x_state))
+      if (!it->canCheckY(y_state))
         return std::make_pair(false, std::vector<Observation>());
 
       if (!it->conformsStateY(y_state))
@@ -325,7 +334,7 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
     ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.3");
     if (diff_z_filter_)
     {
-      if (!it->canCheckZ(x_state))
+      if (!it->canCheckZ(z_state))
         return std::make_pair(false, std::vector<Observation>());
       if (!it->conformsStateZ(z_state))
       {
@@ -333,16 +342,43 @@ std::pair<bool, std::vector<Observation> > VelocityObserver::estimateStates()
         continue;
       }
     }
-    ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.4");
-    if (it->canCheck(rot_x_state, rot_y_state, rot_z_state))
-      return std::make_pair(false, std::vector<Observation>());
-    if (it->conformsState(rot_x_state, rot_y_state, rot_z_state))
-      result.push_back(Observation(it->getName(), it->getNumber()));
-    else
+
+    if (diff_rot_x_filter_)
     {
-      ROS_ERROR_STREAM("rotation filter is not confrom result x:" << rot_x_state << " y:" << rot_y_state << " z:" <<
-                       rot_z_state);
+      if (!it->canCheckRotX(rot_x_state))
+        return std::make_pair(false, std::vector<Observation>());
+
+      if (!it->conformsStateRotX(rot_x_state))
+      {
+        ROS_ERROR_STREAM("rot x filter is not confrom result " << rot_x_state);
+        continue;
+      }
     }
+    ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.2");
+    if (diff_rot_y_filter_)
+    {
+      if (!it->canCheckRotY(rot_y_state))
+        return std::make_pair(false, std::vector<Observation>());
+
+      if (!it->conformsStateRotY(rot_y_state))
+      {
+        ROS_ERROR_STREAM("rot y filter is not confrom result " << rot_y_state);
+        continue;
+      }
+    }
+    ROS_DEBUG_STREAM("VelocityObserver::estimateStates 1.3");
+    if (diff_rot_z_filter_)
+    {
+      if (!it->canCheckRotZ(rot_z_state))
+        return std::make_pair(false, std::vector<Observation>());
+      if (!it->conformsStateRotZ(rot_z_state))
+      {
+        ROS_ERROR_STREAM("rot z filter is not confrom result " << rot_z_state);
+        continue;
+      }
+    }
+
+    result.push_back(Observation(it->getName(), it->getNumber()));
   }
 
   return std::make_pair(true, result);
