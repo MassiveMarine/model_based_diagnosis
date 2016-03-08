@@ -5,8 +5,6 @@ compile_only:
 
   tags:
     - sim0
-  except:
-    - safdar
 
 compile_with_test:
   script:
@@ -17,7 +15,7 @@ compile_with_test:
   tags:
     - sim0
   except:
-    - safdar
     - sloigge/diagnosis
     - sloigge/observers
     - sloigge/resource_monitor
+    - cmuehlbacher/rule_system
