@@ -1,6 +1,18 @@
-//
-// Created by clemens on 18.11.15.
-//
+/*
+This file is part of the tug model based diagnosis software for robots
+Copyright (c) 2015, Clemens Muehlbacher
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <gtest/gtest.h>
 #include <tug_observer_plugin_utils/filter/value_filter/MeanValueFilter.h>
@@ -218,7 +230,7 @@ TEST(MeanValueFilter, three_value_insert2)
   filter.update(0.);
   filter.update(1.);
   filter.update(1.);
-  EXPECT_FLOAT_EQ(2./3., filter.getValue());
+  EXPECT_FLOAT_EQ(2. / 3., filter.getValue());
   EXPECT_EQ(3, filter.getSampleSize());
 }
 
@@ -270,7 +282,7 @@ TEST(MeanValueFilter, three_value_insert6)
   filter.update(0.);
   filter.update(-1.);
   filter.update(-1.);
-  EXPECT_FLOAT_EQ(-2./3., filter.getValue());
+  EXPECT_FLOAT_EQ(-2. / 3., filter.getValue());
   EXPECT_EQ(3, filter.getSampleSize());
 }
 
@@ -324,7 +336,7 @@ TEST(MeanValueFilter, four_value_insert2)
   filter.update(0.);
   filter.update(1.);
   filter.update(1.);
-  EXPECT_FLOAT_EQ(2./3., filter.getValue());
+  EXPECT_FLOAT_EQ(2. / 3., filter.getValue());
   EXPECT_EQ(3, filter.getSampleSize());
 }
 
@@ -380,7 +392,7 @@ TEST(MeanValueFilter, four_value_insert6)
   filter.update(0.);
   filter.update(-1.);
   filter.update(-1.);
-  EXPECT_FLOAT_EQ(-2./3., filter.getValue());
+  EXPECT_FLOAT_EQ(-2. / 3., filter.getValue());
   EXPECT_EQ(3, filter.getSampleSize());
 }
 
@@ -436,7 +448,7 @@ TEST(MeanValueFilter, four_value_insert10)
   filter.update(0.);
   filter.update(1.);
   filter.update(1.);
-  EXPECT_FLOAT_EQ(2./3., filter.getValue());
+  EXPECT_FLOAT_EQ(2. / 3., filter.getValue());
   EXPECT_EQ(3, filter.getSampleSize());
 }
 
@@ -492,7 +504,7 @@ TEST(MeanValueFilter, four_value_insert14)
   filter.update(0.);
   filter.update(-1.);
   filter.update(-1.);
-  EXPECT_FLOAT_EQ(-2./3., filter.getValue());
+  EXPECT_FLOAT_EQ(-2. / 3., filter.getValue());
   EXPECT_EQ(3, filter.getSampleSize());
 }
 
@@ -700,7 +712,7 @@ TEST(MeanValueFilter, no_buffer_three_value_insert2)
   filter.update(0.);
   filter.update(1.);
   filter.update(1.);
-  EXPECT_FLOAT_EQ(2./3., filter.getValue());
+  EXPECT_FLOAT_EQ(2. / 3., filter.getValue());
   EXPECT_EQ(3, filter.getSampleSize());
 }
 
@@ -744,7 +756,7 @@ TEST(MeanValueFilter, no_buffer_three_value_insert6)
   filter.update(0.);
   filter.update(-1.);
   filter.update(-1.);
-  EXPECT_FLOAT_EQ(-2./3., filter.getValue());
+  EXPECT_FLOAT_EQ(-2. / 3., filter.getValue());
   EXPECT_EQ(3, filter.getSampleSize());
 }
 
@@ -790,7 +802,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert2)
   filter.update(0.);
   filter.update(1.);
   filter.update(1.);
-  EXPECT_FLOAT_EQ(3./4., filter.getValue());
+  EXPECT_FLOAT_EQ(3. / 4., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -826,7 +838,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert5)
   filter.update(-1.);
   filter.update(-1.);
   filter.update(-1.);
-  EXPECT_FLOAT_EQ(-1./2., filter.getValue());
+  EXPECT_FLOAT_EQ(-1. / 2., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -838,7 +850,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert6)
   filter.update(0.);
   filter.update(-1.);
   filter.update(-1.);
-  EXPECT_FLOAT_EQ(-1./4., filter.getValue());
+  EXPECT_FLOAT_EQ(-1. / 4., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -850,7 +862,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert7)
   filter.update(0.);
   filter.update(-1.);
   filter.update(-2.);
-  EXPECT_FLOAT_EQ(-1./2., filter.getValue());
+  EXPECT_FLOAT_EQ(-1. / 2., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -862,7 +874,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert8)
   filter.update(-2.);
   filter.update(-1.);
   filter.update(0.);
-  EXPECT_FLOAT_EQ(-1./2., filter.getValue());
+  EXPECT_FLOAT_EQ(-1. / 2., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -874,7 +886,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert9)
   filter.update(1.);
   filter.update(1.);
   filter.update(1.);
-  EXPECT_FLOAT_EQ(1./2., filter.getValue());
+  EXPECT_FLOAT_EQ(1. / 2., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -886,7 +898,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert10)
   filter.update(0.);
   filter.update(1.);
   filter.update(1.);
-  EXPECT_FLOAT_EQ(1./4., filter.getValue());
+  EXPECT_FLOAT_EQ(1. / 4., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -898,7 +910,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert11)
   filter.update(0.);
   filter.update(1.);
   filter.update(2.);
-  EXPECT_FLOAT_EQ(1./2., filter.getValue());
+  EXPECT_FLOAT_EQ(1. / 2., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -910,7 +922,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert12)
   filter.update(2.);
   filter.update(1.);
   filter.update(0.);
-  EXPECT_FLOAT_EQ(1./2., filter.getValue());
+  EXPECT_FLOAT_EQ(1. / 2., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -934,7 +946,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert14)
   filter.update(0.);
   filter.update(-1.);
   filter.update(-1.);
-  EXPECT_FLOAT_EQ(-3./4., filter.getValue());
+  EXPECT_FLOAT_EQ(-3. / 4., filter.getValue());
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
@@ -962,7 +974,7 @@ TEST(MeanValueFilter, no_buffer_four_value_insert16)
   EXPECT_EQ(4, filter.getSampleSize());
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "test_mean_filter");

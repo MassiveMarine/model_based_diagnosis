@@ -14,10 +14,10 @@ from std_msgs.msg import Header
 from observation_store import ObservationStore
 import threading
 
+
 # from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_configuration
 
 class Diagnosis(object):
-
     def __init__(self):
         self._observation_store = ObservationStore()
         self._trigger_condition = threading.Condition()
@@ -39,7 +39,8 @@ class Diagnosis(object):
 
         self._observer_sub = rospy.Subscriber("/observers/info", observer_info, self.observer_callback)
         self._diagnosis_pub = rospy.Publisher('/diagnosis', diagnosis_set, queue_size=10)
-        self._service = rospy.Service('diagnosis_configuration_change', DiagnosisConfiguration, self.handle_diagnosis_configuration_change)
+        self._service = rospy.Service('diagnosis_configuration_change', DiagnosisConfiguration,
+                                      self.handle_diagnosis_configuration_change)
 
     def observer_callback(self, observations):
         for obs in observations.observation_infos:
@@ -121,7 +122,8 @@ class Diagnosis(object):
 
             self._diagnosis_pub.publish(msg)
 
-            rospy.loginfo( "new diagnosis done in " + str(r.get_stats()['total_time']) + " with '" + str(self.solver_list[6]) + "':")
+            rospy.loginfo("new diagnosis done in " + str(r.get_stats()['total_time']) + " with '" + str(
+                self.solver_list[6]) + "':")
             for corrupt_node in corrupt_nodes:
                 rospy.loginfo(str(corrupt_node))
             if not len(corrupt_nodes):

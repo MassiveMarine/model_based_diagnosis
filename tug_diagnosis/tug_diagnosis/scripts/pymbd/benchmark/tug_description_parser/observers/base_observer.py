@@ -3,6 +3,7 @@ from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.sat.description import Sentence
 from pymbd.benchmark.tug_description_parser.observer import OBSERVERS
+import unittest
 
 
 class BaseObserver(Sentence):
@@ -10,6 +11,7 @@ class BaseObserver(Sentence):
     Represents the fault injection logic used to enable/disable a gate's function.
     The implication ab_predicate -> gate_function
     """
+
     def __init__(self):
         pass
 
@@ -78,13 +80,15 @@ class checkInputData():
         if not isinstance(data, str):
             raise TypeError
 
-        forbidden_strings_list = ['/', '', ab_pred("/"), ab_pred("")]+forbidden_str
+        forbidden_strings_list = ['/', '', ab_pred("/"), ab_pred("")] + forbidden_str
         if any(x == data for x in forbidden_strings_list):
-            raise ValueError("Forbidden strings found! '" + str(forbidden_strings_list) + "' are not allowed. '" + str(data) + "' use one of these.")
+            raise ValueError("Forbidden strings found! '" + str(forbidden_strings_list) + "' are not allowed. '" + str(
+                data) + "' use one of these.")
 
-        forbidden_chars_list = ['$', '#', '|']+forbidden_chars
+        forbidden_chars_list = ['$', '#', '|'] + forbidden_chars
         if any(x in data for x in forbidden_chars_list):
-            raise ValueError("Forbidden characters found! '" + str(forbidden_chars_list) + "' are not allowed. '" + str(data) + "' use one of these.")
+            raise ValueError("Forbidden characters found! '" + str(forbidden_chars_list) + "' are not allowed. '" + str(
+                data) + "' use one of these.")
 
     @staticmethod
     def list_data_valid(the_list, check_entries=True, allow_empty=False, num_entries=0):
@@ -114,7 +118,6 @@ class checkInputData():
                     checkInputData.list_data_valid(entry)
 
 
-
 class CalleridsObserver(BaseObserver):
     """
     Represents the fault injection logic used to enable/disable a gate's function.
@@ -123,7 +126,8 @@ class CalleridsObserver(BaseObserver):
 
     def __init__(self, nodes_all, nodes):
         super(CalleridsObserver, self).__init__()
-        # if not nodes_all or nodes_all == ab_pred("/") or nodes_all == ab_pred("") or nodes_all == "/" or nodes_all == "":
+        # if not nodes_all or nodes_all == ab_pred("/") or nodes_all == ab_pred("") or nodes_all == "/" or
+        #  nodes_all == "":
         #     raise ValueError
         # if not isinstance(nodes_all, str):
         #     raise TypeError
@@ -158,7 +162,6 @@ class CalleridsObserver(BaseObserver):
 
         return the_list
 
-
     @staticmethod
     def generate_model_parameter(obs_type, topic, callerids):
         vars = {}
@@ -188,35 +191,38 @@ class CalleridsObserver(BaseObserver):
         observation_all_all = obs_type + "_obs_" + topic_a + "_all_" + topic_b + "_all"
         vars[observation_all_all] = Variable(observation_all_all, Variable.BOOLEAN, None)
 
-        observations_all_items = [obs_type + "_obs_" + topic_a + "_all_" + topic_b + "_" + obs_item for obs_item in callerids_b]
+        observations_all_items = [obs_type + "_obs_" + topic_a + "_all_" + topic_b + "_" + obs_item for obs_item in
+                                  callerids_b]
         rules.append(CalleridsObserver(observation_all_all, observations_all_items))
 
-        observations_items_all = [obs_type + "_obs_" + topic_a + "_" + obs_item + "_" + topic_b + "_all" for obs_item in callerids_a]
+        observations_items_all = [obs_type + "_obs_" + topic_a + "_" + obs_item + "_" + topic_b + "_all" for obs_item in
+                                  callerids_a]
         rules.append(CalleridsObserver(observation_all_all, observations_items_all))
 
         for node_a in callerids_a:
             observations_item_all = obs_type + "_obs_" + topic_a + "_" + node_a + "_" + topic_b + "_all"
             vars[observations_item_all] = Variable(observations_item_all, Variable.BOOLEAN, None)
-            observations_item_items = [obs_type + "_obs_" + topic_a + "_" + node_a + "_" + topic_b + "_" + obs for obs in callerids_b]
+            observations_item_items = [obs_type + "_obs_" + topic_a + "_" + node_a + "_" + topic_b + "_" + obs for obs
+                                       in callerids_b]
             rules.append(CalleridsObserver(observations_item_all, observations_item_items))
 
         for node_b in callerids_b:
             observations_all_item = obs_type + "_obs_" + topic_a + "_all_" + topic_b + "_" + node_b
             vars[observations_all_item] = Variable(observations_all_item, Variable.BOOLEAN, None)
-            observations_items_item = [obs_type + "_obs_" + topic_a + "_" + obs + "_" + topic_b + "_" + node_b for obs in callerids_a]
+            observations_items_item = [obs_type + "_obs_" + topic_a + "_" + obs + "_" + topic_b + "_" + node_b for obs
+                                       in callerids_a]
             rules.append(CalleridsObserver(observations_all_item, observations_items_item))
 
         return vars, rules, []
 
     @staticmethod
-    def decrypt_resource_info(obs_type, topic,):
+    def decrypt_resource_info(obs_type, topic, ):
         checkInputData.str_data_valid(obs_type)
         checkInputData.str_data_valid(topic)
         return [obs_type + '_obs_' + topic + "_all"]
 
-picosat.SENTENCE_INTERPRETERS[CalleridsObserver] = lambda engine, pred, unused: pred.to_clause()
 
-import unittest
+picosat.SENTENCE_INTERPRETERS[CalleridsObserver] = lambda engine, pred, unused: pred.to_clause()
 
 
 class TestCalleridsObserver(unittest.TestCase):
@@ -280,7 +286,8 @@ class TestCalleridsObserver(unittest.TestCase):
 
         for i, obj in vars.items():
             self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
-            self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
+            self.assertEqual(str(vars_req[i]), str(obj),
+                             "Variable '" + str(i) + "' not generated with right parameters!")
 
         rules_req = [CalleridsObserver('hz_obs_/topic1_all', ['hz_obs_/topic1_/node1', 'hz_obs_/topic1_node2'])]
 
@@ -329,7 +336,8 @@ class TestCalleridsObserver(unittest.TestCase):
             CalleridsObserver.generate_model_parameter("hz", "topic1", 1)
 
     def test_decrypt_resource_info(self):
-        self.assertEqual(CalleridsObserver.decrypt_resource_info("hz", "/topic1"), ['hz_obs_/topic1_all'], "Topic name decryption not correct!")
+        self.assertEqual(CalleridsObserver.decrypt_resource_info("hz", "/topic1"), ['hz_obs_/topic1_all'],
+                         "Topic name decryption not correct!")
 
         with self.assertRaises(ValueError):
             CalleridsObserver.decrypt_resource_info("", "/topic1")

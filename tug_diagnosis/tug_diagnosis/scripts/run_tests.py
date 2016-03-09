@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import rostest
-PKG = 'tug_diagnosis'
 
 import sys
 import os
@@ -21,9 +20,9 @@ from pymbd.benchmark.tug_description_parser.observers.activated_observer import 
 from pymbd.benchmark.tug_description_parser.model import TestConfigurationValidation
 from pymbd.benchmark.tug_description_parser.model import TestModelGenerator
 
+PKG = 'tug_diagnosis'
 
 if __name__ == '__main__':
-
     rostest.rosrun(PKG, 'test_base_observer', TestCalleridsObserver)
     rostest.rosrun(PKG, 'test_hz_observer', TestHzObserver)
     rostest.rosrun(PKG, 'test_timestamp_observer', TestTimestampObserver)

@@ -3,6 +3,7 @@ from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.benchmark.tug_description_parser.observers.base_observer import *
 from tug_diagnosis_msgs.msg import observer_configuration
+import unittest
 
 
 class ActivatedObserver(BaseObserver):
@@ -10,6 +11,7 @@ class ActivatedObserver(BaseObserver):
     Represents the fault injection logic used to enable/disable a gate's function.
     The implication ab_predicate -> gate_function
     """
+
     def __init__(self, ab_node, observation):
         super(ActivatedObserver, self).__init__()
         checkInputData.str_data_valid(ab_node)
@@ -54,9 +56,6 @@ class ActivatedObserver(BaseObserver):
 
 picosat.SENTENCE_INTERPRETERS[ActivatedObserver] = lambda engine, pred, unused: pred.to_clause()
 OBSERVERS['activated'] = ActivatedObserver
-
-
-import unittest
 
 
 class TestActivatedObserver(unittest.TestCase):
@@ -111,7 +110,10 @@ class TestActivatedObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
         nodes_subscribe_topics = {}
-        vars, rules, nodes, real_nodes = ActivatedObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = ActivatedObserver.generate_model_parameter(config, topics_published_from_nodes,
+                                                                                    topics_subscribed_from_nodes,
+                                                                                    nodes_publish_topics,
+                                                                                    nodes_subscribe_topics)
 
         vars_req = {'activated_obs_/node1': Variable('activated_obs_/node1', 1, None),
                     # 'activated_obs_/node2': Variable('activated_obs_/node2', 1, None),
@@ -121,7 +123,8 @@ class TestActivatedObserver(unittest.TestCase):
         self.assertEqual(len(vars), len(vars_req), "Activated added wrong number of variables!")
         for i, obj in vars.items():
             self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
-            self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
+            self.assertEqual(str(vars_req[i]), str(obj),
+                             "Variable '" + str(i) + "' not generated with right parameters!")
 
         rules_req = [ActivatedObserver(ab_pred('/node1'), 'activated_obs_/node1'),
                      # ActivatedObserver(ab_pred('/node2'), 'activated_obs_/node2'),
@@ -163,7 +166,8 @@ class TestActivatedObserver(unittest.TestCase):
                         (TypeError, observer_configuration(type="activated", resource=[1])),
                         (TypeError, observer_configuration(type="activated", resource='no_list')),
                         (TypeError, observer_configuration(type="activated", resource=1)),
-                        (ValueError, observer_configuration(type="activated", resource=['/topic1', '/topic2', '/topic3'])),
+                        (ValueError,
+                         observer_configuration(type="activated", resource=['/topic1', '/topic2', '/topic3'])),
                         ]
 
         for (error, config) in config_tests:
@@ -176,7 +180,8 @@ class TestActivatedObserver(unittest.TestCase):
             print "... DONE"
 
     def test_decrypt_resource_info(self):
-        self.assertEqual(ActivatedObserver.decrypt_resource_info("/node1"), ['activated_obs_/node1'], "Topic name decryption not correct!")
+        self.assertEqual(ActivatedObserver.decrypt_resource_info("/node1"), ['activated_obs_/node1'],
+                         "Topic name decryption not correct!")
 
         resource_info_tests = [
             (ValueError, "/"),
@@ -185,11 +190,10 @@ class TestActivatedObserver(unittest.TestCase):
             (ValueError, "/node_name []"),
             (ValueError, "/node_name some_wrong_text"),
             (TypeError, 1),
-            ]
+        ]
 
         for (error, resource_info) in resource_info_tests:
             with self.assertRaises(error):
                 print "'" + str(error.__name__) + "' should be raised by '" + str(resource_info) + "'",
                 ActivatedObserver.decrypt_resource_info(resource_info)
             print "... DONE"
-

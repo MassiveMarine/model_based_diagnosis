@@ -7,7 +7,6 @@ from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_c
 
 from tug_diagnosis_msgs.srv import *
 
-
 if __name__ == "__main__":
     rospy.init_node('tug_diagnosis_initialization', anonymous=False)
     rospy.loginfo("tug_diagnosis_initialization: starting")
@@ -22,7 +21,8 @@ if __name__ == "__main__":
         sub_topic = YamlHelper.get_param(node, 'sub_topic', [])
         pub_topic = YamlHelper.get_param(node, 'pub_topic', [])
 
-        model_configuration.nodes.append(node_configuration(name=str(name), pub_topic=list(pub_topic), sub_topic=list(sub_topic)))
+        model_configuration.nodes.append(
+            node_configuration(name=str(name), pub_topic=list(pub_topic), sub_topic=list(sub_topic)))
 
     rospy.loginfo("tug_diagnosis_initialization: load observers")
     for observation in YamlHelper.get_param(configs, 'observations'):
@@ -36,7 +36,8 @@ if __name__ == "__main__":
 
         model_configuration.observers.append(observer_configuration(type=str(type), resource=list(resource)))
 
-    rospy.loginfo(str(len(model_configuration.nodes)) + " nodes and " + str(len(model_configuration.observers)) + " observers loaded")
+    rospy.loginfo(str(len(model_configuration.nodes)) + " nodes and " + str(
+        len(model_configuration.observers)) + " observers loaded")
 
     rospy.loginfo("tug_diagnosis_initialization: waiting for service")
     rospy.wait_for_service('diagnosis_configuration_change')
@@ -48,8 +49,7 @@ if __name__ == "__main__":
         errorcode = resp1.errorcode
         error_msg = resp1.error_msg
         rospy.loginfo("tug_diagnosis_initialization: configuration sent")
-        if not errorcode is DiagnosisConfigurationResponse.NO_ERROR:
+        if errorcode is not DiagnosisConfigurationResponse.NO_ERROR:
             raise StandardError(error_msg)
     except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
-
+        print "Service call failed: %s" % e

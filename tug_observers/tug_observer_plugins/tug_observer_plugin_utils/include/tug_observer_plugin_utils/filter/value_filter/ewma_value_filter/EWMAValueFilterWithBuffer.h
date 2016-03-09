@@ -25,60 +25,59 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 template<class T>
 class EWMAValueFilterWithBuffer : public ValueFilter<T>
 {
-  double decay_rate_;
-  boost::mutex scope_mutex_;
-  boost::circular_buffer<T> buffer_;
+    double decay_rate_;
+    boost::mutex scope_mutex_;
+    boost::circular_buffer<T> buffer_;
 
 public:
-  explicit EWMAValueFilterWithBuffer(XmlRpc::XmlRpcValue params)
-  {
-    decay_rate_ = ProcessYaml::getValue<double>("decay_rate", params);
-    if(decay_rate_ >= 1.0 || decay_rate_ <= 0.0)
-      throw std::invalid_argument("decay rate must be between (0, 1)");
-    unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
-    buffer_ = boost::circular_buffer<T>(window_size);
-  }
-
-  virtual void update(const T& new_value)
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    buffer_.push_back(new_value);
-  }
-
-  virtual T getValue()
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    T result = static_cast<T>(0);
-
-    for (size_t i = 0; i < buffer_.size(); ++i)
+    explicit EWMAValueFilterWithBuffer(XmlRpc::XmlRpcValue params)
     {
-      T current_element = buffer_[i];
-      if (i == 0)
-      {
-        result = current_element;
-      }
-      else
-      {
-        result = result * (1.0 - decay_rate_) + current_element * decay_rate_;
-      }
+      decay_rate_ = ProcessYaml::getValue<double>("decay_rate", params);
+      if (decay_rate_ >= 1.0 || decay_rate_ <= 0.0)
+        throw std::invalid_argument("decay rate must be between (0, 1)");
+      unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
+      buffer_ = boost::circular_buffer<T>(window_size);
     }
 
-    return result;
-  }
+    virtual void update(const T &new_value)
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      buffer_.push_back(new_value);
+    }
 
-  virtual void reset()
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    buffer_.clear();
-  }
+    virtual T getValue()
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      T result = static_cast<T>(0);
 
-  virtual size_t getSampleSize()
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    return buffer_.size();
-  }
+      for (size_t i = 0; i < buffer_.size(); ++i)
+      {
+        T current_element = buffer_[i];
+        if (i == 0)
+        {
+          result = current_element;
+        }
+        else
+        {
+          result = result * (1.0 - decay_rate_) + current_element * decay_rate_;
+        }
+      }
+
+      return result;
+    }
+
+    virtual void reset()
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      buffer_.clear();
+    }
+
+    virtual size_t getSampleSize()
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      return buffer_.size();
+    }
 };
-
 
 
 #endif  // TUG_OBSERVER_PLUGIN_UTILS_FILTER_VALUE_FILTER_EWMA_VALUE_FILTER_EWMAVALUEFILTERWITHBUFFER_H

@@ -22,7 +22,7 @@ namespace tug_observers
 {
 
     ObserverPluginBase::ObserverPluginBase(std::string type) : spinner_(1, &internal_call_back_queue_), type_(type),
-    is_started_up_(true)
+                                                               is_started_up_(true)
     {
       nh_.setCallbackQueue(&internal_call_back_queue_);
     }
@@ -46,7 +46,7 @@ namespace tug_observers
       if (error_code >= 0)
       {
         ROS_WARN_STREAM("report error with state which is positive " <<
-                                "-> will not be recognized as error -> change signe of error code");
+                        "-> will not be recognized as error -> change signe of error code");
         error_code *= -1;
       }
 
@@ -83,17 +83,17 @@ namespace tug_observers
 
     bool ObserverPluginBase::isStartedUp()
     {
-      if(is_started_up_)
+      if (is_started_up_)
         return true;
 
       ROS_DEBUG_STREAM("checking the time to set is started");
-      if(start_up_time_ < ros::Time::now())
+      if (start_up_time_ < ros::Time::now())
       {
         ROS_DEBUG_STREAM("observer is started");
         is_started_up_ = true;
       }
 
-      if(!is_started_up_)
+      if (!is_started_up_)
         ROS_DEBUG_STREAM("observer is not started yet");
 
       return is_started_up_;

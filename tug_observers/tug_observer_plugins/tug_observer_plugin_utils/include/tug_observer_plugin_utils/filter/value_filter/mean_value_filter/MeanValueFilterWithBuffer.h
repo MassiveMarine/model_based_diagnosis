@@ -27,45 +27,45 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 template<class T>
 class MeanValueFilterWithBuffer : public ValueFilter<T>
 {
-  boost::circular_buffer<T> buffer_;
-  boost::mutex scope_mutex_;
+    boost::circular_buffer<T> buffer_;
+    boost::mutex scope_mutex_;
 
 public:
-  explicit MeanValueFilterWithBuffer(XmlRpc::XmlRpcValue params)
-  {
-    unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
-    if(window_size < 2)
-      throw std::invalid_argument("mean value filter must be initialized with a window size of at least 2");
-    buffer_ = boost::circular_buffer<T>(window_size);
-  }
+    explicit MeanValueFilterWithBuffer(XmlRpc::XmlRpcValue params)
+    {
+      unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
+      if (window_size < 2)
+        throw std::invalid_argument("mean value filter must be initialized with a window size of at least 2");
+      buffer_ = boost::circular_buffer<T>(window_size);
+    }
 
-  virtual void update(const T& new_value)
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    buffer_.push_back(new_value);
-  }
+    virtual void update(const T &new_value)
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      buffer_.push_back(new_value);
+    }
 
-  virtual T getValue()
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    if (buffer_.empty())
-      return static_cast<T>(0);
+    virtual T getValue()
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      if (buffer_.empty())
+        return static_cast<T>(0);
 
-    T result = std::accumulate(buffer_.begin(), buffer_.end(), static_cast<T>(0));
-    return result / static_cast<T>(buffer_.size());
-  }
+      T result = std::accumulate(buffer_.begin(), buffer_.end(), static_cast<T>(0));
+      return result / static_cast<T>(buffer_.size());
+    }
 
-  virtual void reset()
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    buffer_.clear();
-  }
+    virtual void reset()
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      buffer_.clear();
+    }
 
-  virtual size_t getSampleSize()
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    return buffer_.size();
-  }
+    virtual size_t getSampleSize()
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      return buffer_.size();
+    }
 };
 
 #endif  // TUG_OBSERVER_PLUGIN_UTILS_FILTER_VALUE_FILTER_MEAN_VALUE_FILTER_MEANVALUEFILTERWITHBUFFER_H

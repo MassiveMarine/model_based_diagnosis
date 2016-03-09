@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ###############################################################################
 # two_way_dict python module
-# Copyright (c) 2005-2008 RADLogic Pty. Ltd. 
+# Copyright (c) 2005-2008 RADLogic Pty. Ltd.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ Running this module as a script will run the unittest suite.
 This requires Python 2.2 or greater.
 
 """
+import unittest
 
 __author__ = 'Tim Wegener <twegener@radlogic.com.au>'
 __version__ = '$Revision: 0.3 $'
@@ -55,8 +56,6 @@ Stuart Mentzer <Stuart_Mentzer - objexx.com> - suggestions/bugfix for replace
 # Replaced some 'has_key' method calls with 'in'.
 # Added todo item to replace UnitTest test suite with doctests.
 #
-
-import unittest
 
 
 class TwoWayDict(dict):
@@ -103,7 +102,7 @@ class TwoWayDict(dict):
 
     def __setitem__(self, k, value):
         """x.__setitem__(i, y) <==> x[i]=y"""
-        
+
         # Check for 1-to-many mappings.
         if value in self._reverse_map:
             del self[self._reverse_map[value]]
@@ -112,7 +111,7 @@ class TwoWayDict(dict):
             del self._reverse_map[self[k]]
 
         self._reverse_map[value] = k
-        
+
         dict.__setitem__(self, k, value)
 
     def __delitem__(self, k):
@@ -195,7 +194,6 @@ class TwoWayDict(dict):
 
         If value is not found, default is returned if given,
         otherwise KeyError is raised.
-        
         """
         key = self._reverse_map.pop(value, *args)
         try:
@@ -218,7 +216,7 @@ class TwoWayDict(dict):
 
     def update(self, dict=None, **kwargs):
         """Update from dict, or sequence of key, value pairs or kwargs."""
-        
+
         # dict.update does not seem to call self.__getitem__,
         # so need to redefine update method here.
 
@@ -237,7 +235,6 @@ class TwoWayDict(dict):
 
         This isn't very useful due to the one-to-one mapping restriction,
         but here to match Py2.3/2.4 dict interface.
-        
         """
         # It is redefined here, so that it works in Py2.2.
 
@@ -245,6 +242,7 @@ class TwoWayDict(dict):
         for key in iterable:
             twd[key] = value
         return twd
+
     fromkeys = classmethod(fromkeys)
 
     def fromvalues(cls, iterable, key=None):
@@ -254,20 +252,19 @@ class TwoWayDict(dict):
 
         This isn't very useful due to the one-to-one mapping restriction,
         but here for symmetry.
-        
         """
         d = cls()
         for value in iterable:
             d[key] = value
         return d
+
     fromvalues = classmethod(fromvalues)
 
 
 # Test suite
 # todo: Replace this with doctests.
-        
-class TestTwoWayDictBase(unittest.TestCase):
 
+class TestTwoWayDictBase(unittest.TestCase):
     def setUp(self):
 
         # Make sure test keys are not in same sort order as values.
@@ -294,7 +291,7 @@ class TestTwoWayDictBase(unittest.TestCase):
 
         self.assert_(self.twd)
         self.assert_(not TwoWayDict())
-            
+
     def test_keys(self):
 
         keys = self.twd.keys()
@@ -337,7 +334,6 @@ class TestTwoWayDictBase(unittest.TestCase):
     def test_getitem_absent(self):
 
         def get_absent_key(key, self=self):
-
             return self.twd[key]
 
         self.assertRaises(KeyError, get_absent_key, self.absent_key)
@@ -346,30 +342,30 @@ class TestTwoWayDictBase(unittest.TestCase):
 
         for k, v in self.test_items:
             self.assertEqual(v, self.twd.get(k))
-            
+
     def test_get_absent(self):
 
         self.assertEqual(None, self.twd.get(self.absent_key))
-            
+
     def test_get_absent_default(self):
 
         self.assertEqual(self.default_val,
                          self.twd.get(self.absent_key, self.default_val))
-            
+
     def test_get_key(self):
 
         for k, v in self.test_items:
             self.assertEqual(k, self.twd.get_key(v))
-            
+
     def test_get_key_absent(self):
 
         self.assertEqual(None, self.twd.get_key(self.absent_val))
-            
+
     def test_get_key_absent_default(self):
 
         self.assertEqual(self.default_val,
                          self.twd.get_key(self.absent_val, self.default_val))
-            
+
     def test_len(self):
 
         self.assertEqual(0, len(TwoWayDict()))
@@ -511,7 +507,7 @@ class TestTwoWayDictBase(unittest.TestCase):
         self.assert_(d)
         self.assert_(self.test_keys[0] not in d)
         self.assert_(self.test_keys[-1] in d)
-        
+
     def test_fromkeys_one(self):
 
         keys = [self.new_key]
@@ -535,7 +531,7 @@ class TestTwoWayDictBase(unittest.TestCase):
             reversed_items.append((v, k))
         reversed_items.sort()
         self.assertEqual(reversed_items, found_reversed_items)
-        
+
     def test_iter(self):
 
         twd_iter = iter(self.twd)
@@ -598,7 +594,7 @@ class TestTwoWayDictBase(unittest.TestCase):
         twd_items_iter = self.twd.iteritems()
         for item in self.test_items:
             twd_items_iter.next()
-            
+
         self.assertRaises(StopIteration, twd_items_iter.next)
 
     def test_replace(self):
@@ -611,7 +607,7 @@ class TestTwoWayDictBase(unittest.TestCase):
         self.assert_('abcd' in twd_copy)
         self.assert_(twd_copy.key(6) == 'abcd')
         self.assertRaises(KeyError, lambda: twd_copy.key(5))
-        
+
 
 if __name__ == '__main__':
     unittest.main()

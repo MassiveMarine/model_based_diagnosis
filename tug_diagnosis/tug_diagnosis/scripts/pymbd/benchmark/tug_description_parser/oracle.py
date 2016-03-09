@@ -5,7 +5,6 @@ import time
 
 
 class TUGDescriptionOracle(Description):
-
     def __init__(self, **options):
         super(TUGDescriptionOracle, self).__init__([], **options)
         self.comp_calls = 0
@@ -44,12 +43,12 @@ class TUGDescriptionOracle(Description):
 
     def is_real_node(self, node_name):
         return self.net.is_real_node(node_name)
-    
+
     def get_num_nodes(self):
         if not self.setup_system_model():
             return 0
         return len(self.nodes)
-        
+
     def get_conflict_set(self, h):
         if not self.setup_system_model():
             return None
@@ -57,13 +56,13 @@ class TUGDescriptionOracle(Description):
         t0 = time.time()
         cs = self.net.calculate_conflicts(self.numbers_to_nodes(h))
         t1 = time.time()
-        self.comp_time += t1-t0
+        self.comp_time += t1 - t0
         if cs:
             self.scs.add(frozenset(cs))
             return self.nodes_to_numbers(cs)
         else:
             return None
-    
+
     def check_consistency(self, h):
         if not self.setup_system_model():
             return None
@@ -71,7 +70,7 @@ class TUGDescriptionOracle(Description):
         t0 = time.time()
         sat = self.net.check_consistency(self.numbers_to_nodes(h))
         t1 = time.time()
-        self.check_time += t1-t0
+        self.check_time += t1 - t0
         return sat
 
     def finished(self):

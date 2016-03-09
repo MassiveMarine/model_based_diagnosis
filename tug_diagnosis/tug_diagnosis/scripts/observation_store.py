@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 from pymbd.benchmark.tug_description_parser.observer import decrypt_resource_info
+
 __author__ = 'clemens'
 
 
 class ObservationWithNumber(object):
-
     def __init__(self, number):
         self.number = number
 
 
 class ObservationWithString(object):
-
     def __init__(self, message):
         self.message = message
 
@@ -20,7 +19,6 @@ class ObservationContainer(object):
 
 
 class ObservationStore(object):
-
     def __init__(self):
         # map between observations and time
         self._observation_timings = {}

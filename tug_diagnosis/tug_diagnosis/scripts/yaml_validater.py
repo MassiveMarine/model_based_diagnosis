@@ -26,7 +26,7 @@ class DiagnosisConfigValidater():
                       self.check_observation_without_publication,
                       self.check_observation_of_published_or_subscribed_topics,
                       self.check_naming_of_topics,
-                      self.check_topic_loops_of_nodes,]
+                      self.check_topic_loops_of_nodes, ]
 
         self.debug = debug
         self.configs = configs
@@ -64,26 +64,32 @@ class DiagnosisConfigValidater():
                     self.topics.update([item] if isinstance(item, str) else item)
 
         if self.debug:
-            print WARNING + 'Topics that are observerd by diagnosis config: %3d' %(len(self.topics)) + ENDC
-            print WARNING + 'Topics that are used in config: %3d' %(len(self.topics_from_nodes | self.topics)) + ENDC
+            print WARNING + 'Topics that are observerd by diagnosis config: %3d' % (len(self.topics)) + ENDC
+            print WARNING + 'Topics that are used in config: %3d' % (len(self.topics_from_nodes | self.topics)) + ENDC
 
     def check_publication(self):
-        published_topics = [topic for topic in self.topics_from_nodes if topic in self.topics_published_from_nodes.keys()]
-        not_published_topics = [topic for topic in self.topics_from_nodes if topic not in self.topics_published_from_nodes.keys()]
+        published_topics = [topic for topic in self.topics_from_nodes if
+                            topic in self.topics_published_from_nodes.keys()]
+        not_published_topics = [topic for topic in self.topics_from_nodes if
+                                topic not in self.topics_published_from_nodes.keys()]
 
         if self.debug:
-            print WARNING + 'Topics that are published / not published:   %3d / %3d' % (len(published_topics), len(not_published_topics)) + ENDC
+            print WARNING + 'Topics that are published / not published:   %3d / %3d' % (
+                len(published_topics), len(not_published_topics)) + ENDC
             print "not published topics:"
             print not_published_topics
 
         return True if not len(not_published_topics) or not self.CHECK_PUBLICATION_NECESSARY else False
 
     def check_subscription(self):
-        subscribed_topics = [topic for topic in self.topics_from_nodes if topic in self.topics_subscribed_from_nodes.keys()]
-        not_subscribed_topics = [topic for topic in self.topics_from_nodes if topic not in self.topics_subscribed_from_nodes.keys()]
+        subscribed_topics = [topic for topic in self.topics_from_nodes if
+                             topic in self.topics_subscribed_from_nodes.keys()]
+        not_subscribed_topics = [topic for topic in self.topics_from_nodes if
+                                 topic not in self.topics_subscribed_from_nodes.keys()]
 
         if self.debug:
-            print WARNING + 'Topics that are subscribed / not subscribed: %3d / %3d' % (len(subscribed_topics), len(not_subscribed_topics)) + ENDC
+            print WARNING + 'Topics that are subscribed / not subscribed: %3d / %3d' % (
+                len(subscribed_topics), len(not_subscribed_topics)) + ENDC
             print "not subscribed topics:"
             print not_subscribed_topics
 
@@ -96,26 +102,31 @@ class DiagnosisConfigValidater():
             print WARNING + 'Topics observed but no node subscribes or publishs: %3d' % (len(ghost_topics)) + ENDC
             print ghost_topics
 
-        return True if not len(ghost_topics) or not self.CHECK_OBSERVATION_WITHOUT_SUBSCRIPTION_OR_PUBLICATION_NECESSARY else False
+        return True if not len(
+            ghost_topics) or not self.CHECK_OBSERVATION_WITHOUT_SUBSCRIPTION_OR_PUBLICATION_NECESSARY else False
 
     def check_observation_without_publication(self):
-        published_topics = [topic for topic in self.topics_from_nodes if topic in self.topics_published_from_nodes.keys()]
+        published_topics = [topic for topic in self.topics_from_nodes if
+                            topic in self.topics_published_from_nodes.keys()]
         publishless_topics = [topic for topic in self.topics if topic not in published_topics]
 
         if self.debug:
             print WARNING + 'Topics observed but without publishing node: %3d' % (len(publishless_topics)) + ENDC
             print publishless_topics
 
-        return True if not len(publishless_topics) or not self.CHECK_OBSERVATION_WITHOUT_PUBLICATION_NECESSARY else False
+        return True if not len(
+            publishless_topics) or not self.CHECK_OBSERVATION_WITHOUT_PUBLICATION_NECESSARY else False
 
     def check_observation_of_published_or_subscribed_topics(self):
         useless_topics = [topic for topic in self.topics_from_nodes if topic not in self.topics]
 
         if self.debug:
-            print WARNING + 'Topics subscribed or published by nodes but not observed: %3d' % (len(useless_topics)) + ENDC
+            print WARNING + 'Topics subscribed or published by nodes but not observed: %3d' % (
+                len(useless_topics)) + ENDC
             print useless_topics
 
-        return True if not len(useless_topics) or not self.CHECK_OBSERVATION_OF_PUBLISHED_OR_SUBSCRIBED_TOPICS_NECESSARY else False
+        return True if not len(
+            useless_topics) or not self.CHECK_OBSERVATION_OF_PUBLISHED_OR_SUBSCRIBED_TOPICS_NECESSARY else False
 
     def check_naming_of_topics(self):
         all_topics = self.topics_from_nodes | self.topics
@@ -125,7 +136,7 @@ class DiagnosisConfigValidater():
                 forbidden_topics.update([entry])
 
         if self.debug:
-            print WARNING + 'Topics that contains forbidden characters: %3d' %(len(forbidden_topics)) + ENDC
+            print WARNING + 'Topics that contains forbidden characters: %3d' % (len(forbidden_topics)) + ENDC
             print list(forbidden_topics)
 
         return True if not len(forbidden_topics) or not self.CHECK_NAMING_OF_TOPICS_NECESSARY else False
@@ -137,7 +148,8 @@ class DiagnosisConfigValidater():
             topic_in_loop = set(node.get('pub_topic', [])) & set(node.get('sub_topic', []))
             if self.debug and len(topic_in_loop):
                 loop_found |= True
-                print WARNING + 'Topics that are published and subscribed by the same node %s: %3d' %(node_name, (len(topic_in_loop))) + ENDC
+                print WARNING + 'Topics that are published and subscribed by the same node %s: %3d' % (
+                    node_name, (len(topic_in_loop))) + ENDC
                 print list(topic_in_loop)
 
         return True if not loop_found or not self.CHECK_TOPIC_LOOPS_OF_NODES_NECESSARY else False
@@ -165,7 +177,3 @@ if __name__ == "__main__":
     print OKGREEN + 'all passed' + ENDC if validater.run_tests() else FAIL + 'some failed' + ENDC
 
     exit(0)
-
-
-
-

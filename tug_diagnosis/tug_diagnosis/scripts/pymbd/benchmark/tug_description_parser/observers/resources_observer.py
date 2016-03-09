@@ -3,14 +3,15 @@ from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.benchmark.tug_description_parser.observers.base_observer import *
 from tug_diagnosis_msgs.msg import observer_configuration
+import unittest
 
 
 class ResourcesObserver(BaseObserver):
     """
-    Represents the fault injection logic used to enable/disable a gate's function. 
-    The implication ab_predicate -> gate_function  
+    Represents the fault injection logic used to enable/disable a gate's function.
+    The implication ab_predicate -> gate_function
     """
-    
+
     def __init__(self, ab_node, observation, ab_subscribed_topics):
         super(ResourcesObserver, self).__init__()
         checkInputData.str_data_valid(ab_node)
@@ -20,7 +21,7 @@ class ResourcesObserver(BaseObserver):
         self.ab_node = ab_node
         self.observation = observation
         self.ab_subscribed_topics = ab_subscribed_topics
-        
+
     def __repr__(self):
         return "resources: %s, %s, %s" % (self.ab_node, self.observation, self.ab_subscribed_topics)
 
@@ -63,11 +64,9 @@ class ResourcesObserver(BaseObserver):
 
         return ['resources_obs_' + resource_info]
 
+
 picosat.SENTENCE_INTERPRETERS[ResourcesObserver] = lambda engine, pred, unused: pred.to_clause()
 OBSERVERS['resources'] = ResourcesObserver
-
-
-import unittest
 
 
 class TestResourcesObserver(unittest.TestCase):
@@ -158,7 +157,10 @@ class TestResourcesObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {}
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
         nodes_subscribe_topics = {}
-        vars, rules, nodes, real_nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes,
+                                                                                    topics_subscribed_from_nodes,
+                                                                                    nodes_publish_topics,
+                                                                                    nodes_subscribe_topics)
 
         vars_req = {'resources_obs_/node1': Variable('resources_obs_/node1', 1, None),
                     # 'resources_obs_/node2': Variable('resources_obs_/node2', 1, None),
@@ -168,7 +170,8 @@ class TestResourcesObserver(unittest.TestCase):
         self.assertEqual(len(vars), len(vars_req), "resources added wrong number of variables!")
         for i, obj in vars.items():
             self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
-            self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
+            self.assertEqual(str(vars_req[i]), str(obj),
+                             "Variable '" + str(i) + "' not generated with right parameters!")
 
         subscribed_topics = []
         rules_req = [ResourcesObserver(ab_pred('/node1'), 'resources_obs_/node1', subscribed_topics),
@@ -189,7 +192,10 @@ class TestResourcesObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
-        vars, rules, nodes, real_nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = ResourcesObserver.generate_model_parameter(config, topics_published_from_nodes,
+                                                                                    topics_subscribed_from_nodes,
+                                                                                    nodes_publish_topics,
+                                                                                    nodes_subscribe_topics)
 
         vars_req = {'resources_obs_node1': Variable('resources_obs_node1', 1, None),
                     # 'resources_obs_node2': Variable('resources_obs_node2', 1, None),
@@ -199,7 +205,8 @@ class TestResourcesObserver(unittest.TestCase):
         self.assertEqual(len(vars), len(vars_req), "resources added wrong number of variables!")
         for i, obj in vars.items():
             self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
-            self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
+            self.assertEqual(str(vars_req[i]), str(obj),
+                             "Variable '" + str(i) + "' not generated with right parameters!")
 
         rules_req = [ResourcesObserver(ab_pred('node1'), 'resources_obs_node1', all_ab_pred([])),
                      # ResourcesObserver(ab_pred('node2'), 'resources_obs_node2', all_ab_pred(['/topic1'])),
@@ -273,17 +280,17 @@ class TestResourcesObserver(unittest.TestCase):
              ]
 
         for (error, nodes_subscribe_topics) in nodes_subscribe_topics_testes:
-
             with self.assertRaises(error):
                 print "'" + str(error.__name__) + "' should be raised by '" + str(nodes_subscribe_topics) + "'",
 
                 ResourcesObserver.generate_model_parameter(config,
-                                                   topics_published_from_nodes, topics_subscribed_from_nodes,
-                                                   nodes_publish_topics, nodes_subscribe_topics)
+                                                           topics_published_from_nodes, topics_subscribed_from_nodes,
+                                                           nodes_publish_topics, nodes_subscribe_topics)
             print "... DONE"
 
     def test_decrypt_resources_info(self):
-        self.assertEqual(ResourcesObserver.decrypt_resource_info("/node1"), ['resources_obs_/node1'], "Topic name decryption not correct!")
+        self.assertEqual(ResourcesObserver.decrypt_resource_info("/node1"), ['resources_obs_/node1'],
+                         "Topic name decryption not correct!")
 
         resource_info_tests = [
             (ValueError, "/"),
@@ -292,11 +299,10 @@ class TestResourcesObserver(unittest.TestCase):
             (ValueError, "/node_name []"),
             (ValueError, "/node_name some_wrong_text"),
             (TypeError, 1),
-            ]
+        ]
 
         for (error, resource_info) in resource_info_tests:
             with self.assertRaises(error):
                 print "'" + str(error.__name__) + "' should be raised by '" + str(resource_info) + "'",
                 ResourcesObserver.decrypt_resource_info(resource_info)
             print "... DONE"
-

@@ -27,55 +27,55 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 template<class T>
 class MedianValueFilter : public ValueFilter<T>
 {
-  boost::circular_buffer<T> buffer_;
-  boost::mutex scope_mutex_;
+    boost::circular_buffer<T> buffer_;
+    boost::mutex scope_mutex_;
 
 public:
-  explicit MedianValueFilter(XmlRpc::XmlRpcValue params)
-  {
-    unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
-    if(window_size < 3)
-      throw std::invalid_argument("windows size for a median filter must be at lest 3");
-    buffer_ = boost::circular_buffer<T>(window_size);
-  }
+    explicit MedianValueFilter(XmlRpc::XmlRpcValue params)
+    {
+      unsigned int window_size = ProcessYaml::getValue<unsigned int>("window_size", params);
+      if (window_size < 3)
+        throw std::invalid_argument("windows size for a median filter must be at lest 3");
+      buffer_ = boost::circular_buffer<T>(window_size);
+    }
 
-  virtual void update(const T& new_value)
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    buffer_.push_back(new_value);
-  }
+    virtual void update(const T &new_value)
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      buffer_.push_back(new_value);
+    }
 
-  virtual T getValue()
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    if (buffer_.empty())
-      return static_cast<T>(0);
+    virtual T getValue()
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      if (buffer_.empty())
+        return static_cast<T>(0);
 
-    size_t upper_median_index = std::ceil(static_cast<double>(buffer_.size() + 1)/2.) - 1;
-    size_t lower_median_index = std::floor(static_cast<double>(buffer_.size() + 1)/2.) - 1;
+      size_t upper_median_index = std::ceil(static_cast<double>(buffer_.size() + 1) / 2.) - 1;
+      size_t lower_median_index = std::floor(static_cast<double>(buffer_.size() + 1) / 2.) - 1;
 
-    //for(typename boost::circular_buffer<T>::iterator it = buffer_.begin(); it != buffer_.end(); ++it)
-    //  ROS_DEBUG_STREAM("content in the buffer: " << *it);
-    ROS_DEBUG_STREAM("upper_median_index: " << upper_median_index << " lower_median_index:" << lower_median_index);
-    ROS_DEBUG_STREAM("value at upper_median_index: " << buffer_[upper_median_index] <<
-                             " value at lower_median_index:" << buffer_[lower_median_index]);
+      // for(typename boost::circular_buffer<T>::iterator it = buffer_.begin(); it != buffer_.end(); ++it)
+      //  ROS_DEBUG_STREAM("content in the buffer: " << *it);
+      ROS_DEBUG_STREAM("upper_median_index: " << upper_median_index << " lower_median_index:" << lower_median_index);
+      ROS_DEBUG_STREAM("value at upper_median_index: " << buffer_[upper_median_index] <<
+                       " value at lower_median_index:" << buffer_[lower_median_index]);
 
-    boost::circular_buffer<T> tmp_buffer = buffer_;
-    std::sort(tmp_buffer.begin(), tmp_buffer.end());
-    return (tmp_buffer[upper_median_index] + tmp_buffer[lower_median_index]) / static_cast<T>(2);
-  }
+      boost::circular_buffer<T> tmp_buffer = buffer_;
+      std::sort(tmp_buffer.begin(), tmp_buffer.end());
+      return (tmp_buffer[upper_median_index] + tmp_buffer[lower_median_index]) / static_cast<T>(2);
+    }
 
-  virtual void reset()
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    buffer_.clear();
-  }
+    virtual void reset()
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      buffer_.clear();
+    }
 
-  virtual size_t getSampleSize()
-  {
-    boost::mutex::scoped_lock scoped_lock(scope_mutex_);
-    return buffer_.size();
-  }
+    virtual size_t getSampleSize()
+    {
+      boost::mutex::scoped_lock scoped_lock(scope_mutex_);
+      return buffer_.size();
+    }
 };
 
 
