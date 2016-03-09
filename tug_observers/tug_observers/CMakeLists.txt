@@ -138,7 +138,6 @@ add_dependencies(tug_observers_node tug_observers_msgs_generate_messages_cpp)
 target_link_libraries(tug_observer_plugin_base
   ${catkin_LIBRARIES}
   ${BOOST_LIBRARIES}
-  ros-crypto-lib crypto xml++-2.6 ssl
 )
 
 target_link_libraries(tug_observers_node
