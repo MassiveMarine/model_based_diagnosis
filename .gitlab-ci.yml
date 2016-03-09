@@ -1,4 +1,4 @@
-compile_only:
+compile:
   script:
     - source ci/setup_ws.sh
     - catkin_make
@@ -6,11 +6,11 @@ compile_only:
   tags:
     - sim0
 
-compile_with_test:
+test:
   script:
     - source ci/setup_ws.sh
-    - catkin_make
-    - catkin_make run_tests 
+    - catkin_make run_tests
+    - catkin_test_results
 
   tags:
     - sim0
