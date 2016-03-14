@@ -46,11 +46,15 @@
   <build_depend>tug_observers_msgs</build_depend>
   <build_depend>tug_python_utils</build_depend>
   <build_depend>roslint</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
 
   <run_depend>rospy</run_depend>
   <run_depend>tug_diagnosis_msgs</run_depend>
   <run_depend>tug_observers_msgs</run_depend>
   <run_depend>tug_python_utils</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
