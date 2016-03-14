@@ -55,22 +55,22 @@ class Diagnosis(object):
         action = req.action
         config = req.config
 
-        # print config
-
         if action == DiagnosisConfigurationRequest.ADD:
-            self.o.net_generator.add_config(config)
+            result = self.o.net_generator.add_config(config)
         elif action == DiagnosisConfigurationRequest.REMOVE:
-            self.o.net_generator.remove_config(config)
+            result = self.o.net_generator.remove_config(config)
         elif action == DiagnosisConfigurationRequest.SET:
-            self.o.net_generator.set_config(config)
+            result = self.o.net_generator.set_config(config)
         elif action == DiagnosisConfigurationRequest.UPDATE:
-            self.o.net_generator.update_config(config)
+            result = self.o.net_generator.update_config(config)
         else:
-            return DiagnosisConfigurationResponse(errorcode=1, error_msg='unknown action')
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.GENERAL_ERROR, error_msg='unknown action')
 
         self.o.setup = False
 
-        return DiagnosisConfigurationResponse(errorcode=0, error_msg='no error')
+        print self.o.net_generator.config
+
+        return result
 
     def run(self):
 

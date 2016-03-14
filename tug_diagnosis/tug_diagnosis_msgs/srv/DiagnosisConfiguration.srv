@@ -14,7 +14,7 @@ int32 UPDATE=4
 int32 errorcode
 string error_msg
 int32 NO_ERROR=0
-int32 GENERAL_ERROR=0
-
+int32 GENERAL_ERROR=-1
+int32 CONFIG_INVALID=-2
 
 

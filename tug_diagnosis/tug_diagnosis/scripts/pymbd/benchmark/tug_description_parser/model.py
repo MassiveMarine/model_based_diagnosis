@@ -5,9 +5,10 @@ from sentences import PushSentence
 from pymbd.sat.description import Description
 from pymbd.sat.problem import Problem
 from pymbd.sat.variable import Variable
-from config_validater import DiagnosisConfigValidater
+from config_validator import DiagnosisConfigValidator
 
 from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_configuration
+from tug_diagnosis_msgs.srv import DiagnosisConfigurationResponse
 
 
 class ConfigurationValidation(object):
@@ -73,9 +74,11 @@ class ModelGenerator(object):
         self.config = None
 
     def test_config(self):
-        check = DiagnosisConfigValidater(config=self.config, debug=True)
+        DiagnosisConfigValidator.minimize_config(self.config)
+        check = DiagnosisConfigValidator(config=self.config, debug=DiagnosisConfigValidator.DEBUG_LEVEL_VERBOSE)
+        # check = DiagnosisConfigValidator(config=self.config, debug=DiagnosisConfigValidator.DEBUG_LEVEL_DISABLED)
         result = check.run_tests()
-        print 'all passed' if result else 'some failed'
+
         return result
 
     def set_config(self, set_config):
@@ -85,8 +88,9 @@ class ModelGenerator(object):
 
         if not self.test_config():
             self.config = config_backup
-            return False
-        return True
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID, error_msg='New configuration is not valid!')
+
+        return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.NO_ERROR, error_msg='')
 
     def add_config(self, config_add):
         """
@@ -130,9 +134,9 @@ class ModelGenerator(object):
             self.config.observers.append(observer)
         if not self.test_config():
             self.config = config_backup
-            return False
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID, error_msg='New configuration is not valid!')
 
-        return True
+        return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.NO_ERROR, error_msg='')
 
     def remove_config(self, config_remove):
         """
@@ -197,9 +201,9 @@ class ModelGenerator(object):
 
         if not self.test_config():
             self.config = config_backup
-            return False
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID, error_msg='New configuration is not valid!')
 
-        return True
+        return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.NO_ERROR, error_msg='')
 
     def update_config(self, config_update):
         """
@@ -236,9 +240,9 @@ class ModelGenerator(object):
 
         if not self.test_config():
             self.config = config_backup
-            return False
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID, error_msg='New configuration is not valid!')
 
-        return True
+        return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.NO_ERROR, error_msg='')
 
 
     @staticmethod
@@ -691,6 +695,12 @@ class TestConfigurationValidation(unittest.TestCase):
 class TestModelGenerator(unittest.TestCase):
     def setUp(self):
         pass
+
+    def test_test_config(self):
+        configA = configuration()
+        configA.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
+        gen = ModelGenerator()
 
     def test_set_config_1(self):
         configA = configuration()
@@ -1334,6 +1344,7 @@ class TestModelGenerator(unittest.TestCase):
     def test_update_config_3(self):
         configA = configuration()
         configA.nodes.append(node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic3"]))
@@ -1345,6 +1356,7 @@ class TestModelGenerator(unittest.TestCase):
 
         config_result = configuration()
         config_result.nodes.append(node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
+        config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic3"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic4"]))
 
@@ -1356,6 +1368,7 @@ class TestModelGenerator(unittest.TestCase):
     def test_get_config_copy_1(self):
         configA = configuration()
         configA.nodes.append(node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic3"]))
@@ -1363,6 +1376,7 @@ class TestModelGenerator(unittest.TestCase):
 
         config_result = configuration()
         config_result.nodes.append(node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
+        config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic3"]))
