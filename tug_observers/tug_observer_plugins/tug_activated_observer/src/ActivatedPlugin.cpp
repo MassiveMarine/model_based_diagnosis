@@ -54,7 +54,7 @@ void ActivatedPlugin::initialize(XmlRpc::XmlRpcValue params)
 
 void ActivatedPlugin::nodeInfoCallback(const tug_resource_monitor::NodeInfoArray::ConstPtr &msg)
 {
-  if(!isStartedUp())
+  if (!isStartedUp())
     return;
 
   ROS_DEBUG("ActivatedPlugin::nodeInfoCallback 1");

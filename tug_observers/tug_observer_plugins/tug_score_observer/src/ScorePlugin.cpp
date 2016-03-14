@@ -54,8 +54,8 @@ namespace tug_observer_plugins_cpp
 
     void ScoresPlugin::run()
     {
-      if(!isStartedUp())
-      return;
+      if (!isStartedUp())
+        return;
 
       for (std::vector<boost::shared_ptr<ScoreBase> >::iterator it = bases_.begin(); it != bases_.end(); ++it)
       {

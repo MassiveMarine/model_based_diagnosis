@@ -7,7 +7,6 @@ from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_c
 
 from tug_diagnosis_msgs.srv import *
 
-
 if __name__ == "__main__":
     rospy.init_node('tug_diagnosis_initialization', anonymous=False)
     rospy.loginfo("tug_diagnosis_initialization: starting")

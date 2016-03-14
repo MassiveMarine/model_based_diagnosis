@@ -72,7 +72,7 @@ void VelocityConverterIMU::IMUCB(const sensor_msgs::Imu &msg)
     z_integration_->addValue(msg.linear_acceleration.z - g_z * GRAVITY, msg.header.stamp);
   }
 
-  if(x_integration_->hasIntegration() && y_integration_->hasIntegration() && z_integration_->hasIntegration())
+  if (x_integration_->hasIntegration() && y_integration_->hasIntegration() && z_integration_->hasIntegration())
   {
     reading.linear.x = x_integration_->getIntegration();
     reading.linear.y = y_integration_->getIntegration();

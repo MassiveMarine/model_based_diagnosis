@@ -186,6 +186,7 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 catkin_add_nosetests(scripts)
+set(ROSLINT_PYTHON_OPTS "--ignore=W601,E501,E402")
 roslint_python()
 roslint_add_test()
 

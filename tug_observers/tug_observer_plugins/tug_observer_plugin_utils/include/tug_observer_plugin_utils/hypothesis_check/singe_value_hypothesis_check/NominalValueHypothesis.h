@@ -25,6 +25,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include <tug_observer_plugin_utils/hypothesis_check/singe_value_hypothesis_check/nominal_value/NominalValueFactory.h>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 template <class T>
 class NominalValueHypothesis : public SingleValueHypothesisCheck<T>

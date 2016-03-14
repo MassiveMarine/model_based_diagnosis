@@ -51,7 +51,8 @@ namespace tug_observers
           ROS_DEBUG_STREAM("has start up time will used it to wait");
           double start_up_time = ProcessYaml::getValue<double>("start_up_time", param);
           if (start_up_time <= 0.)
-            throw std::runtime_error("start up time for /" + static_cast<std::string>(param) +" must be posive time in seconds");
+            throw std::runtime_error(
+                    "start up time for /" + static_cast<std::string>(param) + " must be posive time in seconds");
 
           new_plugin->setStartUpTime(start_up_time);
         }

@@ -14,12 +14,12 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TUG_OBSERVER_PLUGIN_UTILS_SIMPLESUMMBASEDINTEGRATION_H
-#define TUG_OBSERVER_PLUGIN_UTILS_SIMPLESUMMBASEDINTEGRATION_H
+#ifndef TUG_OBSERVER_PLUGIN_UTILS_INTEGRATION_SIMPLESUMMBASEDINTEGRATION_H
+#define TUG_OBSERVER_PLUGIN_UTILS_INTEGRATION_SIMPLESUMMBASEDINTEGRATION_H
 
 #include <tug_observer_plugin_utils/integration/Integration.h>
 
-template <class T>
+template<class T>
 class SimpleSummBasedIntegration : public Integration<T>
 {
     T past_value_;
@@ -31,7 +31,7 @@ public:
     SimpleSummBasedIntegration() : has_past_value_(false)
     { }
 
-    virtual void addValue(const T &value, const ros::Time& value_time)
+    virtual void addValue(const T &value, const ros::Time &value_time)
     {
       if (has_past_value_)
       {
@@ -46,7 +46,7 @@ public:
         else if (value_time < past_value_time_)
         {
           ROS_ERROR_STREAM("can't calculate integration with new value:" << value <<
-                            " current time sec:" << value_time.sec <<
+                           " current time sec:" << value_time.sec <<
                            " nsec:" << value_time.nsec << " old time sec: " << past_value_time_.sec <<
                            " nsec:" << past_value_time_.nsec);
           throw std::invalid_argument("new added value is in the past can't process this data");
@@ -76,8 +76,7 @@ public:
     {
       return past_value_time_;
     }
-
 };
 
 
-#endif //TUG_OBSERVER_PLUGIN_UTILS_SIMPLESUMMBASEDINTEGRATION_H
+#endif  // TUG_OBSERVER_PLUGIN_UTILS_INTEGRATION_SIMPLESUMMBASEDINTEGRATION_H

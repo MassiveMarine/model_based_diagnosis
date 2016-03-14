@@ -1,11 +1,26 @@
-//
-// Created by clemens on 17.11.15.
-//
+/*
+This file is part of the software provided by the tug ais group
+Copyright (c) 2015, Clemens Muehlbacher, Stefan Loigge
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <gtest/gtest.h>
 #include <tug_testing/PublisherTester.h>
 #include <tug_observers/ObserverInfoSender.h>
 #include <tug_observers_msgs/observer_info.h>
+#include <utility>
+#include <string>
+#include <vector>
 
 class TestHelperObserverInfo : public ::testing::Test
 {
@@ -25,7 +40,7 @@ protected:
 };
 
 
-void tmpCB(const typename tug_observers_msgs::observer_info::ConstPtr&)
+void tmpCB(const typename tug_observers_msgs::observer_info::ConstPtr &)
 { }
 
 TEST(ObserverInfoSender, check_publisher)
@@ -49,7 +64,7 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test1)
 void sendInfoTestHelperFunction(tug_observers_msgs::observer_info msg_to_send)
 {
   ROS_DEBUG("sendInfoTestHelperFunction called");
-  for(size_t i = 0; i < msg_to_send.observation_infos.size(); ++i)
+  for (size_t i = 0; i < msg_to_send.observation_infos.size(); ++i)
   {
     tug_observers_msgs::observation_info observation_info_to_send = msg_to_send.observation_infos[i];
 
@@ -57,7 +72,7 @@ void sendInfoTestHelperFunction(tug_observers_msgs::observer_info msg_to_send)
     std::string type = observation_info_to_send.type;
     ros::Time time_of_occurence = observation_info_to_send.header.stamp;
     std::vector<Observation> observations;
-    for(size_t j = 0; j < observation_info_to_send.observation.size(); ++j)
+    for (size_t j = 0; j < observation_info_to_send.observation.size(); ++j)
     {
       tug_observers_msgs::observation observation_to_send = observation_info_to_send.observation[j];
 
@@ -82,37 +97,37 @@ void sendAndFlushInfoTestHelperFunction(tug_observers_msgs::observer_info msg_to
 
 bool compareMsgs(tug_observers_msgs::observer_info msg_send, tug_observers_msgs::observer_info msg_received)
 {
-  if(msg_send.observation_infos.size() != msg_received.observation_infos.size())
+  if (msg_send.observation_infos.size() != msg_received.observation_infos.size())
     return false;
-  for(size_t i = 0; i < msg_send.observation_infos.size(); ++i)
+  for (size_t i = 0; i < msg_send.observation_infos.size(); ++i)
   {
     tug_observers_msgs::observation_info observation_info_send = msg_send.observation_infos[i];
     tug_observers_msgs::observation_info observation_info_received = msg_received.observation_infos[i];
 
-    if(observation_info_send.header.stamp != observation_info_received.header.stamp)
+    if (observation_info_send.header.stamp != observation_info_received.header.stamp)
       return false;
 
-    if(observation_info_send.type != observation_info_received.type)
+    if (observation_info_send.type != observation_info_received.type)
       return false;
 
-    if(observation_info_send.resource != observation_info_received.resource)
+    if (observation_info_send.resource != observation_info_received.resource)
       return false;
 
-    if(observation_info_send.observation.size() != observation_info_received.observation.size())
+    if (observation_info_send.observation.size() != observation_info_received.observation.size())
       return false;
 
-    for(size_t j = 0; j < observation_info_send.observation.size(); ++j)
+    for (size_t j = 0; j < observation_info_send.observation.size(); ++j)
     {
       tug_observers_msgs::observation observation_send = observation_info_send.observation[j];
       tug_observers_msgs::observation observation_received = observation_info_received.observation[j];
 
-      if(observation_send.observation_msg != observation_received.observation_msg)
+      if (observation_send.observation_msg != observation_received.observation_msg)
         return false;
 
-      if(observation_send.verbose_observation_msg != observation_received.verbose_observation_msg)
+      if (observation_send.verbose_observation_msg != observation_received.verbose_observation_msg)
         return false;
 
-      if(observation_send.observation != observation_received.observation)
+      if (observation_send.observation != observation_received.observation)
         return false;
     }
   }
@@ -2488,7 +2503,7 @@ TEST_F(TestHelperObserverInfo, send_observer_info_test141)
   EXPECT_PRED2(compareMsgs, msg_to_send, msg_pair.first);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "test_observer_info");

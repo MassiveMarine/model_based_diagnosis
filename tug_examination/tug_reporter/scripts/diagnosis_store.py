@@ -32,7 +32,7 @@ class DiagnosisStore(object):
             if index >= start_index:
                 for mode in resource_assignments:
                     if mode < 0:
-                        count +=1
+                        count += 1
                         break
 
         return count >= occurences
@@ -76,37 +76,41 @@ class DiagnosisStore(object):
             for other_type, dig in self._diagnoses.iteritems():
                 if other_type != type:
                     for resource_assignment in dig.diagnosis:
-                        if (resource_assignment.resource not in tmp_possibe_resource_modes_string or
-                                tmp_possibe_resource_modes_string[resource_assignment.resource] is None):
+                        if resource_assignment.resource not in tmp_possibe_resource_modes_string:
+                            tmp_possibe_resource_modes_string[resource_assignment.resource] = set()
+                        if tmp_possibe_resource_modes_string[resource_assignment.resource] is None:
                             tmp_possibe_resource_modes_string[resource_assignment.resource] = set()
                         tmp_possibe_resource_modes_string[resource_assignment.resource].add(
                             resource_assignment.mode_msg)
 
-                        if (resource_assignment.resource not in tmp_possibe_resource_modes_int or
-                                tmp_possibe_resource_modes_int[resource_assignment.resource] is None):
+                        if resource_assignment.resource not in tmp_possibe_resource_modes_int:
+                            tmp_possibe_resource_modes_int[resource_assignment.resource] = set()
+                        if tmp_possibe_resource_modes_int[resource_assignment.resource] is None:
                             tmp_possibe_resource_modes_int[resource_assignment.resource] = set()
                         tmp_possibe_resource_modes_int[resource_assignment.resource].add(resource_assignment.mode)
 
             for diagnosis in diagnoses:
                 self._diagnoses[type] = diagnosis
                 for resource_assignment in diagnosis.diagnosis:
-                    if (resource_assignment.resource not in tmp_possibe_resource_modes_string or
-                            tmp_possibe_resource_modes_string[resource_assignment.resource] is None):
+                    if resource_assignment.resource not in tmp_possibe_resource_modes_string:
+                        tmp_possibe_resource_modes_string[resource_assignment.resource] = set()
+                    if tmp_possibe_resource_modes_string[resource_assignment.resource] is None:
                         tmp_possibe_resource_modes_string[resource_assignment.resource] = set()
                     tmp_possibe_resource_modes_string[resource_assignment.resource].add(resource_assignment.mode_msg)
 
-                    if (resource_assignment.resource not in tmp_possibe_resource_modes_int or
-                            tmp_possibe_resource_modes_int[resource_assignment.resource] is None):
+                    if resource_assignment.resource not in tmp_possibe_resource_modes_int:
+                        tmp_possibe_resource_modes_int[resource_assignment.resource] = set()
+                    if tmp_possibe_resource_modes_int[resource_assignment.resource] is None:
                         tmp_possibe_resource_modes_int[resource_assignment.resource] = set()
                     tmp_possibe_resource_modes_int[resource_assignment.resource].add(resource_assignment.mode)
 
             for resources in tmp_possibe_resource_modes_string.keys():
-                if not self._possibe_resource_modes_string.has_key(resources):
+                if resources not in self._possibe_resource_modes_string:
                     continue
                 self._possibe_resource_modes_string[resources].append(tmp_possibe_resource_modes_string[resources])
 
             for resources in tmp_possibe_resource_modes_int.keys():
-                if not self._possibe_resource_modes_int.has_key(resources):
+                if resources not in self._possibe_resource_modes_int:
                     continue
                 self._possibe_resource_modes_int[resources].append(tmp_possibe_resource_modes_int[resources])
 

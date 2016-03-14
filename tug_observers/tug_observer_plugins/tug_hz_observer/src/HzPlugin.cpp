@@ -44,7 +44,7 @@ void HzPlugin::initialize(XmlRpc::XmlRpcValue params)
 
 void HzPlugin::run()
 {
-    if(!isStartedUp())
+    if (!isStartedUp())
       return;
 
     for (std::vector<boost::shared_ptr<HzSubs> >::iterator it = subs_.begin(); it != subs_.end(); ++it)

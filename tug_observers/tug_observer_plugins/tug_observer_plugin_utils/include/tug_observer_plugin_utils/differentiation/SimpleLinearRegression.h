@@ -26,7 +26,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 /**
  * we use beta of the simple linear regression as derivative
  */
-template <class T>
+template<class T>
 class SimpleLinearRegression : public Differentiation<T>
 {
     /*
@@ -38,7 +38,7 @@ class SimpleLinearRegression : public Differentiation<T>
     boost::mutex scope_mutex_;
     unsigned int window_size_;
 
-    ros::Time calculateMeanTime(const boost::circular_buffer<ros::Time>& buffer)
+    ros::Time calculateMeanTime(const boost::circular_buffer<ros::Time> &buffer)
     {
       if (buffer.empty())
         return ros::Time(0);
@@ -47,11 +47,11 @@ class SimpleLinearRegression : public Differentiation<T>
       ros::Time lower_time = buffer.front();
       ros::Duration time_diff = upper_time - lower_time;
 
-      return lower_time + (time_diff * (1./2.));
+      return lower_time + (time_diff * (1. / 2.));
     }
 
-    template <class S>
-    S calculateMean(const boost::circular_buffer<S>& buffer)
+    template<class S>
+    S calculateMean(const boost::circular_buffer<S> &buffer)
     {
       if (buffer.empty())
         return static_cast<S>(0);
@@ -63,13 +63,13 @@ class SimpleLinearRegression : public Differentiation<T>
 public:
     explicit SimpleLinearRegression(unsigned int window_size) : window_size_(window_size)
     {
-      if(window_size < 2)
+      if (window_size < 2)
         throw std::invalid_argument("window size for linear regression must be bigger than 1");
       value_buffer_ = boost::circular_buffer<T>(window_size);
       time_buffer_ = boost::circular_buffer<ros::Time>(window_size);
     }
 
-    virtual void addValue(const T &value, const ros::Time& value_time)
+    virtual void addValue(const T &value, const ros::Time &value_time)
     {
       boost::mutex::scoped_lock scoped_lock(scope_mutex_);
       value_buffer_.push_back(value);

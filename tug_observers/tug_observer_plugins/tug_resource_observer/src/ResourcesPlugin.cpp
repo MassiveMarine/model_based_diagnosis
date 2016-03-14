@@ -59,7 +59,7 @@ namespace tug_observer_plugins_cpp
 
     void ResourcesPlugin::nodeInfoCallback(const tug_resource_monitor::NodeInfoArray::ConstPtr &msg)
     {
-      if(!isStartedUp())
+      if (!isStartedUp())
         return;
 
       ROS_DEBUG("ResourcesPlugin::nodeInfoCallback 1");

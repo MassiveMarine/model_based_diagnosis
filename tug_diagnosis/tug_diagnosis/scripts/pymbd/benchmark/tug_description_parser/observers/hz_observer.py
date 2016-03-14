@@ -3,6 +3,7 @@ from pymbd.sat.clause import clause
 from pymbd.sat.variable import Variable
 from pymbd.benchmark.tug_description_parser.observers.base_observer import *
 from tug_diagnosis_msgs.msg import observer_configuration
+import unittest
 
 
 class HzObserver(BaseObserver):
@@ -10,6 +11,7 @@ class HzObserver(BaseObserver):
     Represents the fault injection logic used to enable/disable a gate's function.
     The implication ab_predicate -> gate_function
     """
+
     def __init__(self, ab_node, observation, ab_subscribed_topics):
         super(HzObserver, self).__init__()
         checkInputData.str_data_valid(ab_node)
@@ -50,7 +52,8 @@ class HzObserver(BaseObserver):
         topics = config.resource
         checkInputData.list_data_valid(topics, num_entries=1)
 
-        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=True, entry_type=list, allow_empty=False)
+        checkInputData.dict_data_valid(topics_published_from_nodes, check_entries=True, entry_type=list,
+                                       allow_empty=False)
         checkInputData.list_data_valid(topics_published_from_nodes.keys(), check_entries=True)
         checkInputData.dict_data_valid(nodes_subscribe_topics, check_entries=True, entry_type=list, allow_empty=True)
 
@@ -75,7 +78,8 @@ class HzObserver(BaseObserver):
             if not set(subscribed_topics).issubset(topics_published_from_nodes.keys()):
                 raise ValueError('subscribed topics are not not in topics published list!')
 
-        new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter(config_type, topic, topics_published_from_nodes[topic])
+        new_vars, new_rules, new_nodes = CalleridsObserver.generate_model_parameter(config_type, topic,
+                                                                                    topics_published_from_nodes[topic])
         vars.update(new_vars)
         rules += new_rules
         nodes += new_nodes
@@ -109,9 +113,6 @@ class HzObserver(BaseObserver):
 
 picosat.SENTENCE_INTERPRETERS[HzObserver] = lambda engine, pred, unused: pred.to_clause()
 OBSERVERS['hz'] = HzObserver
-
-
-import unittest
 
 
 class TestHzObserver(unittest.TestCase):
@@ -202,7 +203,10 @@ class TestHzObserver(unittest.TestCase):
         nodes_publish_topics = {'/node1': ['/topic'], '/node2': ['/topic']}
         nodes_subscribe_topics = {}
 
-        vars, rules, nodes, real_nodes = HzObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = HzObserver.generate_model_parameter(config, topics_published_from_nodes,
+                                                                             topics_subscribed_from_nodes,
+                                                                             nodes_publish_topics,
+                                                                             nodes_subscribe_topics)
 
         vars_req = {'hz_obs_/topic_all': Variable('hz_obs_/topic_all', 1, None),
                     'hz_obs_/topic_/node1': Variable('hz_obs_/topic_/node1', 1, None),
@@ -210,8 +214,9 @@ class TestHzObserver(unittest.TestCase):
 
         self.assertEqual(len(vars), len(vars_req), "Hz added wrong number of variables!")
         for i, obj in vars.items():
-            self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
-            self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
+            self.assertTrue(i in vars_req, "Key '" + str(i) + "' not in variables-required list!")
+            self.assertEqual(str(vars_req[i]), str(obj),
+                             "Variable '" + str(i) + "' not generated with right parameters!")
 
         subscribed_topics = []
         rules_req = [HzObserver(ab_pred('/node1'), 'hz_obs_/topic_/node1', subscribed_topics),
@@ -230,7 +235,10 @@ class TestHzObserver(unittest.TestCase):
         topics_subscribed_from_nodes = {'node3': ['/topic2'], 'node2': ['/topic1']}
         nodes_publish_topics = {'node1': ['/topic1'], 'node3': ['/topic3'], 'node2': ['/topic2']}
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
-        vars, rules, nodes, real_nodes = HzObserver.generate_model_parameter(config, topics_published_from_nodes, topics_subscribed_from_nodes, nodes_publish_topics, nodes_subscribe_topics)
+        vars, rules, nodes, real_nodes = HzObserver.generate_model_parameter(config, topics_published_from_nodes,
+                                                                             topics_subscribed_from_nodes,
+                                                                             nodes_publish_topics,
+                                                                             nodes_subscribe_topics)
 
         vars_req = {'hz_obs_/topic1_all': Variable('hz_obs_/topic1_all', 1, None),
                     'hz_obs_/topic1_node1': Variable('hz_obs_/topic1_node1', 1, None),
@@ -243,7 +251,8 @@ class TestHzObserver(unittest.TestCase):
         self.assertEqual(len(vars), len(vars_req), "Hz added wrong number of variables!")
         for i, obj in vars.items():
             self.assertTrue(vars_req.has_key(i), "Key '" + str(i) + "' not in variables-required list!")
-            self.assertEqual(str(vars_req[i]), str(obj), "Variable '" + str(i) + "' not generated with right parameters!")
+            self.assertEqual(str(vars_req[i]), str(obj),
+                             "Variable '" + str(i) + "' not generated with right parameters!")
 
         rules_req = [HzObserver(ab_pred('node1'), 'hz_obs_/topic1_node1', all_ab_pred([])),
                      CalleridsObserver('hz_obs_/topic1_all', ['hz_obs_/topic1_node1']),
@@ -286,8 +295,8 @@ class TestHzObserver(unittest.TestCase):
                 print "'" + str(error.__name__) + "' should be raised by '" + str(config).replace("\n", " ") + "'",
 
                 HzObserver.generate_model_parameter(config,
-                                                   topics_published_from_nodes, topics_subscribed_from_nodes,
-                                                   nodes_publish_topics, nodes_subscribe_topics)
+                                                    topics_published_from_nodes, topics_subscribed_from_nodes,
+                                                    nodes_publish_topics, nodes_subscribe_topics)
             print "... DONE"
 
     def test_generate_model_parameter_errors_2(self):
@@ -299,45 +308,45 @@ class TestHzObserver(unittest.TestCase):
         nodes_subscribe_topics = {'node3': ['/topic2'], 'node2': ['/topic1']}
 
         topics_published_from_nodes_testes = \
-            [#(ValueError, {'/topic':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': []       , '/topic2': ['node2'], '/topic1': ['node1']}),
-             # (ValueError, {'/topic3': ['node3'], '/topic':  ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': []       , '/topic1': ['node1']}),
-             # (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic':  ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': []       }),
-             (TypeError, {1:  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (KeyError, {}),
-             (TypeError, "no_dict"),
-             (TypeError, 1),
-             (ValueError, {'/topic3': ['/' ,'node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['' ,'node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (TypeError, {'/topic3': [1 ,'node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3', '/'], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3', ''], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (TypeError, {'/topic3': ['node3', 1], '/topic2': ['node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['/', 'node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['', 'node2'], '/topic1': ['node1']}),
-             (TypeError, {'/topic3': ['node3'], '/topic2': [1, 'node2'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2', '/'], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2', ''], '/topic1': ['node1']}),
-             (TypeError, {'/topic3': ['node3'], '/topic2': ['node2', 1], '/topic1': ['node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['/', 'node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['', 'node1']}),
-             (TypeError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': [1, 'node1']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1', '/']}),
-             (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1', '']}),
-             (TypeError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1', 1]}),
-             ]
+            [  # (ValueError, {'/topic':  ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': [], '/topic2': ['node2'], '/topic1': ['node1']}),
+                # (ValueError, {'/topic3': ['node3'], '/topic':  ['node2'], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': [], '/topic1': ['node1']}),
+                # (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic':  ['node1']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': []}),
+                (TypeError, {1: ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (ValueError, {'/': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (ValueError, {'': ['node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (KeyError, {}),
+                (TypeError, "no_dict"),
+                (TypeError, 1),
+                (ValueError, {'/topic3': ['/', 'node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': ['', 'node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (TypeError, {'/topic3': [1, 'node3'], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': ['node3', '/'], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': ['node3', ''], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (TypeError, {'/topic3': ['node3', 1], '/topic2': ['node2'], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': ['/', 'node2'], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': ['', 'node2'], '/topic1': ['node1']}),
+                (TypeError, {'/topic3': ['node3'], '/topic2': [1, 'node2'], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': ['node2', '/'], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': ['node2', ''], '/topic1': ['node1']}),
+                (TypeError, {'/topic3': ['node3'], '/topic2': ['node2', 1], '/topic1': ['node1']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['/', 'node1']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['', 'node1']}),
+                (TypeError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': [1, 'node1']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1', '/']}),
+                (ValueError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1', '']}),
+                (TypeError, {'/topic3': ['node3'], '/topic2': ['node2'], '/topic1': ['node1', 1]}),
+            ]
 
         for (error, topics_published_from_nodes) in topics_published_from_nodes_testes:
             with self.assertRaises(error):
                 print "'" + str(error.__name__) + "' should be raised by '" + str(topics_published_from_nodes) + "'",
 
                 HzObserver.generate_model_parameter(config,
-                                                   topics_published_from_nodes, topics_subscribed_from_nodes,
-                                                   nodes_publish_topics, nodes_subscribe_topics)
+                                                    topics_published_from_nodes, topics_subscribed_from_nodes,
+                                                    nodes_publish_topics, nodes_subscribe_topics)
             print "... DONE"
 
     def test_generate_model_parameter_errors_3(self):
@@ -359,21 +368,24 @@ class TestHzObserver(unittest.TestCase):
              ]
 
         for (error, nodes_subscribe_topics) in nodes_subscribe_topics_testes:
-
             with self.assertRaises(error):
                 print "'" + str(error.__name__) + "' should be raised by '" + str(nodes_subscribe_topics) + "'",
 
                 HzObserver.generate_model_parameter(config,
-                                                   topics_published_from_nodes, topics_subscribed_from_nodes,
-                                                   nodes_publish_topics, nodes_subscribe_topics)
+                                                    topics_published_from_nodes, topics_subscribed_from_nodes,
+                                                    nodes_publish_topics, nodes_subscribe_topics)
             print "... DONE"
 
     def test_decrypt_resource_info(self):
-        self.assertEqual(HzObserver.decrypt_resource_info("/topic_name [node1, node2]"), ['hz_obs_/topic_name_node1', 'hz_obs_/topic_name_node2'], "Topic name decryption not correct!")
-        self.assertEqual(HzObserver.decrypt_resource_info("/topic_name [node1, node2, node3, node4, node5]"), ['hz_obs_/topic_name_node1', 'hz_obs_/topic_name_node2', 'hz_obs_/topic_name_node3',
-                                                                                                               'hz_obs_/topic_name_node4', 'hz_obs_/topic_name_node5'], "Topic name decryption not correct!")
-        self.assertEqual(HzObserver.decrypt_resource_info("/topic_name [node1]"), ['hz_obs_/topic_name_node1'], "Topic name decryption not correct!")
-        self.assertEqual(HzObserver.decrypt_resource_info("/topic_name {}"), ['hz_obs_/topic_name_all'], "Topic name decryption not correct!")
+        self.assertEqual(HzObserver.decrypt_resource_info("/topic_name [node1, node2]"),
+                         ['hz_obs_/topic_name_node1', 'hz_obs_/topic_name_node2'], "Topic name decryption not correct!")
+        self.assertEqual(HzObserver.decrypt_resource_info("/topic_name [node1, node2, node3, node4, node5]"),
+                         ['hz_obs_/topic_name_node1', 'hz_obs_/topic_name_node2', 'hz_obs_/topic_name_node3',
+                          'hz_obs_/topic_name_node4', 'hz_obs_/topic_name_node5'], "Topic name decryption not correct!")
+        self.assertEqual(HzObserver.decrypt_resource_info("/topic_name [node1]"), ['hz_obs_/topic_name_node1'],
+                         "Topic name decryption not correct!")
+        self.assertEqual(HzObserver.decrypt_resource_info("/topic_name {}"), ['hz_obs_/topic_name_all'],
+                         "Topic name decryption not correct!")
 
         resource_info_tests = [
             (ValueError, "/ [node1, node2]"),
@@ -385,11 +397,10 @@ class TestHzObserver(unittest.TestCase):
             (ValueError, "/"),
             (ValueError, ""),
             (TypeError, 1),
-            ]
+        ]
 
         for (error, resource_info) in resource_info_tests:
             with self.assertRaises(error):
                 print "'" + str(error.__name__) + "' should be raised by '" + str(resource_info) + "'",
                 HzObserver.decrypt_resource_info(resource_info)
             print "... DONE"
-

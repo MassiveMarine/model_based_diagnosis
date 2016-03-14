@@ -9,6 +9,7 @@ class GeneralObserver(BaseObserver):
     Represents the fault injection logic used to enable/disable a gate's function.
     The implication ab_predicate -> gate_function
     """
+
     def __init__(self, ab_topic, data):
         super(GeneralObserver, self).__init__()
         checkInputData.str_data_valid(ab_topic)
@@ -71,4 +72,3 @@ class GeneralObserver(BaseObserver):
 
 picosat.SENTENCE_INTERPRETERS[GeneralObserver] = lambda engine, pred, unused: pred.to_clause()
 OBSERVERS['general'] = GeneralObserver
-
