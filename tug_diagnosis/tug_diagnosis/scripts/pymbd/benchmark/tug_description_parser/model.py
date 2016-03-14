@@ -265,7 +265,6 @@ class ModelGenerator(object):
 
         return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.NO_ERROR, error_msg='')
 
-
     @staticmethod
     def copy(config):
         """
