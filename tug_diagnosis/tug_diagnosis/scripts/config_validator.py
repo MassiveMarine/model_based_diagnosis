@@ -19,16 +19,17 @@ class DiagnosisConfigValidator():
     CHECK_OBSERVATION_WITHOUT_PUBLICATION_NECESSARY = True
     CHECK_OBSERVATION_OF_PUBLISHED_TOPICS_NECESSARY = True
     CHECK_NAMING_OF_TOPICS_NECESSARY = True
-    CHECK_TOPIC_LOOPS_OF_NODES_NECESSARY = True
+    CHECK_TOPIC_LOOPS_OF_NODES_NECESSARY = False
     CHECK_NODES_WITHOUT_SUBSCRIPTION_OR_PUBLICATION_NECESSARY = True
     CHECK_OBSERVED_NODES_THAT_DO_NOT_EXIST_NECESSARY = True
+    CHECK_CHECK_UNIQUENESS_OF_NODE_NAMES = True
 
     DEBUG_LEVEL_DISABLED = 0
     DEBUG_LEVEL_RESULT = 1
     DEBUG_LEVEL_TESTS = 2
     DEBUG_LEVEL_VERBOSE = 3
 
-    OBS_WITH_TOPICS = ['hz', 'timestamp', 'timeout', 'timing', "scores", 'velocity']
+    OBS_WITH_TOPICS = ['hz', 'timestamp', 'timeout', 'timing', "scores", 'velocity', 'movement']
 
     class NodesConfig(object):
         __slots__ = ['nodes', 'topics_published_from_nodes', 'topics_subscribed_from_nodes',
@@ -59,7 +60,8 @@ class DiagnosisConfigValidator():
                       self.check_naming_of_topics,
                       self.check_topic_loops_of_nodes,
                       self.check_nodes_without_subscription_or_publication,
-                      self.check_observed_nodes_that_do_not_exist]
+                      self.check_observed_nodes_that_do_not_exist,
+                      self.check_uniqueness_of_node_names]
 
         self.debug = debug
         self.config = config
@@ -255,6 +257,19 @@ class DiagnosisConfigValidator():
             return True
         return False
 
+    def check_uniqueness_of_node_names(self):
+        nodes = [node.name for node in self.config.nodes]
+        num_nodes = len(nodes)
+        num_unique_nodes = len(set(nodes))
+        if self.debug >= self.DEBUG_LEVEL_VERBOSE and num_nodes is not num_unique_nodes:
+            print WARNING + 'Some nodes are not unique!' + ENDC
+            [nodes.remove(name) for name in set(nodes) if name in nodes]
+            print list(nodes)
+
+        if num_nodes is num_unique_nodes or not self.CHECK_CHECK_UNIQUENESS_OF_NODE_NAMES:
+            return True
+        return False
+
     def run_tests(self):
         result = True
 
@@ -301,14 +316,15 @@ class DiagnosisConfigValidator():
             except KeyError:
                 continue
 
+        # clean nodes
         unobserved_topics = [resource for (resource_type, resource) in all_nodes_and_topics if resource_type == 'topic']
+        unobserved_nodes = [resource for (resource_type, resource) in all_nodes_and_topics if resource_type == 'node']
 
-        for (resource_type, resource) in all_nodes_and_topics:
-            if resource_type == 'node':
-                print resource
-                for index, node in enumerate(config.nodes):
-                    if resource == node.name and set(node.pub_topic).issubset(unobserved_topics):
-                        del config.nodes[index]
+        for resource in unobserved_nodes:
+            for index in xrange(len(config.nodes) - 1, -1, -1):
+                node = config.nodes[index]
+                if resource == node.name and set(node.pub_topic).issubset(unobserved_topics):
+                    del config.nodes[index]
 
         for node in config.nodes:
             for topic in unobserved_topics:
@@ -317,20 +333,46 @@ class DiagnosisConfigValidator():
                 if topic in node.pub_topic:
                     node.pub_topic.remove(topic)
 
+        # clean observers
+        unconfigured_topics = [resource for (resource_type, resource) in observer_config.observed_resources if
+                               resource_type == 'topic' and
+                               resource not in nodes_config.topics_published_from_nodes.keys()]
+
+        unconfigured_nodes = [resource for (resource_type, resource) in observer_config.observed_resources if
+                              resource_type == 'node' and
+                              resource not in nodes_config.nodes_subscribe_topics.keys()]
+
+        for index in xrange(len(config.observers) - 1, -1, -1):
+            if config.observers[index].type in DiagnosisConfigValidator.OBS_WITH_TOPICS:
+                if set(config.observers[index].resource).issubset(set(unconfigured_topics)):
+                    del config.observers[index]
+            else:
+                if set(config.observers[index].resource).issubset(set(unconfigured_nodes)):
+                    del config.observers[index]
+
 
 if __name__ == "__main__":
     rospy.init_node('tug_diagnosis_config_validator', anonymous=False)
 
     configA = configuration()
-    configA.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
-    configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
-    configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic1", "/topic2"]))
+    # configA.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+    # configA.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=[]))
+    # configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+    # configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic1", "/topic2"]))
     # configA.nodes.append(node_configuration(name="node3", pub_topic=[], sub_topic=[]))
+    # configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
     # configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
-    configA.observers.append(observer_configuration(type="resource", resource=["node3"]))
+    # configA.observers.append(observer_configuration(type="resource", resource=["node3"]))
+
+    configA = configuration()
+    configA.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+    configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=[]))
+    configA.observers.append(observer_configuration(type="movement", resource=["/topic1", "/topic2"]))
 
     validator = DiagnosisConfigValidator(configA, debug=DiagnosisConfigValidator.DEBUG_LEVEL_VERBOSE)
     print validator.run_tests()
     validator.minimize_config(configA)
+
+    print validator.config
 
     exit(0)

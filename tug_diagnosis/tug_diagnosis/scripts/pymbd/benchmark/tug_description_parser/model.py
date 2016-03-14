@@ -89,7 +89,8 @@ class ModelGenerator(object):
 
         if not self.test_config():
             self.config = config_backup
-            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID, error_msg='New configuration is not valid!')
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID,
+                                                  error_msg='New configuration is not valid!')
 
         return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.NO_ERROR, error_msg='')
 
@@ -100,6 +101,10 @@ class ModelGenerator(object):
         :param config_add:
         :return:
         """
+        if not self.config:
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID,
+                                                  error_msg='Config need to be set first!')
+
         if not config_add:
             raise ValueError('No config given for adding')
 
@@ -135,7 +140,8 @@ class ModelGenerator(object):
             self.config.observers.append(observer)
         if not self.test_config():
             self.config = config_backup
-            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID, error_msg='New configuration is not valid!')
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID,
+                                                  error_msg='New configuration is not valid!')
 
         return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.NO_ERROR, error_msg='')
 
@@ -153,11 +159,17 @@ class ModelGenerator(object):
         The observer will also be removed, if it has no remaining resources.
         :param config_remove: config about nodes and observers that should be removed from the model config
         """
+        if not self.config:
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID, error_msg='Config need to be set first!')
+
+        if not config_remove:
+            raise ValueError('No config given for removing')
+
         config_remove = self.copy(config_remove)
         config_backup = self.copy(self.config)
 
         for node in config_remove.nodes:
-            # remove to nodes
+            # remove of nodes
             name_list = [_.name for _ in self.config.nodes]
             if node.name in name_list:
                 index_if_exists = name_list.index(node.name)
@@ -176,7 +188,7 @@ class ModelGenerator(object):
                 elif not len(known_node.sub_topic) and not len(known_node.pub_topic):
                     del self.config.nodes[index_if_exists]
 
-        # remove to observers
+        # remove of observers
         for observer in config_remove.observers:
             # find in known observers
             for index, known_observer in enumerate(self.config.observers):
@@ -212,18 +224,25 @@ class ModelGenerator(object):
         removed and new observers are added.
         :param config_update: new config for given nodes and/or observers
         """
+        if not self.config:
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID,
+                                                  error_msg='Config need to be set first!')
+
+        if not config_update:
+            raise ValueError('No config given for updating')
+
         config_update = self.copy(config_update)
         config_backup = self.copy(self.config)
 
         for node in config_update.nodes:
-            # update to nodes
+            # update of nodes
             name_list = [_.name for _ in self.config.nodes]
             if node.name in name_list:
                 index_if_exists = name_list.index(node.name)
                 del self.config.nodes[index_if_exists]
             self.config.nodes.append(node)
 
-        # remove to observers
+        # remove of observers
         for observer in config_update.observers:
             # find in known observers
             for index, known_observer in enumerate(self.config.observers):
@@ -241,7 +260,8 @@ class ModelGenerator(object):
 
         if not self.test_config():
             self.config = config_backup
-            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID, error_msg='New configuration is not valid!')
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.CONFIG_INVALID,
+                                                  error_msg='New configuration is not valid!')
 
         return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.NO_ERROR, error_msg='')
 
@@ -844,14 +864,14 @@ class TestModelGenerator(unittest.TestCase):
         configB = configuration()
         configB.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=[]))
         configB.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
-        configB.observers.append(observer_configuration(type="timemout", resource=["/topic2"]))
+        configB.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
 
         config_result = configuration()
         config_result.nodes.append(node_configuration(name="node1", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
-        config_result.observers.append(observer_configuration(type="timemout", resource=["/topic2"]))
+        config_result.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
 
         gen = ModelGenerator()
         gen.set_config(configA)
@@ -861,15 +881,17 @@ class TestModelGenerator(unittest.TestCase):
     def test_add_config_8(self):
         configA = configuration()
         configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
+        configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic1"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
 
         configB = configuration()
+        configB.nodes.append(node_configuration(name="node4", pub_topic=["/topic2"], sub_topic=[]))
         configB.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic2"]))
         configB.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
         config_result = configuration()
-        config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
-        config_result.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic2"]))
+        config_result.nodes.append(node_configuration(name="node3", pub_topic=["/topic1"], sub_topic=[]))
+        config_result.nodes.append(node_configuration(name="node4", pub_topic=["/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
@@ -881,16 +903,22 @@ class TestModelGenerator(unittest.TestCase):
     def test_add_config_9(self):
         configA = configuration()
         configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
+        configA.observers.append(observer_configuration(type="activated", resource=["node1"]))
 
         configB = configuration()
+        configB.nodes.append(node_configuration(name="node3", pub_topic=["/topic2"], sub_topic=[]))
         configB.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic2"]))
         configB.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
         config_result = configuration()
         config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
+        config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic1"], sub_topic=[]))
+        config_result.nodes.append(node_configuration(name="node3", pub_topic=["/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
+        config_result.observers.append(observer_configuration(type="activated", resource=["node1"]))
 
         gen = ModelGenerator()
         gen.set_config(configA)
@@ -899,6 +927,7 @@ class TestModelGenerator(unittest.TestCase):
 
     def test_add_config_10(self):
         configA = configuration()
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1"], sub_topic=[]))
         configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
 
@@ -907,7 +936,7 @@ class TestModelGenerator(unittest.TestCase):
         configB.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
 
         config_result = configuration()
-        config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
+        config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic1"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
 
         gen = ModelGenerator()
@@ -918,35 +947,53 @@ class TestModelGenerator(unittest.TestCase):
     def test_add_config_11(self):
         configA = configuration()
         configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
 
         configB = configuration()
-        configB.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic2"]))
+        configB.nodes.append(node_configuration(name="node1", pub_topic=["/topic2"], sub_topic=[]))
         configB.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
 
-        config_result = configuration()
-        config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
-        config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
-        config_result.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
+        config_result_A = configuration()
+        config_result_A.nodes.append(node_configuration(name="node1", pub_topic=["/topic2"], sub_topic=[]))
+        config_result_A.nodes.append(node_configuration(name="node2", pub_topic=["/topic1"], sub_topic=[]))
+        config_result_A.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
+        config_result_A.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
 
         gen = ModelGenerator()
         gen.set_config(configA)
         gen.add_config(configB)
-        self.assertTrue(ConfigurationValidation.compare_configs(gen.config, config_result), "configs do not match!")
+        self.assertTrue(ConfigurationValidation.compare_configs(gen.config, config_result_A), "configs do not match!")
+
+        configC = configuration()
+        configC.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
+
+        config_result_B = configuration()
+        config_result_B.nodes.append(node_configuration(name="node1", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_result_B.nodes.append(node_configuration(name="node2", pub_topic=["/topic1"], sub_topic=[]))
+        config_result_B.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
+        config_result_B.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
+
+        gen.add_config(configC)
+        self.assertTrue(ConfigurationValidation.compare_configs(gen.config, config_result_B), "configs do not match!")
 
     def test_add_config_12(self):
         configA = configuration()
         configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
+        configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic1"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
 
         configB = configuration()
-        configB.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic1"]))
+        configB.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
         configB.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
+        configB.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
         config_result = configuration()
-        config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
-        config_result.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic1"]))
+        # config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
+        config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_result.nodes.append(node_configuration(name="node3", pub_topic=["/topic1"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
+        config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
         gen = ModelGenerator()
         gen.set_config(configA)
@@ -957,6 +1004,7 @@ class TestModelGenerator(unittest.TestCase):
         configA = configuration()
         configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
         configA.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic2"]))
+        configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
@@ -964,8 +1012,9 @@ class TestModelGenerator(unittest.TestCase):
         configB.observers.append(observer_configuration(type="timestamp", resource=["/topic2"]))
 
         config_result = configuration()
-        config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
-        config_result.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic2"]))
+        # config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1"]))
+        # config_result.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic2"]))
+        config_result.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
         config_result.observers.append(observer_configuration(type="timestamp", resource=["/topic2"]))
@@ -977,6 +1026,7 @@ class TestModelGenerator(unittest.TestCase):
 
     def test_add_config_14(self):
         configA = configuration()
+        configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
@@ -984,14 +1034,17 @@ class TestModelGenerator(unittest.TestCase):
         configB = configuration()
         configB.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic2"]))
         configB.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
-        configB.observers.append(observer_configuration(type="timemout", resource=["/topic2"]))
+        configB.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
+        configB.observers.append(observer_configuration(type="activated", resource=["node2"]))
 
         config_result = configuration()
-        config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
+        # config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
         config_result.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic2"]))
+        config_result.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
-        config_result.observers.append(observer_configuration(type="timemout", resource=["/topic2"]))
+        config_result.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
+        config_result.observers.append(observer_configuration(type="activated", resource=["node2"]))
 
         gen = ModelGenerator()
         gen.set_config(configA)
@@ -1000,6 +1053,7 @@ class TestModelGenerator(unittest.TestCase):
 
     def test_add_config_15(self):
         configA = configuration()
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
@@ -1007,14 +1061,15 @@ class TestModelGenerator(unittest.TestCase):
         configB = configuration()
         configB.nodes.append(node_configuration(name="node1", pub_topic=["/topic2"], sub_topic=["/topic2"]))
         configB.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
-        configB.observers.append(observer_configuration(type="timemout", resource=["/topic2"]))
+        configB.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
 
         config_result = configuration()
         config_result.nodes.append(
-            node_configuration(name="node1", pub_topic=["/topic2"], sub_topic=["/topic1", "/topic2"]))
+            node_configuration(name="node1", pub_topic=["/topic2"], sub_topic=["/topic2"]))
+        config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
-        config_result.observers.append(observer_configuration(type="timemout", resource=["/topic2"]))
+        config_result.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
 
         gen = ModelGenerator()
         gen.set_config(configA)
@@ -1042,8 +1097,9 @@ class TestModelGenerator(unittest.TestCase):
 
         gen = ModelGenerator()
         gen.set_config(configA)
+        print gen.config
         gen.add_config(configB)
-
+        print gen.config
         self.assertTrue(ConfigurationValidation.compare_configs(gen.config, config_result), "configs do not match!")
 
     def test_remove_config_1(self):
@@ -1111,16 +1167,19 @@ class TestModelGenerator(unittest.TestCase):
 
     def test_remove_config_4(self):
         configA = configuration()
-        configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
-        configA.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
+        configA.nodes.append(
+            node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
+        configA.observers.append(observer_configuration(type="hz", resource=["/topic3"]))
+        configA.observers.append(observer_configuration(type="hz", resource=["/topic4"]))
 
         configB = configuration()
         configB.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=[]))
 
         config_result = configuration()
-        config_result.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
+        config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
@@ -1132,8 +1191,9 @@ class TestModelGenerator(unittest.TestCase):
 
     def test_remove_config_5(self):
         configA = configuration()
-        configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
-        configA.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
+        configA.nodes.append(
+            node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
@@ -1141,7 +1201,7 @@ class TestModelGenerator(unittest.TestCase):
         configB.nodes.append(node_configuration(name="node1"))
 
         config_result = configuration()
-        config_result.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
+        config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
@@ -1155,6 +1215,7 @@ class TestModelGenerator(unittest.TestCase):
         configA = configuration()
         configA.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
         configA.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
+        configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
         configA.observers.append(observer_configuration(type="timeout", resource=["/topic1"]))
@@ -1165,8 +1226,7 @@ class TestModelGenerator(unittest.TestCase):
         configB.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
 
         config_result = configuration()
-        config_result.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
-        config_result.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
+        config_result.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
 
@@ -1177,6 +1237,7 @@ class TestModelGenerator(unittest.TestCase):
 
     def test_remove_config_7(self):
         configA = configuration()
+        configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.nodes.append(
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
         configA.nodes.append(
@@ -1195,6 +1256,7 @@ class TestModelGenerator(unittest.TestCase):
         configB.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
 
         config_result = configuration()
+        config_result.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.nodes.append(
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
         config_result.nodes.append(
@@ -1213,6 +1275,7 @@ class TestModelGenerator(unittest.TestCase):
 
     def test_remove_config_8(self):
         configA = configuration()
+        configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.nodes.append(
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
         configA.nodes.append(
@@ -1232,7 +1295,8 @@ class TestModelGenerator(unittest.TestCase):
         config_result = configuration()
         config_result.nodes.append(
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
-        config_result.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=["/topic1", "/topic2"]))
+        config_result.nodes.append(
+            node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic3"]))
@@ -1249,6 +1313,7 @@ class TestModelGenerator(unittest.TestCase):
 
     def test_remove_config_9(self):
         configA = configuration()
+        configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.nodes.append(
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
         configA.nodes.append(
@@ -1270,6 +1335,7 @@ class TestModelGenerator(unittest.TestCase):
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
         config_result.nodes.append(
             node_configuration(name="node2", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
+        config_result.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="timeout", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
         config_result.observers.append(observer_configuration(type="timeout", resource=["/topic3"]))
@@ -1283,6 +1349,7 @@ class TestModelGenerator(unittest.TestCase):
 
     def test_remove_config_10(self):
         configA = configuration()
+        configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.nodes.append(
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
         configA.nodes.append(
@@ -1304,6 +1371,7 @@ class TestModelGenerator(unittest.TestCase):
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
         config_result.nodes.append(
             node_configuration(name="node2", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
+        config_result.nodes.append(node_configuration(name="node3", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="timeout", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
         config_result.observers.append(observer_configuration(type="timeout", resource=["/topic3"]))
@@ -1312,10 +1380,12 @@ class TestModelGenerator(unittest.TestCase):
         gen = ModelGenerator()
         gen.set_config(configA)
         gen.remove_config(configB)
+
         self.assertTrue(ConfigurationValidation.compare_configs(gen.config, config_result), "configs do not match!")
 
     def test_update_config_1(self):
         configA = configuration()
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.nodes.append(
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
@@ -1336,10 +1406,12 @@ class TestModelGenerator(unittest.TestCase):
         gen = ModelGenerator()
         gen.set_config(configA)
         gen.update_config(configB)
+
         self.assertTrue(ConfigurationValidation.compare_configs(gen.config, config_result), "configs do not match!")
 
     def test_update_config_2(self):
         configA = configuration()
+        configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         configA.nodes.append(
             node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=["/topic1", "/topic2"]))
         configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
@@ -1352,6 +1424,7 @@ class TestModelGenerator(unittest.TestCase):
 
         config_result = configuration()
         config_result.nodes.append(node_configuration(name="node1", pub_topic=["/topic3", "/topic4"], sub_topic=[]))
+        config_result.nodes.append(node_configuration(name="node2", pub_topic=["/topic1", "/topic2"], sub_topic=[]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
         config_result.observers.append(observer_configuration(type="hz", resource=["/topic3"]))
