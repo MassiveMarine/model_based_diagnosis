@@ -18,12 +18,12 @@ def ab_constraint(engine, ab_constraint):
     if ab_constraint.extended:
         engine.register_core_sentence(None, ab_constraint.ab_predicate)
         weight_str = " %d" % ab_constraint.weight if ab_constraint.weight else ""
-        if ab_constraint.value is True:
+        if ab_constraint.value:
             return "(assert+ (= AB%s true)%s)" % (ab_constraint.ab_predicate, weight_str)
         else:
             return "(assert+ (= AB%s false)%s)" % (ab_constraint.ab_predicate, weight_str)
     else:
-        if ab_constraint.value is True:
+        if ab_constraint.value:
             return "(assert (= AB%s true))" % ab_constraint.ab_predicate
         else:
             return "(assert (= AB%s false))" % ab_constraint.ab_predicate

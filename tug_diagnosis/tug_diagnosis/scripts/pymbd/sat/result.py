@@ -12,7 +12,9 @@ class Result(object):
         self.unsat_core = unsat_core
 
     def sat(self):
-        return self.satisfiable is True
+        if self.satisfiable:
+            return True
+        return False
 
     def unsat(self):
         return not self.sat()

@@ -212,7 +212,7 @@ def decode_sets(bytes):
         aSet = set()
         bits.reverse()
         for i, b in enumerate(bits):
-            if b is True:
+            if b:
                 aSet.add(i)
         setOfSets.add(frozenset(aSet))
     return setOfSets

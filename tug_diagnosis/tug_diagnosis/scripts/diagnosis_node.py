@@ -69,8 +69,6 @@ class Diagnosis(object):
 
         self.o.setup = False
 
-        print self.o.net_generator.config
-
         return result
 
     def run(self):

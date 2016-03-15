@@ -14,7 +14,7 @@ ENGINES['picosat'] = lambda o: PicoSatEngine(o)
 
 
 def to_dimacs_literal(literal, variable_map):
-    if literal.sign is True:
+    if literal.sign:
         return str(variable_map.get_key(literal.name) + 1)
     else:
         return "-" + str(variable_map.get_key(literal.name) + 1)
