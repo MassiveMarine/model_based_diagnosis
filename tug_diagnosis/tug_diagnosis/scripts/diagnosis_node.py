@@ -15,10 +15,9 @@ from observation_store import ObservationStore
 import threading
 
 
-# from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_configuration
-
-class Diagnosis(object):
+class Diagnosis(threading.Thread):
     def __init__(self):
+        threading.Thread.__init__(self)
         self._observation_store = ObservationStore()
         self._trigger_condition = threading.Condition()
 
@@ -65,7 +64,8 @@ class Diagnosis(object):
         elif action == DiagnosisConfigurationRequest.UPDATE:
             result = self.o.net_generator.update_config(config)
         else:
-            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.GENERAL_ERROR, error_msg='unknown action')
+            return DiagnosisConfigurationResponse(errorcode=DiagnosisConfigurationResponse.GENERAL_ERROR,
+                                                  error_msg='unknown action')
 
         self.o.setup = False
 
@@ -132,5 +132,7 @@ if __name__ == "__main__":
     rospy.init_node('tug_diagnosis', anonymous=False)
 
     the_diagnostics = Diagnosis()
+    the_diagnostics.daemon = True
+    the_diagnostics.start()
 
-    the_diagnostics.run()
+    rospy.spin()
