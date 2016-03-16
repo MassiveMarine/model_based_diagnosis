@@ -1,0 +1,22 @@
+nodes:
+  - name: "node1"
+    sub_topic: []
+    pub_topic: ["/topic1"]
+
+  - name: "node2"
+    sub_topic: ["/topic1"]
+    pub_topic: ["/topic2"]
+
+  - name: "node3"
+    sub_topic: ["/topic2"]
+    pub_topic: ["/topic3"]
+
+observations:
+  - type: "hz"
+    topics: ["/topic1"]
+
+  - type: "hz"
+    topics: ["/topic2"]
+
+  - type: "hz"
+    topics: ["/topic3"]

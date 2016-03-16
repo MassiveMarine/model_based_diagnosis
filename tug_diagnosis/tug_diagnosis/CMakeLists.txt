@@ -185,10 +185,17 @@ include_directories(
 # endif()
 
 ## Add folders to be run by python nosetests
-catkin_add_nosetests(scripts)
-set(ROSLINT_PYTHON_OPTS "--ignore=W601,E501,E402")
-roslint_python()
-roslint_add_test()
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  catkin_add_nosetests(scripts)
+  add_rostest(test/test_diagnosis.test)
+
+  set(ROSLINT_PYTHON_OPTS "--ignore=W601,E501,E402")
+  roslint_python()
+  roslint_add_test()
+endif()
+
 
 execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/scripts/lib/picosat
                 COMMAND sh configure)

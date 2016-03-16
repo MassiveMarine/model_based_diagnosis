@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+  <test test-name="test_tug_diagnosis_node" pkg="tug_diagnosis" type="test_diagnosis_node.py" time-limit="120.0">
+  </test>
+  <node name="tug_diagnosis_node" pkg="tug_diagnosis" type="diagnosis_node.py" output="screen">
+  </node>
+  <node name="tug_diagnosis_initialization_node" pkg="tug_diagnosis" type="diagnosis_initialization_node.py" output="screen">
+    <rosparam command="load" file="$(find tug_diagnosis)/test/test_config_1.yaml" />
+  </node>
+</launch>
+
+<!--<launch>-->
+    <!--<test test-name="test_observer_info_sender" pkg="tug_observers" type="test_observer_info_sender" time-limit="120.0" >-->
+    <!--</test>-->
+<!--</launch>-->
