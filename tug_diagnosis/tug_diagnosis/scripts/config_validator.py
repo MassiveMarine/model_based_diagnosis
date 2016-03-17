@@ -3,6 +3,8 @@ import rospy
 from tug_diagnosis_msgs.msg import configuration, node_configuration, observer_configuration
 import Queue
 
+import unittest
+
 HEADER = '\033[95m'
 OKBLUE = '\033[94m'
 OKGREEN = '\033[92m'
@@ -68,17 +70,19 @@ class DiagnosisConfigValidator():
 
         # read nodes configuration
         nodes_config = self.init_nodes(self.config)
-        self.nodes = nodes_config.nodes
-        self.topics_published_from_nodes = nodes_config.topics_published_from_nodes
-        self.topics_subscribed_from_nodes = nodes_config.topics_subscribed_from_nodes
-        self.nodes_publish_topics = nodes_config.nodes_publish_topics
-        self.nodes_subscribe_topics = nodes_config.nodes_subscribe_topics
-        self.topics_from_nodes = nodes_config.topics_from_nodes
+        if nodes_config:
+            self.nodes = nodes_config.nodes
+            self.topics_published_from_nodes = nodes_config.topics_published_from_nodes
+            self.topics_subscribed_from_nodes = nodes_config.topics_subscribed_from_nodes
+            self.nodes_publish_topics = nodes_config.nodes_publish_topics
+            self.nodes_subscribe_topics = nodes_config.nodes_subscribe_topics
+            self.topics_from_nodes = nodes_config.topics_from_nodes
 
         # read observer configuration
         observer_config = self.init_observers(self.config)
-        self.topics = observer_config.topics
-        self.observed_resources = observer_config.observed_resources
+        if observer_config:
+            self.topics = observer_config.topics
+            self.observed_resources = observer_config.observed_resources
 
         if self.debug >= self.DEBUG_LEVEL_VERBOSE:
             print WARNING + 'Topics that are observerd by diagnosis config: %3d' % (len(self.topics)) + ENDC
@@ -86,6 +90,9 @@ class DiagnosisConfigValidator():
 
     @staticmethod
     def init_nodes(config):
+        if not hasattr(config, 'nodes'):
+            return None
+
         nodes = []
         topics_published_from_nodes = {}
         topics_subscribed_from_nodes = {}
@@ -117,6 +124,9 @@ class DiagnosisConfigValidator():
 
     @staticmethod
     def init_observers(config):
+        if not hasattr(config, 'observers'):
+            return None
+
         topics = set()
         observed_resources = set()
         for obs in config.observers:
@@ -276,7 +286,10 @@ class DiagnosisConfigValidator():
         for test in self.tests:
             if self.debug >= self.DEBUG_LEVEL_TESTS:
                 print HEADER + 'running', test.__name__ + ENDC
-            passed = test()
+            try:
+                passed = test()
+            except AttributeError:
+                return False
             result &= passed
             if self.debug >= self.DEBUG_LEVEL_TESTS:
                 print OKGREEN + 'passed' + ENDC if passed else FAIL + 'failed' + ENDC
@@ -291,6 +304,9 @@ class DiagnosisConfigValidator():
         nodes_config = DiagnosisConfigValidator.init_nodes(config)
         # read observer config
         observer_config = DiagnosisConfigValidator.init_observers(config)
+
+        if not nodes_config or not observer_config:
+            return
 
         # get unused nodes and topics
         all_nodes_and_topics = set([('node', node) for node in nodes_config.nodes])
@@ -340,7 +356,7 @@ class DiagnosisConfigValidator():
 
         unconfigured_nodes = [resource for (resource_type, resource) in observer_config.observed_resources if
                               resource_type == 'node' and
-                              resource not in nodes_config.nodes_subscribe_topics.keys()]
+                              resource not in nodes_config.nodes]
 
         for index in xrange(len(config.observers) - 1, -1, -1):
             if config.observers[index].type in DiagnosisConfigValidator.OBS_WITH_TOPICS:
@@ -351,28 +367,389 @@ class DiagnosisConfigValidator():
                     del config.observers[index]
 
 
+def check_list_in_list(compare_fct, first, second, enable_equal_check=False):
+    # if both are equal, they can also be None
+    if not first and not second:
+        return True
+
+    # it's not allowed, if just one of them is None
+    if not first or not second:
+        return False
+
+    # find each element of the first list in the second list
+    for entry_of_first in first:
+        first_found_in_second = False
+        for entry_of_second in second:
+            if compare_fct(entry_of_first, entry_of_second):
+                first_found_in_second = True
+                break
+        if not first_found_in_second:
+            return False
+
+    if enable_equal_check:
+        return check_list_in_list(compare_fct, second, first)
+    return True
+
+
+def compare_node_configuration(first, second):
+    # if both are equal, they can also be None
+    if not first and not second:
+        return True
+
+    # it's not allowed, if just one of them is None
+    if not first or not second:
+        return False
+
+    # it's not allowed, if resources, mode_msg, or mode are different
+    if not first.name == second.name:
+        return False
+    if not check_list_in_list(lambda a, b: a == b, first.sub_topic, second.sub_topic, True):
+        return False
+    if not check_list_in_list(lambda a, b: a == b, first.pub_topic, second.pub_topic, True):
+        return False
+    return True
+
+
+def compare_observer_configuration(first, second):
+    # if both are equal, they can also be None
+    if not first and not second:
+        return True
+
+    # it's not allowed, if just one of them is None
+    if not first or not second:
+        return False
+
+    # it's not allowed, if resources, mode_msg, or mode are different
+    if not first.type == second.type:
+        return False
+    if not check_list_in_list(lambda a, b: a == b, first.resource, second.resource, True):
+        return False
+    return True
+
+
+def compare_configuration(first, second):
+    # if both are equal, they can also be None
+    if not first and not second:
+        return True
+
+    # it's not allowed, if just one of them is None
+    if not first or not second:
+        return False
+
+    # find each element of the first list in the second list and each element of the second list in the first list
+    if not check_list_in_list(compare_node_configuration, first.nodes, second.nodes, True):
+        return False
+    if not check_list_in_list(compare_observer_configuration, second.observers, first.observers, True):
+        return False
+
+    return True
+
 if __name__ == "__main__":
     rospy.init_node('tug_diagnosis_config_validator', anonymous=False)
 
-    configA = configuration()
-    # configA.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
-    # configA.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=[]))
-    # configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
-    # configA.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic1", "/topic2"]))
-    # configA.nodes.append(node_configuration(name="node3", pub_topic=[], sub_topic=[]))
-    # configA.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
-    # configA.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
-    # configA.observers.append(observer_configuration(type="resource", resource=["node3"]))
+    # config_a = configuration()
+    # # config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+    # # config_a.nodes.append(node_configuration(name="node2", pub_topic=[], sub_topic=[]))
+    # # config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+    # # config_a.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic1", "/topic2"]))
+    # # config_a.nodes.append(node_configuration(name="node3", pub_topic=[], sub_topic=[]))
+    # # config_a.observers.append(observer_configuration(type="hz", resource=["/topic1"]))
+    # # config_a.observers.append(observer_configuration(type="hz", resource=["/topic2"]))
+    # # config_a.observers.append(observer_configuration(type="resource", resource=["node3"]))
+    #
+    a_config = configuration()
+    a_config.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+    a_config.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+    a_config.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic2"]))
+    # config_a.observers.append(observer_configuration(type="movement", resource=["/topic1", "/topic2"]))
 
-    configA = configuration()
-    configA.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
-    configA.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=[]))
-    configA.observers.append(observer_configuration(type="movement", resource=["/topic1", "/topic2"]))
+    a_config.observers.append(observer_configuration(type="resource", resource=["node1"]))
+    a_config.observers.append(observer_configuration(type="resource", resource=["node2"]))
+    a_config.observers.append(observer_configuration(type="resource", resource=["node3"]))
 
-    validator = DiagnosisConfigValidator(configA, debug=DiagnosisConfigValidator.DEBUG_LEVEL_VERBOSE)
-    print validator.run_tests()
-    validator.minimize_config(configA)
+    # config_b = configuration()
+    # config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+    # config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+    # config_b.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic2"]))
+
+    # config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+    # config_b.observers.append(observer_configuration(type="resource", resource=["node2"]))
+    # config_b.observers.append(observer_configuration(type="resource", resource=["node3"]))
+
+    # print compare_configuration(config_a, config_b)
+
+    validator = DiagnosisConfigValidator(a_config, debug=DiagnosisConfigValidator.DEBUG_LEVEL_VERBOSE)
+    # print validator.run_tests()
+    validator.minimize_config(a_config)
 
     print validator.config
 
-    exit(0)
+
+class TestDiagnosisConfigValidator(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def test_compare_configuration_1(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic2"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+        config_a.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_b.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic2"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+        config_b.observers.append(observer_configuration(type="timeout", resource=["/topic2"]))
+
+        self.assertTrue(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_2(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["WRONG"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_3(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz"))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_4(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="Wrong", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_5(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_6(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["Wrong"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_7(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_8(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["Wrong"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_9(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_10(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="Wrong", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_11(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_12(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2", "node1"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_13(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1", "node2"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_14(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1", "/topic2"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_compare_configuration_15(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        config_b = configuration()
+        config_b.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_b.nodes.append(node_configuration(name="node2", pub_topic=["/topic2", "/topic3"], sub_topic=["/topic1"]))
+        config_b.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_b.observers.append(observer_configuration(type="hz", resource=["node2"]))
+
+        self.assertFalse(compare_configuration(config_a, config_b), "configurations not equal!")
+
+    def test_minimize_config_1(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic2"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node2"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node3"]))
+
+        config_required = configuration()
+        config_required.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_required.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_required.nodes.append(node_configuration(name="node3", pub_topic=[], sub_topic=["/topic2"]))
+        config_required.observers.append(observer_configuration(type="resource", resource=["node1"]))
+        config_required.observers.append(observer_configuration(type="resource", resource=["node2"]))
+        config_required.observers.append(observer_configuration(type="resource", resource=["node3"]))
+
+        DiagnosisConfigValidator.minimize_config(config_a)
+
+        self.assertTrue(compare_configuration(config_a, config_required), "configurations not equal!")
+
+    def test_minimize_config_2(self):
+        config_a = configuration()
+        config_a.nodes.append(node_configuration(name="node1", pub_topic=["/topic1"], sub_topic=[]))
+        config_a.nodes.append(node_configuration(name="node2", pub_topic=["/topic2"], sub_topic=["/topic1"]))
+        config_a.nodes.append(node_configuration(name="node3", pub_topic=["/topic3"], sub_topic=["/topic2"]))
+        config_a.observers.append(observer_configuration(type="resource", resource=["node1"]))
+
+        config_required = configuration()
+        config_required.nodes.append(node_configuration(name="node1", pub_topic=[], sub_topic=[]))
+        config_required.observers.append(observer_configuration(type="resource", resource=["node1"]))
+
+        DiagnosisConfigValidator.minimize_config(config_a)
+
+        self.assertTrue(compare_configuration(config_a, config_required), "configurations not equal!")

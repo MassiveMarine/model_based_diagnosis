@@ -20,3 +20,54 @@ observations:
 
   - type: "hz"
     topics: ["/topic3"]
+
+  - type: "resources"
+    nodes: ["node1"]
+
+  - type: "resources"
+    nodes: ["node2"]
+
+  - type: "resources"
+    nodes: ["node3"]
+
+  - type: "activated"
+    nodes: ["node1"]
+
+  - type: "activated"
+    nodes: ["node2"]
+
+  - type: "activated"
+    nodes: ["node3"]
+
+  - type: "timeout"
+    topics: ["/topic1"]
+
+  - type: "timeout"
+    topics: ["/topic2"]
+
+  - type: "timeout"
+    topics: ["/topic3"]
+
+  - type: "timestamp"
+    topics: ["/topic1"]
+
+  - type: "timestamp"
+    topics: ["/topic2"]
+
+  - type: "timestamp"
+    topics: ["/topic3"]
+
+  - type: "scores"
+    topics: ["/topic1"]
+
+  - type: "scores"
+    topics: ["/topic2"]
+
+  - type: "scores"
+    topics: ["/topic3"]
+
+  - type: "velocity"
+    topics: ["/topic1", "/topic2"]
+
+  - type: "timing"
+    topics: ["/topic1", "/topic2"]

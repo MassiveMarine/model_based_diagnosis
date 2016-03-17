@@ -20,6 +20,8 @@ from pymbd.benchmark.tug_description_parser.observers.activated_observer import 
 from pymbd.benchmark.tug_description_parser.model import TestConfigurationValidation
 from pymbd.benchmark.tug_description_parser.model import TestModelGenerator
 
+from config_validator import TestDiagnosisConfigValidator
+
 PKG = 'tug_diagnosis'
 
 if __name__ == '__main__':
@@ -35,3 +37,5 @@ if __name__ == '__main__':
 
     rostest.rosrun(PKG, 'test_configuration_validation', TestConfigurationValidation)
     rostest.rosrun(PKG, 'test_model_generator', TestModelGenerator)
+
+    rostest.rosrun(PKG, 'test_diagnosis_config_validator', TestDiagnosisConfigValidator)

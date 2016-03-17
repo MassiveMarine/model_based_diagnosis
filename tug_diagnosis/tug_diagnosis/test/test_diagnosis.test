@@ -9,8 +9,3 @@
     <rosparam command="load" file="$(find tug_diagnosis)/test/test_config_1.yaml" />
   </node>
 </launch>
-
-<!--<launch>-->
-    <!--<test test-name="test_observer_info_sender" pkg="tug_observers" type="test_observer_info_sender" time-limit="120.0" >-->
-    <!--</test>-->
-<!--</launch>-->
