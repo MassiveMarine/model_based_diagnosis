@@ -110,7 +110,7 @@ class ScoresObserver(BaseObserver):
         # return infos
         checkInputData.str_data_valid(resource_info, forbidden_chars=[' '])
 
-        return ['scores_obs_' + str(resource_info)]
+        return ['scores_obs_' + str(resource_info) + "_all"]
 
 
 picosat.SENTENCE_INTERPRETERS[ScoresObserver] = lambda engine, pred, unused: pred.to_clause()
@@ -395,7 +395,7 @@ class TestScoresObserver(unittest.TestCase):
             print "... DONE"
 
     def test_decrypt_resource_info(self):
-        self.assertEqual(ScoresObserver.decrypt_resource_info("/topic_name"), ['scores_obs_/topic_name'],
+        self.assertEqual(ScoresObserver.decrypt_resource_info("/topic_name"), ['scores_obs_/topic_name_all'],
                          "Topic name decryption not correct!")
 
         resource_info_tests = [
