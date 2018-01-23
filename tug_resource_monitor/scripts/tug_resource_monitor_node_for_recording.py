@@ -27,8 +27,8 @@ class TUGResourceMonitor:
                 if not self.processes.has_key(pid):
                     self.processes[pid] = psutil.Process(pid)
 
-                memory_info = self.processes[pid].get_memory_info()[0]
-                cpu_percent = self.processes[pid].get_cpu_percent(interval=0)
+                memory_info = self.processes[pid].memory_info()[0]
+                cpu_percent = self.processes[pid].cpu_percent(interval=0)
 
                 process_info[pid] = [cpu_percent, memory_info]
             except psutil.NoSuchProcess:
