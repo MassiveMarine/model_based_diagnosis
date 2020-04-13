@@ -25,7 +25,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 class VelocityConverterIMU : public VelocityConverter
 {
-    static const double GRAVITY = 9.81;
+    static constexpr double GRAVITY = 9.81;
     std::string topic_;
     ros::Subscriber imu_sub_;
     bool graviation_cancelation_;

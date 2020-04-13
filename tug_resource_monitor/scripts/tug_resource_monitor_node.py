@@ -128,8 +128,8 @@ class TUGResourceMonitor:
                     return
                 node.process = psutil.Process(node.pid)
 
-            node.mem_usage = node.process.get_memory_info()[0]
-            node.cpu_usage = node.process.get_cpu_percent(interval=0)
+            node.mem_usage = node.process.memory_info()[0]
+            node.cpu_usage = node.process.cpu_percent(interval=0)
         except psutil.NoSuchProcess:
             rospy.logwarn("pid of node '" + node.name + "' not found")
             node.pid = 0
